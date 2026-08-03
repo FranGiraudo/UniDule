@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>UniSchedule · Horario UTN</title>
+  <meta name="description" content="Gestor académico personal — Ingeniería en Informática UTN.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+<!-- ════ SIDEBAR (desktop) ════ -->
+<nav id="sidebar" class="open">
+  <div class="s-logo">
+    <div class="s-logo-icon">🎓</div>
+    <div class="s-logo-text"><h1>UniSchedule</h1><p>UTN · 2do Sem 2026</p></div>
+  </div>
+  <div class="nav-list">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" data-view="dashboard" onclick="navigate('dashboard')">
+      <span class="nav-icon">🏠</span><span class="nav-label">Dashboard</span>
+    </div>
+    <div class="nav-item" data-view="schedule" onclick="navigate('schedule')">
+      <span class="nav-icon">📅</span><span class="nav-label">Horario Semanal</span>
+    </div>
+    <div class="nav-section" style="margin-top:8px;">Gestión</div>
+    <div class="nav-item" data-view="subjects" onclick="navigate('subjects')">
+      <span class="nav-icon">📚</span><span class="nav-label">Materias</span>
+    </div>
+    <div class="nav-item" data-view="tasks" onclick="navigate('tasks')">
+      <span class="nav-icon">✅</span><span class="nav-label">Tareas & Exámenes</span>
+    </div>
+    <div class="nav-item" data-view="attendance" onclick="navigate('attendance')">
+      <span class="nav-icon">📊</span><span class="nav-label">Asistencia</span>
+    </div>
+  </div>
+  <div class="s-footer">
+    <div class="nav-item" onclick="toggleSidebar()">
+      <span class="nav-icon" id="sb-icon">‹</span>
+      <span class="nav-label">Colapsar menú</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ════ MAIN ════ -->
+<div id="main">
+
+  <!-- Topbar -->
+  <div id="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="btn-xs mobile-only" id="mobile-menu-btn" onclick="toggleMobileSidebar()" style="font-size:18px;">☰</button>
+      <div>
+        <div id="topbar-title">Dashboard</div>
+        <div id="topbar-date"></div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="live-badge">
+        <div class="pulse-dot"></div>
+        <span>EN VIVO</span>
+      </div>
+      <button class="btn btn-primary btn-sm" id="topbar-add-btn" onclick="handleTopbarAdd()" style="display:none;">
+        + <span id="topbar-add-lbl">Agregar</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Page Content -->
+  <div id="page-content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div id="view-dashboard" class="view active">
+      <div id="next-class-banner"><div id="nc-content"></div></div>
+      <div id="stats-grid" class="stats-grid"></div>
+      <div class="dash-bottom-grid">
+        <div>
+          <div class="section-header">
+            <span class="section-title-sm">Clases de Hoy</span>
+            <span id="today-lbl" class="section-sub"></span>
+          </div>
+          <div id="today-list"></div>
+        </div>
+        <div>
+          <div class="section-title-sm" style="margin-bottom:12px;">Próximas Entregas</div>
+          <div id="upcoming-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SCHEDULE ═══ -->
+    <div id="view-schedule" class="view">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Horario Semanal</div>
+          <div class="view-sub desktop-only">2do Semestre 2026 · Ingeniería en Informática</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <div id="sched-legend" class="sched-legend desktop-only"></div>
+          <button class="btn btn-ghost btn-sm" onclick="exportPDF()" title="Exportar horario a PDF">
+            📄 Exportar PDF
+          </button>
+        </div>
+      </div>
+      <!-- Day picker (mobile) -->
+      <div id="day-tabs-bar" class="day-tabs-bar mobile-only"></div>
+      <!-- Grid container -->
+      <div class="sched-wrap">
+        <div id="sched-container"></div>
+      </div>
+    </div>
+
+    <!-- ═══ SUBJECTS ═══ -->
+    <div id="view-subjects" class="view">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Mis Materias</div>
+          <div id="sub-count-lbl" class="view-sub"></div>
+        </div>
+        <button class="btn btn-primary" onclick="openSubModal()">+ Nueva</button>
+      </div>
+      <div id="subjects-grid" class="subjects-grid"></div>
+    </div>
+
+    <!-- ═══ TASKS ═══ -->
+    <div id="view-tasks" class="view">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Tareas & Exámenes</div>
+          <div id="task-count-lbl" class="view-sub"></div>
+        </div>
+        <button class="btn btn-primary" onclick="openTaskModal()">+ Nueva</button>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-tab active" onclick="setFilter('all',this)">Todas</div>
+        <div class="filter-tab" onclick="setFilter('pending',this)">Pendientes</div>
+        <div class="filter-tab" onclick="setFilter('done',this)">Hechas</div>
+        <div class="filter-tab" onclick="setFilter('type-Parcial',this)">📋 Parciales</div>
+        <div class="filter-tab" onclick="setFilter('type-Final',this)">🎯 Finales</div>
+        <div class="filter-tab" onclick="setFilter('type-Trabajo Práctico',this)">🔧 TPs</div>
+      </div>
+      <div id="tasks-list"></div>
+    </div>
+
+    <!-- ═══ ATTENDANCE ═══ -->
+    <div id="view-attendance" class="view">
+      <div style="margin-bottom:20px;">
+        <div class="view-title">Control de Asistencia</div>
+        <div class="view-sub">Máx. 25% de ausencias — Alerta al 75% del límite</div>
+      </div>
+      <div id="att-grid" class="subjects-grid"></div>
+    </div>
+
+  </div><!-- /page-content -->
+</div><!-- /main -->
+
+<!-- ════ BOTTOM NAV (mobile) ════ -->
+<nav id="bottom-nav">
+  <div class="bnav-item active" data-view="dashboard" onclick="navigate('dashboard')">
+    <span class="bnav-icon">🏠</span><span class="bnav-label">Inicio</span>
+  </div>
+  <div class="bnav-item" data-view="schedule" onclick="navigate('schedule')">
+    <span class="bnav-icon">📅</span><span class="bnav-label">Horario</span>
+  </div>
+  <div class="bnav-item" data-view="subjects" onclick="navigate('subjects')">
+    <span class="bnav-icon">📚</span><span class="bnav-label">Materias</span>
+  </div>
+  <div class="bnav-item" data-view="tasks" onclick="navigate('tasks')">
+    <span class="bnav-icon">✅</span><span class="bnav-label">Tareas</span>
+  </div>
+  <div class="bnav-item" data-view="attendance" onclick="navigate('attendance')">
+    <span class="bnav-icon">📊</span><span class="bnav-label">Asist.</span>
+  </div>
+</nav>
+
+</div><!-- /app -->
+
+<!-- ════ Mobile sidebar overlay ════ -->
+<div id="mobile-overlay" onclick="toggleMobileSidebar()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:49;backdrop-filter:blur(4px);"></div>
+
+<!-- ════ CLASS POPUP ════ -->
+<div id="class-popup" style="display:none;position:fixed;z-index:400;">
+  <div id="class-popup-box" class="class-popup-box"></div>
+</div>
+
+<!-- ════ SUBJECT MODAL ════ -->
+<div id="modal-sub" class="modal-bd" style="display:none;" onclick="closeBD(event,'modal-sub')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="m-header">
+      <div class="modal-title" id="sub-modal-title">Nueva Materia</div>
+      <button class="btn-xs" onclick="closeM('modal-sub')">✕</button>
+    </div>
+    <div class="m-body">
+      <input type="hidden" id="sub-edit-id">
+      <div class="form-grid" style="margin-bottom:12px;">
+        <div style="grid-column:1/-1;">
+          <label class="f-label">Nombre *</label>
+          <input class="f-input" id="sub-name" placeholder="Ej: Redes I">
+        </div>
+        <div>
+          <label class="f-label">Código</label>
+          <input class="f-input" id="sub-code" placeholder="Ej: 471">
+        </div>
+        <div>
+          <label class="f-label">Aula / Bloque</label>
+          <input class="f-input" id="sub-room" placeholder="Ej: Aula 14">
+        </div>
+        <div>
+          <label class="f-label">Profesor/a</label>
+          <input class="f-input" id="sub-prof" placeholder="Ej: García, Juan">
+        </div>
+        <div>
+          <label class="f-label">Email de contacto</label>
+          <input class="f-input" id="sub-email" type="email" placeholder="prof@utn.edu.ar">
+        </div>
+        <div>
+          <label class="f-label">Máx. ausencias</label>
+          <input class="f-input" id="sub-maxabs" type="number" value="6" min="1" max="40">
+        </div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label class="f-label">Color</label>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:6px;" id="color-swatches"></div>
+        <input type="color" id="sub-color-custom" class="color-custom-input" title="Color personalizado">
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <label class="f-label" style="margin:0;">Horarios de Clase</label>
+          <button class="btn btn-ghost btn-sm" onclick="addSlot()">+ Horario</button>
+        </div>
+        <div id="slots-container" style="display:flex;flex-direction:column;gap:7px;"></div>
+      </div>
+    </div>
+    <div class="m-footer">
+      <button class="btn btn-ghost" onclick="closeM('modal-sub')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveSub()">Guardar Materia</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ TASK MODAL ════ -->
+<div id="modal-task" class="modal-bd" style="display:none;" onclick="closeBD(event,'modal-task')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="m-header">
+      <div class="modal-title" id="task-modal-title">Nueva Tarea</div>
+      <button class="btn-xs" onclick="closeM('modal-task')">✕</button>
+    </div>
+    <div class="m-body" style="display:flex;flex-direction:column;gap:12px;">
+      <input type="hidden" id="task-edit-id">
+      <div>
+        <label class="f-label">Título *</label>
+        <input class="f-input" id="task-title" placeholder="Ej: Primer Parcial Auditoría">
+      </div>
+      <div class="form-grid">
+        <div>
+          <label class="f-label">Materia</label>
+          <select class="f-input" id="task-sub"></select>
+        </div>
+        <div>
+          <label class="f-label">Tipo</label>
+          <select class="f-input" id="task-type">
+            <option>Tarea</option><option>Trabajo Práctico</option>
+            <option>Parcial</option><option>Final</option>
+            <option>Proyecto</option><option>Laboratorio</option><option>Otro</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="f-label">Fecha de entrega / examen</label>
+        <input class="f-input" id="task-date" type="date">
+      </div>
+      <div>
+        <label class="f-label">Notas (opcional)</label>
+        <textarea class="f-input" id="task-notes" rows="2" placeholder="Temas, detalles, etc." style="resize:vertical;"></textarea>
+      </div>
+    </div>
+    <div class="m-footer">
+      <button class="btn btn-ghost" onclick="closeM('modal-task')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTask()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ CONFIRM MODAL ════ -->
+<div id="modal-confirm" class="modal-bd" style="display:none;">
+  <div class="modal-box modal-sm" onclick="event.stopPropagation()">
+    <div class="m-header">
+      <div class="modal-title" id="confirm-title">¿Eliminar?</div>
+      <button class="btn-xs" onclick="closeM('modal-confirm')">✕</button>
+    </div>
+    <div class="m-body">
+      <p id="confirm-msg" style="color:var(--text2);font-size:13px;line-height:1.5;"></p>
+    </div>
+    <div class="m-footer">
+      <button class="btn btn-ghost" onclick="closeM('modal-confirm')">Cancelar</button>
+      <button class="btn btn-danger" id="confirm-ok">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
