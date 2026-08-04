@@ -4,7 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>UniDule</title>
-  <meta name="description" content="Gestor académico personal — Ingeniería en Informática IUA.">
+  <meta name="description" content="Gestor académico personal — Ingeniería en Informática IUA.">
+  <link rel="manifest" href="/assets/manifest-QrO5a00y.json">
+  <meta name="theme-color" content="#6366f1">
+  <link rel="apple-touch-icon" href="/assets/icon-CpAmg_6L.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <script type="module" crossorigin src="/assets/index-Cktu_GpN.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-DlmGAa2Q.css">
 </head>
@@ -474,5 +479,12 @@
   </div>
 </div>
 
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Error:', err));
+    });
+  }
+</script>
 </body>
 </html>
