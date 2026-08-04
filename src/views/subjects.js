@@ -195,7 +195,7 @@ export async function saveSub() {
   if (window.api) {
     try {
       await window.api.saveActiveSubject(sub);
-      if (careerMatch) await window.api.syncSubjectProgress(careerMatch.id, 'subject', careerMatch.status, careerMatch.grade, careerMatch.regDate, careerMatch.expDate);
+      if (careerMatch) await window.api.syncSubjectProgress(careerMatch.id, isElective ? 'elective' : 'subject', careerMatch.status, careerMatch.grade, careerMatch.regDate, careerMatch.expDate);
     } catch(e) {
       console.error(e);
       alert('Error al guardar en la nube: ' + e.message);
