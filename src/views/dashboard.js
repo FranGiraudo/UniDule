@@ -162,3 +162,8 @@ export function renderDash() {
 
 
 window.renderDash = renderDash;
+
+import { currentView } from '../core/state.js';
+setInterval(() => {
+  if (currentView === 'dashboard') renderNC();
+}, 1000);

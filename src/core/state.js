@@ -228,19 +228,19 @@ export function syncSubjectsAndCareer() {
   S.subjects = cleanSubjects;
 }
 export function setS(newState) { Object.assign(S, newState); }
-export function setCurrentView(v) { setCurrentView(v); }
-export function setTaskFilter(v) { setTaskFilter(v); }
-export function setSelColor(v) { setSelColor(v); }
-export function setSlots(v) { setSlots(v); }
+export function setCurrentView(v) { currentView = v; }
+export function setTaskFilter(v) { taskFilter = v; }
+export function setSelColor(v) { selColor = v; }
+export function setSlots(v) { slots = v; }
 export function setSbOpen(v) { sbOpen = v; }
-export function setActiveDay(v) { setActiveDay(v); }
-export function setGradesWork(v) { setGradesWork(v); }
-export function setGradesSubId(v) { setGradesSubId(v); }
-export function setDeferredPrompt(v) { setDeferredPrompt(v); }
-export function setActiveCareerTab(v) { setActiveCareerTab(v); }
-export function setSelectedCareerNode(v) { setSelectedCareerNode(v); }
-export function setCareerGridFilterVal(v) { setCareerGridFilterVal(v); }
-export function setCareerGridSearchVal(v) { setCareerGridSearchVal(v); }
+export function setActiveDay(v) { activeDay = v; }
+export function setGradesWork(v) { gradesWork = v; }
+export function setGradesSubId(v) { gradesSubId = v; }
+export function setDeferredPrompt(v) { deferredPrompt = v; }
+export function setActiveCareerTab(v) { activeCareerTab = v; }
+export function setSelectedCareerNode(v) { selectedCareerNode = v; }
+export function setCareerGridFilterVal(v) { careerGridFilter = v; }
+export function setCareerGridSearchVal(v) { careerGridSearch = v; }
 
 window.S = S;
 window.save = save;
