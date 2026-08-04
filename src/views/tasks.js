@@ -1,7 +1,8 @@
-import { S, save, taskFilter, setTaskFilter } from '../core/state.js';
-import { TYPE_BG, TYPE_FG, TYPE_ICON } from '../core/constants.js';
+import { S, save, taskFilter, setTaskFilter, currentView } from '../core/state.js';
+import { TYPE_BG, TYPE_FG, TYPE_ICON, EXAM_TYPES } from '../core/constants.js';
 import { gid, daysUntil, urgColor, formatDate, confirmDel, showToast, closeM } from '../core/utils.js';
 import { SVG_ICONS } from '../core/icons.js';
+import { renderView } from '../core/router.js';
 export function setFilter(f,el) {
   setTaskFilter(f);
   document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
