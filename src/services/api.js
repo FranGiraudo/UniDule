@@ -42,7 +42,7 @@ export async function fetchFullState() {
     supabase.from('user_grades').select('*').eq('user_id', uid),
     supabase.from('user_seminars').select('*').eq('user_id', uid),
     supabase.from('global_subjects').select('*').eq('plan_id', planId).order('year').order('semester'),
-    supabase.from('global_electives').select('*'),
+    supabase.from('global_electives').select('*').eq('plan_id', planId),
     supabase.from('user_progress').select('*').eq('user_id', uid)
   ]);
 
