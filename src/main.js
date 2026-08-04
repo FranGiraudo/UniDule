@@ -33,15 +33,48 @@ async function checkAuth() {
       if (localSStr) {
         try {
           const localS = JSON.parse(localSStr);
-          if (localS.subjects && localS.subjects.length > 0 && (!state.subjects || state.subjects.length === 0)) {
-            console.log("Sincronizando estado local a la nube...");
-            await window.api.syncEntireStateToCloud(localS);
+          let didSync = false;
+
+          if (localS.subjects && localS.subjects.length > 0) {
+            const serverSubIds = new Set((state.subjects || []).map(s => s.id));
+            const missingInServer = localS.subjects.filter(s => !serverSubIds.has(s.id));
+            
+            if (missingInServer.length > 0) {
+              console.log(`Encontradas ${missingInServer.length} materias locales no sincronizadas. Sincronizando...`);
+              for (const sub of missingInServer) {
+                try {
+                  await window.api.saveActiveSubject(sub);
+                  if (sub.grades && sub.grades.length > 0) {
+                    await window.api.syncGrades(sub.id, sub.grades);
+                  }
+                } catch(e) { console.error('Error syncing local subject', e); }
+              }
+              didSync = true;
+            }
+          }
+          
+          if (localS.tasks && localS.tasks.length > 0) {
+            const serverTaskIds = new Set((state.tasks || []).map(t => t.id));
+            const missingTasks = localS.tasks.filter(t => !serverTaskIds.has(t.id));
+            
+            if (missingTasks.length > 0) {
+              console.log(`Encontradas ${missingTasks.length} tareas locales no sincronizadas. Sincronizando...`);
+              for (const task of missingTasks) {
+                try { await window.api.saveTask(task); } catch(e) { console.error('Error syncing local task', e); }
+              }
+              didSync = true;
+            }
+          }
+          
+          if (didSync) {
             const newState = await fetchFullState();
             window.S = newState || state;
           } else {
             window.S = state;
           }
-        } catch(e) { window.S = state; }
+        } catch(parseErr) {
+          window.S = state;
+        }
       } else {
         window.S = state;
       }

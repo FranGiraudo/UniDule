@@ -170,7 +170,7 @@ export async function saveTask(task) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
   
-  await supabase.from('user_tasks').upsert({
+  const { error } = await supabase.from('user_tasks').upsert({
     id: task.id,
     user_id: user.id,
     title: task.title,
@@ -181,6 +181,7 @@ export async function saveTask(task) {
     done: task.done || false,
     grade_id: task.gradeId || null
   });
+  if (error) throw error;
 }
 
 export async function saveSeminar(sem) {
@@ -230,7 +231,8 @@ export async function syncGrades(activeSubjectId, gradesArray) {
       date: g.date || null,
       weight: g.weight || null
     }));
-    await supabase.from('user_grades').upsert(toUpsert);
+    const { error } = await supabase.from('user_grades').upsert(toUpsert);
+    if (error) throw error;
   }
 }
 

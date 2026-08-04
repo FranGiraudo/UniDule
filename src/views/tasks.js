@@ -225,7 +225,12 @@ export async function saveTask() {
   if (existing) Object.assign(existing,task); else S.tasks.push(task);
   save();
   if (window.api) {
-    try { await window.api.saveTask(task); } catch(e) { console.error(e); }
+    try { 
+      await window.api.saveTask(task); 
+    } catch(e) { 
+      console.error(e); 
+      alert('Error al guardar la tarea en la nube: ' + e.message);
+    }
   }
   closeM('modal-task'); renderView(currentView);
 }

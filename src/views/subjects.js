@@ -154,7 +154,7 @@ export function addSlot()        { slots.push({id:gid(),day:'Lunes',startTime:'0
 export function rmSlot(i)        { slots.splice(i,1); renderSlots(); }
 export function updSlot(i,f,v)   { slots[i][f]=v; }
 
-export function saveSub() {
+export async function saveSub() {
   const name=document.getElementById('sub-name').value.trim();
   if (!name){alert('Nombre requerido.');return;}
   const eid=document.getElementById('sub-edit-id').value;
@@ -193,8 +193,13 @@ export function saveSub() {
   syncSubjectsAndCareer();
   save();
   if (window.api) {
-    window.api.saveActiveSubject(sub).catch(console.error);
-    if (careerMatch) window.api.syncSubjectProgress(careerMatch.id, 'subject', careerMatch.status, careerMatch.grade, careerMatch.regDate, careerMatch.expDate).catch(console.error);
+    try {
+      await window.api.saveActiveSubject(sub);
+      if (careerMatch) await window.api.syncSubjectProgress(careerMatch.id, 'subject', careerMatch.status, careerMatch.grade, careerMatch.regDate, careerMatch.expDate);
+    } catch(e) {
+      console.error(e);
+      alert('Error al guardar en la nube: ' + e.message);
+    }
   }
   closeM('modal-sub'); renderView(currentView);
 }
