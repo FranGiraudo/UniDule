@@ -407,14 +407,14 @@
 
 <!-- ════ CAREER DETAIL PANEL ════ -->
 <div id="career-detail-panel" class="career-detail-panel" style="display:none;">
-  <div class="career-detail-header">
-    <div>
-      <div id="career-detail-title" style="font-size:1.125rem;font-weight:800;color:var(--text);line-height:1.2;"></div>
-      <div id="career-detail-meta" style="font-size:0.75rem;color:var(--text2);margin-top:0.25rem;"></div>
+  <div class="career-detail-header" style="align-items: center; padding: 1.5rem;">
+    <div style="display:flex; flex-direction: column; gap: 4px;">
+      <div id="career-detail-title" style="font-size:1.5rem;font-weight:900;color:var(--text);line-height:1.2;"></div>
+      <div id="career-detail-meta" style="font-size:0.85rem;color:var(--primary);font-weight:600;"></div>
     </div>
-    <button class="btn-xs" onclick="closeCareerDetail()" style="background:var(--bg); border:1px solid var(--border);">✕</button>
+    <button class="btn-xs" onclick="closeCareerDetail()" style="background:var(--card); border:1px solid var(--border); width:32px; height:32px; border-radius: 8px; font-size: 14px; display:flex; align-items:center; justify-content:center; cursor:pointer;">✕</button>
   </div>
-  <div id="career-detail-body" class="career-detail-body"></div>
+  <div id="career-detail-body" class="career-detail-body" style="padding: 0 1.5rem 1.5rem;"></div>
 </div>
 
 <!-- ════ SEMINAR MODAL ════ -->

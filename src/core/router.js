@@ -29,6 +29,10 @@ export function navigate(v) {
   updateDate();
   // Close mobile sidebar if open
   closeMobileSidebar();
+  
+  if (v !== 'career' && window.closeCareerDetail) {
+    window.closeCareerDetail();
+  }
 }
 
 export function handleTopbarAdd() {
