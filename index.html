@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>UniSchedule · Horario UTN</title>
+  <title>UniDule</title>
   <meta name="description" content="Gestor académico personal — Ingeniería en Informática UTN.">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -11,7 +11,7 @@
 <div id="login-screen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;">
   <div style="background:var(--card);padding:2rem;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.1);width:100%;max-width:400px;text-align:center;border:1px solid var(--border);">
     <div style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:12px;background:var(--primary);color:#fff;margin-bottom:1rem;font-size:24px;">🎓</div>
-    <h2 style="margin-bottom:1.5rem;color:var(--text);">UniSchedule</h2>
+    <h2 style="margin-bottom:1.5rem;color:var(--text);">UniDule</h2>
     <form id="auth-form" onsubmit="window.handleLogin(event)">
       <input type="email" id="auth-email" placeholder="Correo electrónico" style="width:100%;padding:0.75rem;margin-bottom:1rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);" required>
       <input type="password" id="auth-pass" placeholder="Contraseña" style="width:100%;padding:0.75rem;margin-bottom:1.5rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);" required>
@@ -31,7 +31,7 @@
     <div class="s-logo-icon">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
     </div>
-    <div class="s-logo-text"><h1>UniSchedule</h1><p>UTN · 2do Sem 2026</p></div>
+    <div class="s-logo-text"><h1>UniDule</h1><p>UTN · 2do Sem 2026</p></div>
   </div>
   <div class="nav-list">
     <div class="nav-section">Principal</div>
@@ -323,7 +323,7 @@
     </div>
     <div class="m-footer">
       <button class="btn btn-ghost" onclick="closeM('modal-task')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveTask()">Guardar</button>
+      <button class="btn btn-primary" id="btn-save-task" onclick="saveTask()">Guardar</button>
     </div>
   </div>
 </div>

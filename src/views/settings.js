@@ -68,19 +68,34 @@ export async function saveProfileSettings() {
   if (!S.profile) S.profile = {};
   const elName = document.getElementById('setting-user-name');
   const elCareer = document.getElementById('setting-user-career');
+  const elPlan = document.getElementById('setting-user-plan');
+  
+  let planChanged = false;
+
   if (elName) S.profile.name = elName.value;
   if (elCareer) S.profile.career = elCareer.value;
+  if (elPlan && S.profile.plan_id !== elPlan.value) {
+    S.profile.plan_id = elPlan.value;
+    planChanged = true;
+  }
+
   save();
   if (window.api) {
     try {
       await window.api.syncProfile(S.profile);
       showToast('Perfil guardado', 'success');
+      if (planChanged) {
+        setTimeout(() => window.location.reload(), 800);
+      }
     } catch(e) {
       console.error(e);
       showToast('Perfil guardado localmente (error de nube)', 'error');
     }
   } else {
     showToast('Perfil guardado', 'success');
+    if (planChanged) {
+      setTimeout(() => window.location.reload(), 800);
+    }
   }
 }
 
@@ -102,6 +117,13 @@ export function renderSettings() {
             <div>
               <label class="f-label">Carrera</label>
               <input class="f-input" id="setting-user-career" type="text" placeholder="Tu carrera">
+            </div>
+            <div>
+              <label class="f-label">Plan de Estudio</label>
+              <select class="f-input" id="setting-user-plan" style="width:100%; border:1px solid var(--border); padding:0.75rem; background:var(--bg); color:var(--text); border-radius:0.5rem; outline:none; font-family:inherit;">
+                <option value="2016">Plan 2016</option>
+                <option value="2026">Plan 2026</option>
+              </select>
             </div>
             <button class="btn btn-primary" onclick="saveProfileSettings()">Guardar perfil</button>
           </div>
@@ -137,8 +159,10 @@ export function renderSettings() {
 
   const elName   = document.getElementById('setting-user-name');
   const elCareer = document.getElementById('setting-user-career');
+  const elPlan   = document.getElementById('setting-user-plan');
   if (elName   && S.profile) elName.value   = S.profile.name   || 'Fran Giraudo';
   if (elCareer && S.profile) elCareer.value = S.profile.career || 'Ingeniería en Informática — IUA';
+  if (elPlan   && S.profile) elPlan.value   = S.profile.plan_id || '2016';
 
   const grid = document.getElementById('theme-presets-grid');
   if (!grid) return;

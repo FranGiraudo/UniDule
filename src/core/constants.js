@@ -28,62 +28,9 @@ export const GRADE_TYPES = ['Parcial 1','Parcial 2','Parcial 3','Recuperatorio',
 export const EXAM_TYPES  = new Set(['Parcial 1','Parcial 2','Parcial 3','Recuperatorio','Final']);
 
 
-export const DEF_SUBJECTS = [
-  { id:'cs-aud', name:'Auditoría', code:'000478', color:'#6366f1',
-    professor:'Tapia, C. / Casanovas, J.I.', room:'Aula 14', email:'', maxAbsences:6, absences:0,
-    grades:[], status:'cursando', allowsPromotion:false,
-    schedules:[
-      {id:'a1',day:'Martes',startTime:'10:35',endTime:'12:10',type:'Práctico'},
-      {id:'a2',day:'Jueves',startTime:'14:45',endTime:'16:20',type:'Teórico'}
-    ]},
-  { id:'cs-fis2', name:'Física II', code:'000456', color:'#f59e0b',
-    professor:'A confirmar', room:'A confirmar', email:'', maxAbsences:6, absences:0,
-    grades:[], status:'cursando', allowsPromotion:false, schedules:[] },
-  { id:'cs-ge2', name:'Gestión de Empresas II', code:'000496', color:'#10b981',
-    professor:'Vanden, Guillermo', room:'Aula Híbrida 33', email:'', maxAbsences:6, absences:0,
-    grades:[], status:'cursando', allowsPromotion:false,
-    schedules:[
-      {id:'g1',day:'Lunes',startTime:'11:25',endTime:'13:00',type:'Teórico'}
-    ]},
-  { id:'cs-iw3', name:'Ingeniería Web III', code:'000806', color:'#ec4899',
-    professor:'García Mattio, M. / Silvestre, A.', room:'Aula 26', email:'', maxAbsences:6, absences:0,
-    grades:[], status:'cursando', allowsPromotion:false,
-    schedules:[
-      {id:'b1',day:'Martes',startTime:'13:55',endTime:'15:30',type:'Teórico-Lab'},
-      {id:'b2',day:'Jueves',startTime:'19:00',endTime:'20:35',type:'Práctico-Lab'}
-    ]},
-  { id:'cs-mn', name:'Métodos Numéricos', code:'000467', color:'#a855f7',
-    professor:'A confirmar', room:'A confirmar', email:'', maxAbsences:6, absences:0,
-    grades:[], status:'cursando', allowsPromotion:false, schedules:[] },
-  { id:'cs-pe', name:'Probabilidad y Estadística', code:'000256', color:'#14b8a6',
-    professor:'Luczywo, Nadia', room:'Aula 28', email:'', maxAbsences:6, absences:0,
-    grades:[], status:'cursando', allowsPromotion:false,
-    schedules:[
-      {id:'c1',day:'Martes',startTime:'10:15',endTime:'12:15',type:'Clases'}
-    ]},
-  { id:'cs-red1', name:'Redes I', code:'000471', color:'#f97316',
-    professor:'Giovanardi, E. / Ávila Mattar, C.', room:'Lab Redes', email:'', maxAbsences:6, absences:0,
-    grades:[], status:'cursando', allowsPromotion:false,
-    schedules:[
-      {id:'d1',day:'Jueves',startTime:'09:45',endTime:'12:10',type:'Teórico-Lab'},
-      {id:'d2',day:'Viernes',startTime:'08:00',endTime:'09:30',type:'Práctico-Lab'}
-    ]},
-  { id:'cs-pfs', name:'Programación Funcional y Scripting', code:'000813', color:'#f43f5e',
-    professor:'Montes, M. / García Mattio, M.', room:'Aula 14', email:'', maxAbsences:6, absences:0,
-    grades:[], status:'cursando', allowsPromotion:false,
-    schedules:[
-      {id:'e1',day:'Lunes',startTime:'14:45',endTime:'16:20',type:'Teórico'},
-      {id:'e2',day:'Martes',startTime:'13:55',endTime:'15:30',type:'Práctico-Lab'}
-    ]}
-];
+export const DEF_SUBJECTS = [];
 
-export const DEF_TASKS = [
-  {id:gid(),title:'1er Parcial',subjectId:'cs-aud',type:'Parcial',dueDate:'2026-09-20',notes:'',done:false},
-  {id:gid(),title:'TP Obligatorio — App Web',subjectId:'cs-iw3',type:'Trabajo Práctico',dueDate:'2026-10-05',notes:'Proyecto web completo',done:false},
-  {id:gid(),title:'1er Parcial',subjectId:'cs-red1',type:'Parcial',dueDate:'2026-09-18',notes:'',done:false},
-  {id:gid(),title:'1er Parcial',subjectId:'cs-pe',type:'Parcial',dueDate:'2026-09-25',notes:'',done:false},
-  {id:gid(),title:'1er Parcial',subjectId:'cs-pfs',type:'Parcial',dueDate:'2026-09-22',notes:'',done:false},
-];
+export const DEF_TASKS = [];
 
 // Patches: subjects cuyos datos cambiaron después del primer guardado en localStorage
 export const PATCHES = {
@@ -106,7 +53,7 @@ export const CAREER_STATUS_CFG = {
 export const DEF_CAREER = [
   // ── Año 1, Semestre 1 ─────────────────────────────────────────────────
   {id:'cs-info1',    code:'000450', name:'Informática 1',                 year:1,semester:1,credits:6,status:'aprobada',grade:7,correlatives:{toCurse:[], toPass:[]}},
-  {id:'cs-teccomp',  code:'000451', name:'Tecnología de Computadoras',    year:1,semester:1,credits:6,status:'regular',grade:null,regDate:'2025-06-17',expDate:'2027-02-19',correlatives:{toCurse:[], toPass:[]}},
+  {id:'cs-teccomp',  code:'000451', name:'Tecnología en Computadoras',    year:1,semester:1,credits:6,status:'regular',grade:null,regDate:'2025-06-17',expDate:'2027-02-19',correlatives:{toCurse:[], toPass:[]}},
   {id:'cs-algegeo',  code:'000453', name:'Álgebra y Geometría',           year:1,semester:1,credits:6,status:'regular',grade:null,regDate:'2025-06-18',expDate:'2027-02-19',correlatives:{toCurse:[], toPass:[]}},
   {id:'cs-am1a',     code:'000452', name:'Análisis Matemático 1A',        year:1,semester:1,credits:6,status:'aprobada',grade:8,correlatives:{toCurse:[], toPass:[]}},
   {id:'cs-fis1',     code:'000454', name:'Física 1',                      year:1,semester:1,credits:6,status:'regular',grade:null,regDate:'2025-06-19',expDate:'2027-02-19',correlatives:{toCurse:[], toPass:[]}},
@@ -165,7 +112,7 @@ export const DEF_CAREER = [
   {id:'cs-seginf',   code:'000500', name:'Seguridad Informática',         year:5,semester:2,credits:6,status:'pendiente',grade:null,correlatives:{toCurse:['cs-redes3'], toPass:['cs-redes3']}},
   {id:'cs-tfg',      code:'000501', name:'Trabajo Final de Grado',        year:5,semester:2,credits:12,status:'pendiente',grade:null,correlatives:{toCurse:[], toPass:[]}},
   {id:'cs-pps',      code:'000616', name:'Práctica Profesional Sup.',     year:5,semester:2,credits:13,status:'pendiente',grade:null,correlatives:{toCurse:[], toPass:[]}},
-  {id:'cs-ia',       code:'000762', name:'Inteligencia Artificial',       year:5,semester:2,credits:6,status:'pendiente',grade:null,correlatives:{toCurse:['cs-economia','cs-modsim'], toPass:['cs-economia','cs-modsim']}},
+  {id:'cs-ia',       code:'000762', name:'Inteligencia Artificial',       year:5,semester:2,credits:6,status:'pendiente',grade:null,correlatives:{toCurse:['cs-modsim'], toPass:['cs-modsim']}},
 ];
 
 

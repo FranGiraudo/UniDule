@@ -22,13 +22,26 @@ export async function fetchFullState() {
 
   const uid = user.id;
 
+  // 1. Fetch user profile first to know their active plan
+  const { data: profileData, error: profileErr } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .eq('id', uid)
+    .single();
+
+  if (profileErr && profileErr.code !== 'PGRST116') {
+    console.error('Error fetching profile:', profileErr);
+  }
+
+  const planId = profileData?.plan_id || '2016';
+
+  // 2. Fetch all other data using the user's planId
   const results = await Promise.all([
-    supabase.from('user_profiles').select('*').eq('id', uid).single(),
     supabase.from('user_active_subjects').select('*').eq('user_id', uid),
     supabase.from('user_tasks').select('*').eq('user_id', uid),
     supabase.from('user_grades').select('*').eq('user_id', uid),
     supabase.from('user_seminars').select('*').eq('user_id', uid),
-    supabase.from('global_subjects').select('*').order('year').order('semester'),
+    supabase.from('global_subjects').select('*').eq('plan_id', planId).order('year').order('semester'),
     supabase.from('global_electives').select('*'),
     supabase.from('user_progress').select('*').eq('user_id', uid)
   ]);
@@ -38,7 +51,6 @@ export async function fetchFullState() {
   });
 
   const [
-    { data: profileData },
     { data: activeSubsData },
     { data: tasksData },
     { data: gradesData },
@@ -67,7 +79,7 @@ export async function fetchFullState() {
       grades: (gradesData || []).filter(g => g.active_subject_id === s.id).map(g => ({
         id: g.id,
         type: g.title,
-        score: g.grade,
+        score: g.grade === -1 ? '' : g.grade,
         date: g.date,
         weight: g.weight
       }))
@@ -99,7 +111,7 @@ export async function fetchFullState() {
   });
 
   return {
-    profile: { name: profile.name, career: profile.career, theme: profile.theme },
+    profile: { name: profile.name, career: profile.career, theme: profile.theme, plan_id: planId },
     subjects: activeSubs,
     tasks: (tasksData || []).map(t => ({
       id: t.id,
@@ -126,7 +138,8 @@ export async function syncProfile(profile) {
     id: user.id,
     name: profile.name,
     career: profile.career,
-    theme: profile.theme
+    theme: profile.theme,
+    plan_id: profile.plan_id
   });
 }
 
@@ -242,7 +255,7 @@ export async function syncGrades(activeSubjectId, gradesArray) {
         user_id: user.id,
         active_subject_id: activeSubjectId,
         title: g.title || g.type || 'Nota',
-        grade: (numGrade !== null && !isNaN(numGrade)) ? numGrade : null,
+        grade: (numGrade !== null && !isNaN(numGrade)) ? numGrade : -1,
         date: g.date || null,
         weight: g.weight || null
       };

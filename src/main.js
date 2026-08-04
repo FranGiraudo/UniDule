@@ -39,32 +39,52 @@ async function checkAuth() {
 
       // Si la nube devolvió subjects vacíos pero tenemos locales, sincronizarlos primero
       if (cloudState.subjects.length === 0 && localS && localS.subjects && localS.subjects.length > 0) {
-        console.log('Sincronizando materias locales a la nube...');
-        for (const sub of localS.subjects) {
-          try {
-            await window.api.saveActiveSubject(sub);
-            if (sub.grades && sub.grades.length > 0) {
-              await window.api.syncGrades(sub.id, sub.grades);
-            }
-          } catch(e) { console.error('Error subiendo materia local:', sub.name, e); }
-        }
-        // Re-fetch con los datos ya subidos
-        const refreshed = await fetchFullState();
-        if (refreshed) {
-          cloudState.subjects = refreshed.subjects;
-          cloudState.tasks = [...cloudState.tasks, ...refreshed.tasks.filter(t => !cloudState.tasks.find(ct => ct.id === t.id))];
+        const realSubs = localS.subjects.filter(s => !['cs-aud','cs-ge2','cs-fis2','cs-iw3','cs-mn','cs-pe','cs-red1','cs-pfs'].includes(s.id));
+        if (realSubs.length > 0) {
+          console.log('Sincronizando materias locales a la nube...');
+          for (const sub of realSubs) {
+            try {
+              await window.api.saveActiveSubject(sub);
+              if (sub.grades && sub.grades.length > 0) {
+                await window.api.syncGrades(sub.id, sub.grades);
+              }
+            } catch(e) { console.error('Error subiendo materia local:', sub.name, e); }
+          }
+          // Re-fetch con los datos ya subidos
+          const refreshed = await fetchFullState();
+          if (refreshed) {
+            cloudState.subjects = refreshed.subjects;
+            cloudState.tasks = [...cloudState.tasks, ...refreshed.tasks.filter(t => !cloudState.tasks.find(ct => ct.id === t.id))];
+          }
         }
       }
 
       // Si la nube devolvió tasks vacías pero tenemos locales, sincronizarlas
       if (cloudState.tasks.length === 0 && localS && localS.tasks && localS.tasks.length > 0) {
-        console.log('Sincronizando tareas locales a la nube...');
-        for (const task of localS.tasks) {
-          try { await window.api.saveTask(task); } catch(e) { console.error('Error subiendo tarea local:', e); }
+        const realTasks = localS.tasks.filter(t => t.title !== '1er Parcial' && t.title !== 'TP Obligatorio — App Web');
+        if (realTasks.length > 0) {
+          console.log('Sincronizando tareas locales a la nube...');
+          for (const task of realTasks) {
+            try { await window.api.saveTask(task); } catch(e) { console.error('Error subiendo tarea local:', e); }
+          }
+          const refreshed = await fetchFullState();
+          if (refreshed) cloudState.tasks = refreshed.tasks;
         }
-        const refreshed = await fetchFullState();
-        if (refreshed) cloudState.tasks = refreshed.tasks;
       }
+
+      // CLEANUP ASINCRÓNICO PARA ELIMINAR DATOS FALSOS QUE YA SE SUBIERON
+      setTimeout(async () => {
+        try {
+          const fakes = cloudState.tasks.filter(t => t.title === '1er Parcial' || t.title === 'TP Obligatorio — App Web');
+          for (const f of fakes) {
+            await window.api.deleteTask(f.id);
+          }
+          const fakeSubs = cloudState.subjects.filter(s => ['cs-aud','cs-ge2','cs-fis2','cs-iw3','cs-mn','cs-pe','cs-red1','cs-pfs'].includes(s.id) && s.grades.length === 0);
+          for (const s of fakeSubs) {
+            await window.api.deleteActiveSubject(s.id);
+          }
+        } catch(e) {}
+      }, 3000);
 
       // Cargar el estado de la nube directamente en S (el módulo exportado que usan todas las vistas)
       loadStateFromCloud(cloudState);
@@ -161,4 +181,19 @@ window.addEventListener('beforeinstallprompt', (e) => {
   window.deferredPrompt = e;
   const btn = document.getElementById('install-btn');
   if (btn) btn.style.display = 'block';
+});
+
+// Support Enter key to save in modals
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    if (document.activeElement && document.activeElement.tagName === 'TEXTAREA') return;
+    const openModal = document.querySelector('.modal-bd[style*="display: flex"]');
+    if (openModal) {
+      const primaryBtn = openModal.querySelector('.btn-primary');
+      if (primaryBtn && !primaryBtn.disabled) {
+        e.preventDefault();
+        primaryBtn.click();
+      }
+    }
+  }
 });

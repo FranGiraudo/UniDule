@@ -268,12 +268,12 @@ export function exportPDF() {
   </head><body>
     <div class="header">
       <div>
-        <h1>Horario Universitario</h1>
+        <h1>UniDule</h1>
         <div class="sub">Ingeniería en Informática · IUA · 2do Semestre 2026</div>
         <div class="sub">Generado el ${now}</div>
       </div>
       <div>
-        <div class="badge-utn">UniSchedule</div>
+        <div class="badge-utn">UniDule</div>
         <div style="margin-top:8px;text-align:right;">
           <button class="no-print" onclick="window.print()" style="background:${themeColor};color:#fff;border:none;padding:7px 16px;border-radius:7px;cursor:pointer;font-weight:700;font-size:12px;">Guardar como PDF</button>
         </div>
@@ -291,7 +291,7 @@ export function exportPDF() {
     </table>`:''}
 
     <div class="footer">
-      <span>UniSchedule · IUA Ingeniería en Informática</span>
+      <span>UniDule · IUA Ingeniería en Informática</span>
       <span>${now}</span>
     </div>
   </body></html>`);

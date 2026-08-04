@@ -4,7 +4,7 @@ import { CAREER_STATUS_CFG, DEF_CAREER, DEF_ELECTIVES, DEF_SEMINARS } from '../c
 import { showToast, openM, closeM } from '../core/utils.js';
 import { SVG_ICONS } from '../core/icons.js';
 import { THEMES } from '../core/theme.js';
-import { renderCareerMap, clearCmHighlight } from './careerMap.js';
+import { renderCareerMap, clearCmHighlight, highlightCareerMapNodes } from './careerMap.js';
 
 export function ensureCareerLoaded() {
   if (!S.career || !S.career.subjects || S.career.subjects.length < 30) {
@@ -48,10 +48,32 @@ let finalsSearch = '';
 let finalsSort   = 'exp-asc';
 
 export function setCareerGridFilter(val) { setCareerGridFilterVal(val); renderCareerGrid(); }
-export function setCareerGridSearch(val) { setCareerGridSearchVal(val); renderCareerGrid(); }
+export function setCareerGridSearch(val) {
+  const input = document.getElementById('career-grid-search');
+  let start = input ? input.selectionStart : val.length;
+  let end = input ? input.selectionEnd : val.length;
+  setCareerGridSearchVal(val);
+  renderCareerGrid();
+  const newInput = document.getElementById('career-grid-search');
+  if (newInput) {
+    newInput.focus();
+    try { newInput.setSelectionRange(start, end); } catch(e){}
+  }
+}
 
 function setFinalsFilter(val) { finalsFilter = val; renderCareerFinals(); }
-function setFinalsSearch(val) { finalsSearch = val; renderCareerFinals(); }
+function setFinalsSearch(val) {
+  const input = document.getElementById('finals-search');
+  let start = input ? input.selectionStart : val.length;
+  let end = input ? input.selectionEnd : val.length;
+  finalsSearch = val;
+  renderCareerFinals();
+  const newInput = document.getElementById('finals-search');
+  if (newInput) {
+    newInput.focus();
+    try { newInput.setSelectionRange(start, end); } catch(e){}
+  }
+}
 function setFinalsSort(val)   { finalsSort   = val; renderCareerFinals(); }
 
 // ═══════════════════════════════════════════════════════════
@@ -96,7 +118,21 @@ export function renderCareer() {
   }
 
   if      (activeCareerTab === 'grid')      renderCareerGrid();
-  else if (activeCareerTab === 'map')       renderCareerMap();
+  else if (activeCareerTab === 'map') {
+    const mapSubs = S.career.subjects.map(s => {
+      const cs = getComputedStatus(s);
+      return { ...s, cfg: CAREER_STATUS_CFG[cs] || CAREER_STATUS_CFG.pendiente };
+    });
+    renderCareerMap('career-map-container', mapSubs, (id) => {
+      setSelectedCareerNode(id);
+      const sub = S.career.subjects.find(x => x.id === id);
+      if (!sub) return;
+      const needed  = new Set(sub.correlatives.toCurse || []);
+      const unlocks = new Set(S.career.subjects.filter(x => (x.correlatives.toCurse||[]).includes(id)).map(x=>x.id));
+      highlightCareerMapNodes(id, needed, unlocks);
+      openCareerSubDetail(id);
+    });
+  }
   else if (activeCareerTab === 'seminars')  renderCareerSeminars();
   else if (activeCareerTab === 'electives') renderCareerElectives();
   else if (activeCareerTab === 'finals')    renderCareerFinals();
@@ -281,7 +317,7 @@ export function renderCareerElectives() {
               <div style="font-size:0.6875rem;color:var(--text2);margin-bottom:0.5rem;">Código: ${s.code || '—'} · Área: ${s.category}</div>
               <div style="display:flex;align-items:center;gap:0.5rem;">
                 <span class="career-status-badge" style="background:${cfg.bg};color:${cfg.color};border:1px solid ${cfg.border};">${cfg.label}</span>
-                ${s.grade !== null ? `<span style="font-size:0.75rem;font-weight:800;color:${s.grade>=4?'#4ade80':'#f87171'};">Nota: ${s.grade}</span>` : ''}
+                ${s.status === 'aprobada' && s.grade !== null ? `<span style="font-size:0.75rem;font-weight:800;color:${s.grade>=4?'#4ade80':'#f87171'};">Nota: ${s.grade}</span>` : ''}
               </div>
             </div>
             <div style="display:flex;justify-content:flex-end;gap:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border);">
@@ -304,7 +340,7 @@ export function renderCareerGrid() {
     <div style="margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;justify-content:space-between;background:var(--card);padding:0.75rem;border-radius:0.75rem;border:1px solid var(--border);">
       <div style="display:flex;align-items:center;gap:0.5rem;flex:1;min-width:200px;">
         <input type="text" class="f-input" placeholder="Buscar materia o código..."
-          value="${careerGridSearch}" oninput="setCareerGridSearch(this.value)" style="font-size:0.75rem;padding:0.375rem 0.625rem;">
+          id="career-grid-search" value="${careerGridSearch}" oninput="setCareerGridSearch(this.value)" style="font-size:0.75rem;padding:0.375rem 0.625rem;">
       </div>
       <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
         <select class="f-input" onchange="setCareerGridFilter(this.value)" style="font-size:0.75rem;padding:0.375rem 0.625rem;">
@@ -342,12 +378,13 @@ export function renderCareerGrid() {
     const pct = totalYear ? Math.round(approved / totalYear * 100) : 0;
     const barColor = pct >= 100 ? '#4ade80' : pct >= 50 ? '#60a5fa' : 'var(--primary)';
 
-    const semHtml = [1,2].map(sem => {
+    const semHtml = [0,1,2].map(sem => {
       const semSubs = yearSubs.filter(s => s.semester === sem);
       if (!semSubs.length) return '';
+      const lbl = sem === 0 ? 'Anual' : `${sem}° Semestre`;
       return `
       <div class="career-sem-section">
-        <div class="career-sem-label">${sem}° Semestre</div>
+        <div class="career-sem-label">${lbl}</div>
         ${semSubs.map(s => {
           const cs = getComputedStatus(s);
           const cfg = CAREER_STATUS_CFG[cs] || CAREER_STATUS_CFG.pendiente;
@@ -362,7 +399,7 @@ export function renderCareerGrid() {
               <div class="career-sub-name">${s.name}</div>
               <div class="career-sub-meta">
                 <span>${s.credits} créditos</span>
-                ${s.grade !== null ? `<span style="color:${s.grade>=4?'#4ade80':'#f87171'};font-weight:700;">Nota: ${s.grade}</span>` : ''}
+                ${s.status === 'aprobada' && s.grade !== null ? `<span style="color:${s.grade>=4?'#4ade80':'#f87171'};font-weight:700;">Nota: ${s.grade}</span>` : ''}
                 ${canFinal ? `<span class="career-final-badge">Final disponible</span>` : ''}
               </div>
             </div>
@@ -452,7 +489,7 @@ export function renderCareerFinals() {
     <div style="margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;justify-content:space-between;background:var(--card);padding:0.75rem;border-radius:0.75rem;border:1px solid var(--border);">
       <div style="display:flex;align-items:center;gap:0.5rem;flex:1;min-width:180px;">
         <input type="text" class="f-input" placeholder="Buscar final o código..."
-          value="${finalsSearch}" oninput="setFinalsSearch(this.value)" style="font-size:0.75rem;padding:0.375rem 0.625rem;">
+          id="finals-search" value="${finalsSearch}" oninput="setFinalsSearch(this.value)" style="font-size:0.75rem;padding:0.375rem 0.625rem;">
       </div>
       <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
         <select class="f-input" onchange="setFinalsFilter(this.value)" style="font-size:0.75rem;padding:0.375rem 0.625rem;">
@@ -705,7 +742,7 @@ export function openCareerSubDetail(id) {
   document.getElementById('career-detail-title').textContent = s.name;
   document.getElementById('career-detail-meta').textContent  = isElective 
       ? `Categoría: ${s.category} · ${s.credits} créditos`
-      : `${s.year}° Año · ${s.semester}° Semestre · ${s.credits} créditos`;
+      : `${s.year}° Año · ${s.semester === 0 ? 'Anual' : s.semester + '° Semestre'} · ${s.credits} créditos`;
   document.getElementById('career-detail-body').innerHTML = `
     <div style="display:flex;flex-direction:column;gap:16px;">
       <span class="career-status-badge" style="background:${cfg.bg};color:${cfg.color};border:1px solid ${cfg.border};font-size:12px;padding:.3rem .75rem;align-self:flex-start;">${cfg.label}</span>
@@ -811,3 +848,7 @@ window.openAddSeminarModal = openAddSeminarModal;
 window.saveSeminarModal = saveSeminar;
 window.toggleSeminarStatus = toggleSeminarStatus;
 window.closeCareerDetail = closeCareerDetail;
+
+window.setFinalsFilter = setFinalsFilter;
+window.setFinalsSearch = setFinalsSearch;
+window.setFinalsSort = setFinalsSort;

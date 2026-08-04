@@ -21,8 +21,8 @@ export function syncTaskWithGrade(task) {
   else if (task.type === 'Laboratorio') gradeType = 'Lab';
   else if (task.type === 'Parcial') {
     const titleLower = (task.title || '').toLowerCase();
-    if (titleLower.includes('2')) gradeType = 'Parcial 2';
-    else if (titleLower.includes('3')) gradeType = 'Parcial 3';
+    if (titleLower.includes('2') || titleLower.includes('segund')) gradeType = 'Parcial 2';
+    else if (titleLower.includes('3') || titleLower.includes('tercer')) gradeType = 'Parcial 3';
     else gradeType = 'Parcial 1';
   } else if (task.type === 'Tarea' || task.type === 'Proyecto') {
     gradeType = 'TP';
@@ -185,54 +185,67 @@ export function openTaskModal(id) {
   document.getElementById('modal-task').style.display='flex';
 }
 export async function saveTask() {
-  const title=document.getElementById('task-title').value.trim();
-  if (!title){showToast('Debes ingresar un título para la tarea.', 'error');return;}
-  const eid=document.getElementById('task-edit-id').value;
-  const existing=S.tasks.find(t=>t.id===eid);
-  const task={
-    id:eid||gid(), title,
-    subjectId:document.getElementById('task-sub').value||null,
-    type:document.getElementById('task-type').value,
-    dueDate:document.getElementById('task-date').value||null,
-    notes:document.getElementById('task-notes').value.trim(),
-    gradeId: existing ? existing.gradeId : null,
-    done:existing?existing.done:false
-  };
+  const btn = document.getElementById('btn-save-task');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:#fff;animation:spin 1s ease-in-out infinite;margin-right:8px;"></span> Guardando...';
+  }
+  
+  try {
+    const title=document.getElementById('task-title').value.trim();
+    if (!title){showToast('Debes ingresar un título para la tarea.', 'error');return;}
+    const eid=document.getElementById('task-edit-id').value;
+    const existing=S.tasks.find(t=>t.id===eid);
+    const task={
+      id:eid||gid(), title,
+      subjectId:document.getElementById('task-sub').value||null,
+      type:document.getElementById('task-type').value,
+      dueDate:document.getElementById('task-date').value||null,
+      notes:document.getElementById('task-notes').value.trim(),
+      gradeId: existing ? existing.gradeId : null,
+      done:existing?existing.done:false
+    };
 
-  if (task.subjectId) {
-    syncTaskWithGrade(task);
-    const s = S.subjects.find(x => x.id === task.subjectId);
-    if (window.api && s) {
-      try { 
-        await window.api.saveActiveSubject(s);
-        await window.api.syncGrades(s.id, s.grades); 
-      } catch(e) { console.error(e); }
-    }
-  } else if (existing && existing.gradeId && existing.subjectId) {
-    const oldSub = S.subjects.find(s => s.id === existing.subjectId);
-    if (oldSub && oldSub.grades) {
-      oldSub.grades = oldSub.grades.filter(g => g.id !== existing.gradeId);
-      if (window.api) {
+    if (task.subjectId) {
+      syncTaskWithGrade(task);
+      const s = S.subjects.find(x => x.id === task.subjectId);
+      if (window.api && s) {
         try { 
-          await window.api.saveActiveSubject(oldSub);
-          await window.api.syncGrades(oldSub.id, oldSub.grades); 
+          await window.api.saveActiveSubject(s);
+          await window.api.syncGrades(s.id, s.grades); 
         } catch(e) { console.error(e); }
       }
+    } else if (existing && existing.gradeId && existing.subjectId) {
+      const oldSub = S.subjects.find(s => s.id === existing.subjectId);
+      if (oldSub && oldSub.grades) {
+        oldSub.grades = oldSub.grades.filter(g => g.id !== existing.gradeId);
+        if (window.api) {
+          try { 
+            await window.api.saveActiveSubject(oldSub);
+            await window.api.syncGrades(oldSub.id, oldSub.grades); 
+          } catch(e) { console.error(e); }
+        }
+      }
+      task.gradeId = null;
     }
-    task.gradeId = null;
-  }
 
-  if (existing) Object.assign(existing,task); else S.tasks.push(task);
-  save();
-  if (window.api) {
-    try { 
-      await window.api.saveTask(task); 
-    } catch(e) { 
-      console.error(e); 
-      alert('Error al guardar la tarea en la nube: ' + e.message);
+    if (existing) Object.assign(existing,task); else S.tasks.push(task);
+    save();
+    if (window.api) {
+      try { 
+        await window.api.saveTask(task); 
+      } catch(e) { 
+        console.error(e); 
+        alert('Error al guardar la tarea en la nube: ' + e.message);
+      }
+    }
+    closeM('modal-task'); renderView(currentView);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = 'Guardar';
     }
   }
-  closeM('modal-task'); renderView(currentView);
 }
 
 export function delTask(id) {

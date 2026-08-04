@@ -232,15 +232,24 @@ export function openGradesModal(subId) {
 export function renderGradesInModal() {
   const c = document.getElementById('grades-container');
   if (!gradesWork.length) {
-    c.innerHTML = `<div style="font-size:11px;color:var(--text2);padding:10px 0;text-align:center;">Sin evaluaciones — hacé clic en "+ Agregar"</div>`;
+    c.innerHTML = '<div style="font-size:11px;color:var(--text2);padding:10px 0;text-align:center;">Sin evaluaciones — hacé clic en "+ Agregar"</div>';
     return;
   }
   c.innerHTML = gradesWork.map((g, i) => {
+    let displayType = g.type;
+    if (displayType === 'Parcial') displayType = 'Parcial 1';
+    
     const sc = g.score !== '' && g.score !== null ? parseFloat(g.score) : null;
     const scoreColor = sc !== null ? (sc >= 4 ? '#4ade80' : '#f87171') : 'var(--text)';
+    
+    let optionsHTML = GRADE_TYPES.map(t => `<option ${displayType===t?'selected':''}>${t}</option>`).join('');
+    if (!GRADE_TYPES.includes(displayType)) {
+      optionsHTML += `<option selected>${displayType}</option>`;
+    }
+
     return `<div class="grade-row">
       <select class="f-input" style="font-size:12px;" onchange="updGrade(${i},'type',this.value)">
-        ${GRADE_TYPES.map(t => `<option ${g.type===t?'selected':''}>${t}</option>`).join('')}
+        ${optionsHTML}
       </select>
       <input type="number" class="f-input" min="0" max="10" step="0.5" placeholder="—"
         style="font-size:14px;font-weight:800;text-align:center;color:${scoreColor};"

@@ -35,20 +35,11 @@ export function loadState() {
       if (!S.career || !S.career.subjects || S.career.subjects.length < 30) {
         S.career = { subjects: DEF_CAREER.map(s=>({...s,correlatives:{toCurse:[...s.correlatives.toCurse],toPass:[...s.correlatives.toPass]}})) };
       } else {
-        // Fusionar DEF_CAREER con el estado guardado del usuario
-        S.career.subjects = DEF_CAREER.map(def => {
-          const existing = S.career.subjects.find(x => x.id === def.id || (x.code && x.code === def.code));
-          if (!existing) return {...def, correlatives:{toCurse:[...def.correlatives.toCurse],toPass:[...def.correlatives.toPass]}};
-          return {
-            ...def,
-            ...existing,
-            status: (existing.status !== undefined && existing.status !== null) ? existing.status : def.status,
-            grade: (existing.grade !== null && existing.grade !== undefined) ? existing.grade : def.grade,
-            regDate: existing.regDate || def.regDate || null,
-            expDate: existing.expDate || def.expDate || null,
-            correlatives: { toCurse: [...def.correlatives.toCurse], toPass: [...def.correlatives.toPass] }
-          };
-        });
+        // Mantiene el plan guardado en lugar de forzar DEF_CAREER
+        S.career.subjects = S.career.subjects.map(sub => ({
+          ...sub,
+          correlatives: sub.correlatives ? { toCurse: [...(sub.correlatives.toCurse||[])], toPass: [...(sub.correlatives.toPass||[])] } : { toCurse: [], toPass: [] }
+        }));
       }
       syncSubjectsAndCareer();
 
@@ -118,17 +109,7 @@ export function loadStateFromCloud(cloudState) {
     const cloudCareerSubs = cloudState.career && cloudState.career.subjects;
     if (cloudCareerSubs && cloudCareerSubs.length > 30) {
       S.career = {
-        subjects: DEF_CAREER.map(def => {
-          const fromCloud = cloudCareerSubs.find(x => String(x.id) === String(def.id) || x.code === def.code);
-          return {
-            ...def,
-            correlatives: { toCurse: [...def.correlatives.toCurse], toPass: [...def.correlatives.toPass] },
-            status: fromCloud ? fromCloud.status : 'pendiente',
-            grade: fromCloud ? fromCloud.grade : null,
-            regDate: fromCloud ? fromCloud.regDate : null,
-            expDate: fromCloud ? fromCloud.expDate : null,
-          };
-        }),
+        subjects: cloudCareerSubs,
         electives: cloudState.career.electives || [],
         seminars: cloudState.career.seminars || []
       };

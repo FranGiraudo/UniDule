@@ -1,6 +1,6 @@
 {
-  "name": "UniSchedule",
-  "short_name": "UniSchedule",
+  "name": "UniDule",
+  "short_name": "UniDule",
   "description": "Gestor académico personal — Ingeniería en Informática IUA.",
   "start_url": "./index.html",
   "scope": "./",
