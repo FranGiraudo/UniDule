@@ -64,7 +64,7 @@ export function showToast(msg, type='success') {
   }, 3500);
 }
 
-export function confirmDel(type, id, onConfirm) {
+export function confirmDel(type, id) {
   const msg = type==='subject' ? '¿Eliminar materia y sus tareas?'
             : type==='task' ? '¿Eliminar tarea?'
             : '¿Eliminar calificación?';
@@ -83,7 +83,8 @@ export function confirmDel(type, id, onConfirm) {
   `;
   document.body.appendChild(overlay);
   window.__confirmDel_cb = () => {
-    onConfirm(id);
+    if (type === 'subject' && window.delSubject) window.delSubject(id);
+    else if (type === 'task' && window.delTask) window.delTask(id);
     delete window.__confirmDel_cb;
   };
 }

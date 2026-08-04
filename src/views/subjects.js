@@ -303,6 +303,26 @@ export function saveGrades() {
   renderView(currentView);
 }
 
+export function delSubject(id) {
+  const s = S.subjects.find(x => x.id === id);
+  if (!s) return;
+  S.subjects = S.subjects.filter(x => x.id !== id);
+  S.tasks = S.tasks.filter(t => t.subjectId !== id);
+  
+  if (S.career && S.career.subjects) {
+    const cs = S.career.subjects.find(c => c.id === id || (c.code && c.code === s.code));
+    if (cs) {
+      cs.status = 'disponible';
+      if (window.api) window.api.syncSubjectProgress(cs.id, 'subject', 'disponible', null, null, null).catch(console.error);
+    }
+  }
+  syncSubjectsAndCareer();
+  save();
+  if (window.api) window.api.deleteActiveSubject(id).catch(console.error);
+  renderView(currentView);
+  showToast('Materia eliminada');
+}
+
 window.renderSubs = renderSubs;
 window.openSubModal = openSubModal;
 window.onCareerSubSelect = onCareerSubSelect;
@@ -311,6 +331,7 @@ window.addSlot = addSlot;
 window.rmSlot = rmSlot;
 window.updSlot = updSlot;
 window.saveSub = saveSub;
+window.delSubject = delSubject;
 window.openGradesModal = openGradesModal;
 window.addGrade = addGrade;
 window.rmGrade = rmGrade;

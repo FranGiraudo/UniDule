@@ -215,6 +215,13 @@ export function saveTask() {
   closeM('modal-task'); renderView(currentView);
 }
 
+export function delTask(id) {
+  S.tasks = S.tasks.filter(t => t.id !== id);
+  save();
+  if (window.api) window.api.deleteTask(id).catch(console.error);
+  renderView(currentView);
+  showToast('Tarea eliminada');
+}
 
 window.setFilter = setFilter;
 window.renderTasks = renderTasks;
@@ -223,3 +230,4 @@ window.promptGradeFromTask = promptGradeFromTask;
 window.saveGradeFromModal = saveGradeFromModal;
 window.openTaskModal = openTaskModal;
 window.saveTask = saveTask;
+window.delTask = delTask;
