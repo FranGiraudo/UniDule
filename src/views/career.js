@@ -880,8 +880,6 @@ function setTheme(themeKey) {
 }
 
 
-window.switchCareerTab = switchCareerTab;
+window.setCareerTab = setCareerTab;
 window.setCareerGridFilter = setCareerGridFilter;
 window.setCareerGridSearch = setCareerGridSearch;
-window.saveSeminars = saveSeminars;
-window.saveElective = saveElective;
