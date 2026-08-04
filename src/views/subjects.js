@@ -1,7 +1,9 @@
-import { S, save, syncSubjectsAndCareer, selColor, setSelColor, slots, setSlots, gradesWork, setGradesWork, gradesSubId, setGradesSubId } from '../core/state.js';
-import { DEF_SUBJECTS, COLORS, SUBJECT_STATUS, GRADE_TYPES, DAYS } from '../core/constants.js';
+import { S, save, syncSubjectsAndCareer, selColor, setSelColor, slots, setSlots, gradesWork, setGradesWork, gradesSubId, setGradesSubId, currentView } from '../core/state.js';
+import { DEF_SUBJECTS, COLORS, SUBJECT_STATUS, GRADE_TYPES, DAYS, EXAM_TYPES } from '../core/constants.js';
 import { gid, confirmDel, showToast, isMobile, closeM } from '../core/utils.js';
 import { SVG_ICONS } from '../core/icons.js';
+import { renderView } from '../core/router.js';
+
 export function renderSubs() {
   const n=S.subjects.length;
   document.getElementById('sub-count-lbl').textContent=`${n} materia${n!==1?'s':''} registrada${n!==1?'s':''}`;
@@ -62,7 +64,6 @@ export function openSubModal(id) {
   document.getElementById('sub-modal-title').textContent=isEdit?'Editar Materia':'Nueva Materia';
   setSelColor('#6366f1'); setSlots([]);
 
-  // Cargar desplegable de materias del plan de carrera
   const careerSel = document.getElementById('sub-career-select');
   if (careerSel && S.career && S.career.subjects) {
     const sorted = [...S.career.subjects].sort((a,b) => (a.year - b.year) || (a.semester - b.semester) || a.name.localeCompare(b.name));
@@ -110,11 +111,13 @@ export function renderSwatches() {
   document.getElementById('color-swatches').innerHTML=COLORS.map(c=>
     `<div class="color-dot ${c===selColor?'sel':''}" style="background:${c};" onclick="pickColor('${c}')" title="${c}"></div>`).join('');
 }
+
 export function pickColor(c) {
   setSelColor(c);
   document.querySelectorAll('.color-dot').forEach(d=>d.classList.toggle('sel',d.title===c));
   document.getElementById('sub-color-custom').value=c;
 }
+
 document.getElementById('sub-color-custom').addEventListener('input',function(){
   setSelColor(this.value);
   document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('sel'));
@@ -136,6 +139,7 @@ export function renderSlots() {
       <div class="slot-rm" onclick="rmSlot(${i})">✕</div>
     </div>`).join('');
 }
+
 export function addSlot()        { slots.push({id:gid(),day:'Lunes',startTime:'08:00',endTime:'10:00',type:'Teórico'}); renderSlots(); }
 export function rmSlot(i)        { slots.splice(i,1); renderSlots(); }
 export function updSlot(i,f,v)   { slots[i][f]=v; }
@@ -161,12 +165,12 @@ export function saveSub() {
   };
   if (existing) Object.assign(existing,sub); else S.subjects.push(sub);
 
-  // Vincular y sincronizar bidireccionalmente con plan de carrera
+  let careerMatch = null;
   if (S.career && S.career.subjects) {
-    const match = S.career.subjects.find(cs => cs.id === sub.id || (cs.code && cs.code === sub.code) || cs.name.toLowerCase() === sub.name.toLowerCase());
-    if (match) {
-      match.id = sub.id;
-      match.status = (statusVal === 'aprobado' || statusVal === 'promocionado') ? 'aprobada' : statusVal;
+    careerMatch = S.career.subjects.find(cs => cs.id === sub.id || (cs.code && cs.code === sub.code) || cs.name.toLowerCase() === sub.name.toLowerCase());
+    if (careerMatch) {
+      careerMatch.id = sub.id;
+      careerMatch.status = (statusVal === 'aprobado' || statusVal === 'promocionado') ? 'aprobada' : statusVal;
     }
   }
 
@@ -174,7 +178,7 @@ export function saveSub() {
   save();
   if (window.api) {
     window.api.saveActiveSubject(sub).catch(console.error);
-    if (match) window.api.syncSubjectProgress(match.id, 'subject', match.status, match.grade, match.regDate, match.expDate).catch(console.error);
+    if (careerMatch) window.api.syncSubjectProgress(careerMatch.id, 'subject', careerMatch.status, careerMatch.grade, careerMatch.regDate, careerMatch.expDate).catch(console.error);
   }
   closeM('modal-sub'); renderView(currentView);
 }
@@ -185,19 +189,10 @@ export function openGradesModal(subId) {
     const cs = S.career.subjects.find(x => x.id === subId || (x.code && subId && (x.code === subId || x.code.slice(-3) === subId.slice(-3))));
     if (cs) {
       s = {
-        id: cs.id,
-        name: cs.name,
-        code: cs.code || '',
-        color: '#6366f1',
-        professor: '',
-        room: '',
-        email: '',
-        maxAbsences: 6,
-        absences: 0,
-        grades: [],
-        status: cs.status || 'cursando',
-        allowsPromotion: false,
-        schedules: []
+        id: cs.id, name: cs.name, code: cs.code || '',
+        color: '#6366f1', professor: '', room: '', email: '',
+        maxAbsences: 6, absences: 0, grades: [],
+        status: cs.status || 'cursando', allowsPromotion: false, schedules: []
       };
       S.subjects.push(s);
     }
@@ -245,16 +240,12 @@ export function saveGrades() {
   const s = S.subjects.find(x => x.id === gradesSubId);
   if (!s) return;
 
-  // Sincronizar evaluaciones ↔ tareas
-  const prevGrades = s.grades || [];
-  const newGrades  = gradesWork.map(g => ({...g}));
+  const newGrades = gradesWork.map(g => ({...g}));
 
-  // Crear/actualizar tarea por cada evaluación que no tenga nota aún
   newGrades.forEach(g => {
-    if (g.score !== '' && g.score !== null) return; // ya tiene nota, no hacer tarea
+    if (g.score !== '' && g.score !== null) return;
     const existing = S.tasks.find(t => t.gradeId === g.id);
     if (!existing) {
-      // Crear tarea nueva vinculada
       S.tasks.push({
         id: gid(),
         title: `${g.type} — ${s.name}`,
@@ -266,12 +257,10 @@ export function saveGrades() {
         done: false
       });
     } else {
-      // Actualizar fecha si cambió
       existing.dueDate = g.date || null;
     }
   });
 
-  // Eliminar tareas de evaluaciones que ya no existen
   const newIds = new Set(newGrades.map(g => g.id));
   S.tasks = S.tasks.filter(t => !t.gradeId || newIds.has(t.gradeId));
 
@@ -280,10 +269,11 @@ export function saveGrades() {
   s.status = newStatus;
   s.allowsPromotion = document.getElementById('grades-promotion').checked;
 
+  let careerMatch = null;
   if (S.career && S.career.subjects) {
-    const match = S.career.subjects.find(cs => cs.id === s.id || (cs.code && cs.code === s.code) || cs.name.toLowerCase() === s.name.toLowerCase());
-    if (match) {
-      match.status = (newStatus === 'aprobado' || newStatus === 'promocionado') ? 'aprobada' : newStatus;
+    careerMatch = S.career.subjects.find(cs => cs.id === s.id || (cs.code && cs.code === s.code) || cs.name.toLowerCase() === s.name.toLowerCase());
+    if (careerMatch) {
+      careerMatch.status = (newStatus === 'aprobado' || newStatus === 'promocionado') ? 'aprobada' : newStatus;
     }
   }
 
@@ -291,15 +281,13 @@ export function saveGrades() {
   save();
   if (window.api) {
     window.api.syncGrades(s.id, s.grades).catch(console.error);
-    if (match) window.api.syncSubjectProgress(match.id, 'subject', match.status, match.grade, match.regDate, match.expDate).catch(console.error);
+    if (careerMatch) window.api.syncSubjectProgress(careerMatch.id, 'subject', careerMatch.status, careerMatch.grade, careerMatch.regDate, careerMatch.expDate).catch(console.error);
   }
   closeM('modal-grades');
   renderView(currentView);
 }
 
-
 window.renderSubs = renderSubs;
-
 window.openSubModal = openSubModal;
 window.onCareerSubSelect = onCareerSubSelect;
 window.pickColor = pickColor;
