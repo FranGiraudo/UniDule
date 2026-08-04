@@ -25,11 +25,13 @@ function showLogin() {
   if (app) app.style.display = 'none';
 }
 
+import { STORAGE_KEY } from './core/constants.js';
+
 async function checkAuth() {
   try {
     const state = await fetchFullState();
     if (state) {
-      const localSStr = localStorage.getItem('appState');
+      const localSStr = localStorage.getItem(STORAGE_KEY);
       if (localSStr) {
         try {
           const localS = JSON.parse(localSStr);
