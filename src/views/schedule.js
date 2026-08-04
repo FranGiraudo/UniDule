@@ -1,8 +1,10 @@
 import { S, activeDay, setActiveDay } from '../core/state.js';
 import { DAYS, DSHORT, GRID_START, GRID_END, PPM } from '../core/constants.js';
 import { THEMES } from '../core/theme.js';
-import { t2y, dur, t2m, daysUntil, formatDate, todayDay, nowMin, isMobile } from '../core/utils.js';
+import { t2y, dur, t2m, m2t, daysUntil, formatDate, todayDay, nowMin, isMobile } from '../core/utils.js';
 import { SVG_ICONS } from '../core/icons.js';
+
+const GRID_H = (t2m(GRID_END) - t2m(GRID_START)) * PPM;
 export function assignCols(blocks) {
   const sorted=[...blocks].sort((a,b)=>t2m(a.sc.startTime)-t2m(b.sc.startTime));
   const cols=[];
@@ -112,7 +114,7 @@ export function renderSched() {
       const blocks=assignCols(rawBlocks);
 
       const bHtml=blocks.map(({s,sc,col,nCols})=>{
-        const top=t2y(sc.startTime), h=dur(sc.startTime,sc.endTime);
+        const top=t2y(sc.startTime, GRID_START, PPM), h=dur(sc.startTime,sc.endTime, PPM);
         const w=100/nCols, lft=col*w;
         return `<div class="class-block"
           style="top:${top}px;height:${h}px;left:${3+lft*.97}%;right:${3+(100-lft-w)*.97}%;
@@ -126,7 +128,7 @@ export function renderSched() {
 
       let nowLine='';
       if (isToday&&nowM>=gs&&nowM<=gs+tm) {
-        const y=t2y(m2t(nowM));
+        const y=t2y(m2t(nowM), GRID_START, PPM);
         nowLine=`<div class="now-line" style="top:${y}px;"><div class="now-dot"></div></div>`;
       }
       return `<div style="flex:1;min-width:0;position:relative;height:${GRID_H}px;border-left:1px solid var(--border);background:${isToday?'rgba(99,102,241,.03)':'transparent'};">${hlines}${bHtml}${nowLine}</div>`;
