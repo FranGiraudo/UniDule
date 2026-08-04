@@ -28,7 +28,7 @@ export async function fetchFullState() {
     supabase.from('user_tasks').select('*').eq('user_id', uid),
     supabase.from('user_grades').select('*').eq('user_id', uid),
     supabase.from('user_seminars').select('*').eq('user_id', uid),
-    supabase.from('global_subjects').select('*'),
+    supabase.from('global_subjects').select('*').order('year').order('semester'),
     supabase.from('global_electives').select('*'),
     supabase.from('user_progress').select('*').eq('user_id', uid)
   ]);
@@ -75,9 +75,11 @@ export async function fetchFullState() {
   });
 
   const careerSubs = (globalSubsData || []).map(g => {
-    const prog = (progressData || []).find(p => p.global_id === g.id && p.type === 'subject');
+    // user_progress.global_id stores the code (e.g. 'cs-info1'), not the UUID
+    const prog = (progressData || []).find(p => p.global_id === g.code && p.type === 'subject');
     return {
       ...g,
+      id: g.code,  // frontend uses code as the logical id (matches DEF_CAREER)
       correlatives: g.correlatives || { toCurse: [], toPass: [] },
       status: prog ? prog.status : 'pendiente',
       grade: prog ? parseFloat(prog.grade) : null,
@@ -87,9 +89,10 @@ export async function fetchFullState() {
   });
 
   const careerElecs = (globalElecsData || []).map(g => {
-    const prog = (progressData || []).find(p => p.global_id === g.id && p.type === 'elective');
+    const prog = (progressData || []).find(p => p.global_id === g.code && p.type === 'elective');
     return {
       ...g,
+      id: g.code,
       status: prog ? prog.status : 'pendiente',
       grade: prog ? parseFloat(prog.grade) : null
     };
