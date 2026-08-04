@@ -252,7 +252,7 @@ export function addGrade()      { gradesWork.push({id:gid(),type:'Parcial 1',sco
 export function rmGrade(i)      { gradesWork.splice(i,1); renderGradesInModal(); }
 export function updGrade(i,f,v) { gradesWork[i][f] = f==='score'?(v===''?'':parseFloat(v)):v; }
 
-export function saveGrades() {
+export async function saveGrades() {
   const s = S.subjects.find(x => x.id === gradesSubId);
   if (!s) return;
 
@@ -296,8 +296,11 @@ export function saveGrades() {
   syncSubjectsAndCareer();
   save();
   if (window.api) {
-    window.api.syncGrades(s.id, s.grades).catch(console.error);
-    if (careerMatch) window.api.syncSubjectProgress(careerMatch.id, 'subject', careerMatch.status, careerMatch.grade, careerMatch.regDate, careerMatch.expDate).catch(console.error);
+    try {
+      await window.api.saveActiveSubject(s);
+      await window.api.syncGrades(s.id, s.grades);
+      if (careerMatch) await window.api.syncSubjectProgress(careerMatch.id, 'subject', careerMatch.status, careerMatch.grade, careerMatch.regDate, careerMatch.expDate);
+    } catch(e) { console.error(e); }
   }
   closeM('modal-grades');
   renderView(currentView);
