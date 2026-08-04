@@ -986,7 +986,7 @@ window.cseSaveDetail = function(id) {
     window.api.syncSubjectProgress(s.id, isElective ? 'elective' : 'subject', s.status, s.grade, s.regDate, s.expDate).catch(console.error);
   }
 
-  if (!isElective) syncSubjectsAndCareer();
+  syncSubjectsAndCareer();
   save();
   closeCareerDetail();
   

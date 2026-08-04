@@ -195,7 +195,10 @@ export function syncSubjectsAndCareer() {
   }
 
   // 3. Reconstruir S.subjects ÚNICAMENTE con las materias que están CURSANDO
-  const cursandoSubs = S.career.subjects.filter(cs => cs.status === 'cursando');
+  const cursandoSubs = [
+    ...(S.career.subjects ? S.career.subjects.filter(cs => cs.status === 'cursando') : []),
+    ...(S.career.electives ? S.career.electives.filter(ce => ce.status === 'cursando') : [])
+  ];
   const cleanSubjects = [];
   const processedIds = new Set();
 
