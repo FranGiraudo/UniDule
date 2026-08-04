@@ -2,14 +2,12 @@
    UniSchedule — Service Worker  (cache-first, offline)
 ═══════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'unischedule-v3';
+const CACHE_NAME = 'unischedule-v4';
 const CORE_ASSETS = [
   './',
   './index.html',
-  './app.js',
-  './style.css',
   './manifest.json',
-  './icon.svg'
+  './logo.png'
 ];
 
 // ─── INSTALL: pre-cache core assets ───────────────
