@@ -65,7 +65,7 @@ export function openSubModal(id) {
   document.getElementById('sub-modal-title').textContent=isEdit?'Editar Materia':'Nueva Materia';
   setSelColor('#6366f1'); setSlots([]);
 
-  const careerSel = document.getElementById('sub-career-select');
+  const careerSel = document.getElementById('career-subjects-list');
   if (careerSel && S.career && S.career.subjects) {
     let availableSubs = S.career.subjects;
     if (!isEdit) {
@@ -75,8 +75,7 @@ export function openSubModal(id) {
       availableSubs = availableSubs.filter(s => s.id === id || getComputedStatus(s) === 'disponible');
     }
     const sorted = [...availableSubs].sort((a,b) => (a.year - b.year) || (a.semester - b.semester) || a.name.localeCompare(b.name));
-    careerSel.innerHTML = `<option value="">— Seleccionar materia del plan —</option>` +
-      sorted.map(cs => `<option value="${cs.id}">${cs.year}° Año ${cs.semester}° Sem: ${cs.name} (${cs.code||'Sin cód'})</option>`).join('');
+    careerSel.innerHTML = sorted.map(cs => `<option value="${cs.name}">${cs.year}° Año ${cs.semester}° Sem (${cs.code||'Sin cód'})</option>`).join('');
   }
 
   if (isEdit) {
@@ -90,7 +89,6 @@ export function openSubModal(id) {
     document.getElementById('sub-maxabs').value=s.maxAbsences||6;
     const subStatusEl = document.getElementById('sub-status');
     if (subStatusEl) subStatusEl.value = s.status || 'cursando';
-    if (careerSel) careerSel.value = s.id;
     setSelColor(s.color||'#6366f1');
     document.getElementById('sub-color-custom').value=selColor;
     setSlots(s.schedules.map(x=>({...x})));
@@ -99,19 +97,23 @@ export function openSubModal(id) {
     document.getElementById('sub-maxabs').value=6;
     const subStatusEl = document.getElementById('sub-status');
     if (subStatusEl) subStatusEl.value = 'cursando';
-    if (careerSel) careerSel.value = '';
     document.getElementById('sub-color-custom').value=selColor;
   }
   renderSwatches(); renderSlots();
   document.getElementById('modal-sub').style.display='flex';
 }
 
-export function onCareerSubSelect(cid) {
-  if (!cid) return;
-  const cs = S.career && S.career.subjects ? S.career.subjects.find(x => x.id === cid) : null;
-  if (!cs) return;
+export function onCareerSubSelect(val) {
+  if (!val) {
+    document.getElementById('sub-edit-id').value = '';
+    return;
+  }
+  const cs = S.career && S.career.subjects ? S.career.subjects.find(x => x.name.toLowerCase() === val.toLowerCase() || x.id === val) : null;
+  if (!cs) {
+    document.getElementById('sub-edit-id').value = '';
+    return;
+  }
   document.getElementById('sub-edit-id').value = cs.id;
-  document.getElementById('sub-name').value = cs.name;
   document.getElementById('sub-code').value = cs.code || '';
 }
 

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>UniSchedule · Horario UTN</title>
   <meta name="description" content="Gestor académico personal — Ingeniería en Informática UTN.">
-  <script type="module" crossorigin src="/assets/index-DPe36SKP.js"></script>
+  <script type="module" crossorigin src="/assets/index-B4SCmcGh.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-BCpFGxmG.css">
 </head>
 <body>
@@ -242,7 +242,8 @@
       <div class="form-grid" style="margin-bottom:12px;">
         <div style="grid-column:1/-1;">
           <label class="f-label">Nombre *</label>
-          <input class="f-input" id="sub-name" placeholder="Ej: Redes I">
+          <input class="f-input" id="sub-name" list="career-subjects-list" placeholder="Ej: Redes I" autocomplete="off" oninput="onCareerSubSelect(this.value)">
+          <datalist id="career-subjects-list"></datalist>
         </div>
         <div>
           <label class="f-label">Código</label>

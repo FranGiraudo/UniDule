@@ -241,7 +241,8 @@
       <div class="form-grid" style="margin-bottom:12px;">
         <div style="grid-column:1/-1;">
           <label class="f-label">Nombre *</label>
-          <input class="f-input" id="sub-name" placeholder="Ej: Redes I">
+          <input class="f-input" id="sub-name" list="career-subjects-list" placeholder="Ej: Redes I" autocomplete="off" oninput="onCareerSubSelect(this.value)">
+          <datalist id="career-subjects-list"></datalist>
         </div>
         <div>
           <label class="f-label">Código</label>
