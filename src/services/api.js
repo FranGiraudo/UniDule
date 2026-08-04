@@ -22,16 +22,7 @@ export async function fetchFullState() {
 
   const uid = user.id;
 
-  const [
-    { data: profileData },
-    { data: activeSubsData },
-    { data: tasksData },
-    { data: gradesData },
-    { data: seminarsData },
-    { data: globalSubsData },
-    { data: globalElecsData },
-    { data: progressData }
-  ] = await Promise.all([
+  const results = await Promise.all([
     supabase.from('user_profiles').select('*').eq('id', uid).single(),
     supabase.from('user_active_subjects').select('*').eq('user_id', uid),
     supabase.from('user_tasks').select('*').eq('user_id', uid),
@@ -41,6 +32,21 @@ export async function fetchFullState() {
     supabase.from('global_electives').select('*'),
     supabase.from('user_progress').select('*').eq('user_id', uid)
   ]);
+
+  results.forEach((r, i) => {
+    if (r.error) console.error(`Supabase fetch error on query ${i}:`, r.error);
+  });
+
+  const [
+    { data: profileData },
+    { data: activeSubsData },
+    { data: tasksData },
+    { data: gradesData },
+    { data: seminarsData },
+    { data: globalSubsData },
+    { data: globalElecsData },
+    { data: progressData }
+  ] = results;
 
   const profile = profileData || { name: user.email.split('@')[0], career: 'Ingeniería en Informática', theme: 'dark' };
 

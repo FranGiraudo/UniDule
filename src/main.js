@@ -68,9 +68,33 @@ async function checkAuth() {
           
           if (didSync) {
             const newState = await fetchFullState();
-            window.S = newState || state;
+            if (newState) {
+              // Merge local items that are missing from server (e.g. if RLS blocks SELECT)
+              const mergedState = { ...newState };
+              const sSubIds = new Set((newState.subjects || []).map(s => s.id));
+              const missingSubs = (localS.subjects || []).filter(s => !sSubIds.has(s.id));
+              mergedState.subjects = [...(newState.subjects || []), ...missingSubs];
+              
+              const sTaskIds = new Set((newState.tasks || []).map(t => t.id));
+              const missingTasks = (localS.tasks || []).filter(t => !sTaskIds.has(t.id));
+              mergedState.tasks = [...(newState.tasks || []), ...missingTasks];
+              
+              window.S = mergedState;
+            } else {
+              window.S = localS;
+            }
           } else {
-            window.S = state;
+            // Even if no sync happened, merge local into state just in case RLS is blocking SELECT
+            const mergedState = { ...(state || {}) };
+            const sSubIds = new Set((mergedState.subjects || []).map(s => s.id));
+            const missingSubs = (localS.subjects || []).filter(s => !sSubIds.has(s.id));
+            mergedState.subjects = [...(mergedState.subjects || []), ...missingSubs];
+            
+            const sTaskIds = new Set((mergedState.tasks || []).map(t => t.id));
+            const missingTasks = (localS.tasks || []).filter(t => !sTaskIds.has(t.id));
+            mergedState.tasks = [...(mergedState.tasks || []), ...missingTasks];
+            
+            window.S = mergedState;
           }
         } catch(parseErr) {
           window.S = state;
