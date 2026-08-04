@@ -29,7 +29,22 @@ async function checkAuth() {
   try {
     const state = await fetchFullState();
     if (state) {
-      window.S = state;
+      const localSStr = localStorage.getItem('appState');
+      if (localSStr) {
+        try {
+          const localS = JSON.parse(localSStr);
+          if (localS.subjects && localS.subjects.length > 0 && (!state.subjects || state.subjects.length === 0)) {
+            console.log("Sincronizando estado local a la nube...");
+            await window.api.syncEntireStateToCloud(localS);
+            const newState = await fetchFullState();
+            window.S = newState || state;
+          } else {
+            window.S = state;
+          }
+        } catch(e) { window.S = state; }
+      } else {
+        window.S = state;
+      }
       window.isLoggedIn = true;
       const loginScreen = document.getElementById('login-screen');
       const app = document.getElementById('app');

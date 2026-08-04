@@ -60,8 +60,8 @@ export async function fetchFullState() {
       schedules: s.schedule || [],
       grades: (gradesData || []).filter(g => g.active_subject_id === s.id).map(g => ({
         id: g.id,
-        title: g.title,
-        grade: g.grade,
+        type: g.title,
+        score: g.grade,
         date: g.date,
         weight: g.weight
       }))
@@ -139,7 +139,7 @@ export async function saveActiveSubject(sub) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
   
-  await supabase.from('user_active_subjects').upsert({
+  const { error } = await supabase.from('user_active_subjects').upsert({
     id: sub.id,
     user_id: user.id,
     code: sub.code || '',
@@ -154,6 +154,7 @@ export async function saveActiveSubject(sub) {
     allows_promotion: sub.allowsPromotion || false,
     schedule: sub.schedules || []
   });
+  if (error) throw error;
 }
 
 export async function deleteActiveSubject(id) {
