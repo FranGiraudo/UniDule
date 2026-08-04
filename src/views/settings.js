@@ -29,13 +29,25 @@ export function handleFileImport(e) {
       document.getElementById('confirm-title').textContent = '¿Restaurar backup?';
       document.getElementById('confirm-msg').textContent =
         `Se cargarán ${d.subjects.length} materias y ${(d.tasks||[]).length} tareas. Esto reemplazará todos los datos actuales.`;
-      document.getElementById('confirm-ok').onclick = () => {
+      document.getElementById('confirm-ok').onclick = async () => {
         S.subjects = d.subjects.map(s => ({
           absences:0, maxAbsences:6, schedules:[], email:'', code:'',
           grades:[], status:'cursando', allowsPromotion:false, ...s
         }));
         S.tasks = (d.tasks||[]).map(t => ({ done:false, notes:'', subjectId:null, dueDate:null, ...t }));
-        save(); document.getElementById('modal-confirm').style.display = 'none'; navigate(S.currentView||'dashboard');
+        save();
+        document.getElementById('modal-confirm').style.display = 'none';
+        // Sincronizar backup a la nube
+        if (window.api) {
+          try {
+            await window.api.syncEntireStateToCloud(S);
+            showToast('Backup restaurado y sincronizado a la nube', 'success');
+          } catch(e) {
+            console.error(e);
+            showToast('Backup restaurado solo localmente (error de nube)', 'error');
+          }
+        }
+        navigate(S.currentView||'dashboard');
       };
       document.getElementById('modal-confirm').style.display = 'flex';
     } catch(_) { alert('Archivo inválido o corrupto.'); }
@@ -52,14 +64,24 @@ export function handleFileImport(e) {
 window.handleFileImport = handleFileImport;
 
 
-export function saveProfileSettings() {
+export async function saveProfileSettings() {
   if (!S.profile) S.profile = {};
   const elName = document.getElementById('setting-user-name');
   const elCareer = document.getElementById('setting-user-career');
   if (elName) S.profile.name = elName.value;
   if (elCareer) S.profile.career = elCareer.value;
   save();
-  alert('Perfil guardado');
+  if (window.api) {
+    try {
+      await window.api.syncProfile(S.profile);
+      showToast('Perfil guardado', 'success');
+    } catch(e) {
+      console.error(e);
+      showToast('Perfil guardado localmente (error de nube)', 'error');
+    }
+  } else {
+    showToast('Perfil guardado', 'success');
+  }
 }
 
 export function renderSettings() {
