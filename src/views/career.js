@@ -280,14 +280,13 @@ export function renderCareerElectives() {
   const el = document.getElementById('career-electives-container');
   if (!el) return;
   if (!S.career) S.career = {};
-  if (!S.career.electives || S.career.electives.length !== DEF_ELECTIVES.length) {
-    const old = S.career.electives || [];
-    S.career.electives = DEF_ELECTIVES.map(e => {
-       const o = old.find(x => x.id === e.id || x.code === e.code);
-       return o ? {...e, status: o.status, grade: o.grade} : {...e};
-    });
+  
+  // Se remueve la verificación length !== DEF_ELECTIVES.length para no pisar el plan 2026
+  if (!S.career.electives) {
+    S.career.electives = DEF_ELECTIVES.map(e => ({...e}));
     save();
   }
+  
   const elecs = S.career.electives;
 
   const approved = elecs.filter(s => s.status === 'aprobada').length;
