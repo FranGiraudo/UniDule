@@ -807,6 +807,5 @@ window.openCareerSubDetail = openCareerSubDetail;
 window.csSetStatus = csSetStatus;
 window.csSetGrade = csSetGrade;
 window.openAddSeminarModal = openAddSeminarModal;
-window.saveSeminarModal = saveSeminarModal;
+window.saveSeminarModal = saveSeminar;
 window.toggleSeminarStatus = toggleSeminarStatus;
-window.delSeminar = delSeminar;
