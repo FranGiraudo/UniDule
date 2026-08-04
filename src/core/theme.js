@@ -198,11 +198,18 @@ export const THEMES = {
     vars: { '--bg': '#e3f6f9', '--bg2': '#cbeaf0', '--card': '#ffffff', '--card2': '#f0fbfd', '--border': '#9ED3DC', '--text': '#1a3b40', '--text2': '#8a4257', '--primary': '#CA6180' }
   },
   dorado_atardecer: {
-    name: 'Dorado Atardecer',
+    name: 'Lluvia Dorada',
     primary: '#FF9D00',
     bg: '#3d2814',
     isLight: false,
     vars: { '--bg': '#3d2814', '--bg2': '#54381e', '--card': '#4b321a', '--card2': '#614122', '--border': 'rgba(255,255,255,.1)', '--text': '#FFCF71', '--text2': '#ffb74d', '--primary': '#FF9D00' }
+  },
+  lcd: {
+    name: 'LCD (Psychedelic)',
+    primary: '#39FF14',
+    bg: '#1A0B2E',
+    isLight: false,
+    vars: { '--bg': '#1A0B2E', '--bg2': '#FF00FF', '--card': '#2B0F4C', '--card2': '#4C128B', '--border': '#00FFCC', '--text': '#FFFF00', '--text2': '#00FFCC', '--primary': '#39FF14' }
   }
 };
 
