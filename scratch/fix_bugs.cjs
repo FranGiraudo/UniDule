@@ -1,4 +1,7 @@
-import { loadState, currentView } from './core/state.js';
+const fs = require('fs');
+
+// 1. Fix main.js authentication
+const mainJs = `import { loadState, currentView } from './core/state.js';
 import { renderView, updateDate } from './core/router.js';
 import { ensureCareerLoaded } from './views/career.js';
 import { applyTheme } from './core/theme.js';
@@ -96,3 +99,27 @@ window.addEventListener('beforeinstallprompt', (e) => {
   const btn = document.getElementById('install-btn');
   if (btn) btn.style.display = 'block';
 });
+`;
+
+fs.writeFileSync('src/main.js', mainJs);
+console.log('Fixed main.js');
+
+// 2. Fix chgAbs in subjects.js and attendance.js
+let subjects = fs.readFileSync('src/views/subjects.js', 'utf8');
+subjects = subjects.replace('window.chgAbs = chgAbs;', '');
+fs.writeFileSync('src/views/subjects.js', subjects);
+
+let att = fs.readFileSync('src/views/attendance.js', 'utf8');
+if (!att.includes('window.chgAbs = chgAbs;')) {
+  att += '\nwindow.chgAbs = chgAbs;\n';
+  fs.writeFileSync('src/views/attendance.js', att);
+}
+console.log('Fixed chgAbs export');
+
+// 3. Create public/favicon.ico (if public doesn't exist, create it)
+if (!fs.existsSync('public')) {
+  fs.mkdirSync('public');
+}
+fs.writeFileSync('public/favicon.ico', ''); // Empty file just to prevent 404
+fs.writeFileSync('favicon.ico', ''); // Empty file in root just in case
+console.log('Created favicon.ico');

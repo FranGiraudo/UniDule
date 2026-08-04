@@ -40,3 +40,5 @@ function chgAbs(id,d){ const s=S.subjects.find(x=>x.id===id); if(s){s.absences=M
 
 
 window.renderAtt = renderAtt;
+
+window.chgAbs = chgAbs;

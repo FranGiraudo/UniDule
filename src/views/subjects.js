@@ -299,7 +299,7 @@ export function saveGrades() {
 
 
 window.renderSubs = renderSubs;
-window.chgAbs = chgAbs;
+
 window.openSubModal = openSubModal;
 window.onCareerSubSelect = onCareerSubSelect;
 window.pickColor = pickColor;
