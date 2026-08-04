@@ -131,20 +131,75 @@ function setAuthLoading(isLoading, btnId, defaultText) {
   if (isLoading && fb) fb.style.display = 'none';
 }
 
+window.authMode = 'login';
+
+window.switchAuthTab = (mode) => {
+  window.authMode = mode;
+  const tabLogin = document.getElementById('tab-login');
+  const tabRegister = document.getElementById('tab-register');
+  const btnSubmit = document.getElementById('btn-auth-submit');
+  
+  if (mode === 'login') {
+    tabLogin.style.background = 'var(--card)';
+    tabLogin.style.color = 'var(--text)';
+    tabLogin.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+    
+    tabRegister.style.background = 'transparent';
+    tabRegister.style.color = 'var(--text-muted)';
+    tabRegister.style.boxShadow = 'none';
+    
+    btnSubmit.textContent = 'Iniciar Sesión';
+  } else {
+    tabRegister.style.background = 'var(--card)';
+    tabRegister.style.color = 'var(--text)';
+    tabRegister.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+    
+    tabLogin.style.background = 'transparent';
+    tabLogin.style.color = 'var(--text-muted)';
+    tabLogin.style.boxShadow = 'none';
+    
+    btnSubmit.textContent = 'Crear Cuenta';
+  }
+};
+
+window.togglePasswordVisibility = () => {
+  const passInput = document.getElementById('auth-pass');
+  const eyeIcon = document.getElementById('eye-icon');
+  
+  if (passInput.type === 'password') {
+    passInput.type = 'text';
+    // Eye off icon
+    eyeIcon.innerHTML = '<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/>';
+  } else {
+    passInput.type = 'password';
+    // Eye icon
+    eyeIcon.innerHTML = '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>';
+  }
+};
+
+window.handleAuthSubmit = async (e) => {
+  if (e) e.preventDefault();
+  if (window.authMode === 'login') {
+    await window.handleLogin();
+  } else {
+    await window.handleRegister();
+  }
+};
+
 window.handleLogin = async (e) => {
   if (e) e.preventDefault();
   const email = document.getElementById('auth-email').value;
   const pass = document.getElementById('auth-pass').value;
   if (!email || !pass) return setAuthFeedback('Por favor, completa los datos');
   
-  setAuthLoading(true, 'btn-login', 'Entrar');
+  setAuthLoading(true, 'btn-auth-submit', 'Entrar');
   try {
     await loginUser(email, pass);
     await checkAuth();
   } catch (err) {
     setAuthFeedback('Error al iniciar sesión: ' + err.message);
   } finally {
-    setAuthLoading(false, 'btn-login', 'Entrar');
+    setAuthLoading(false, 'btn-auth-submit', 'Iniciar Sesión');
   }
 }
 
@@ -154,7 +209,7 @@ window.handleRegister = async (e) => {
   const pass = document.getElementById('auth-pass').value;
   if (!email || !pass) return setAuthFeedback('Por favor, completa los datos');
   
-  setAuthLoading(true, 'btn-register', 'Registrarse');
+  setAuthLoading(true, 'btn-auth-submit', 'Registrando...');
   try {
     await registerUser(email, pass);
     setAuthFeedback('Registro exitoso. Iniciando sesión...', false);
@@ -163,7 +218,7 @@ window.handleRegister = async (e) => {
   } catch (err) {
     setAuthFeedback('Error al registrar: ' + err.message);
   } finally {
-    setAuthLoading(false, 'btn-register', 'Registrarse');
+    setAuthLoading(false, 'btn-auth-submit', 'Crear Cuenta');
   }
 }
 
