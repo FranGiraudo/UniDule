@@ -1,9 +1,10 @@
 import { S } from '../core/state.js';
-import { TYPE_ICON, TYPE_FG, TYPE_BG } from '../core/constants.js';
+import { TYPE_ICON, TYPE_FG, TYPE_BG, DAYS, EXAM_TYPES } from '../core/constants.js';
 import { todayDay, nowMin, t2m, m2t, dur, daysUntil, urgColor, formatDate } from '../core/utils.js';
 import { SVG_ICONS } from '../core/icons.js';
-import { renderView } from '../core/router.js';
+import { renderView, updateDate } from '../core/router.js';
 import { toggleTask } from './tasks.js';
+import { ensureCareerLoaded } from './career.js';
 
 export function getNextClass() {
   const today=todayDay(), now=nowMin(), secs=new Date().getSeconds();

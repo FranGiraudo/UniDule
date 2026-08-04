@@ -17,7 +17,7 @@ export function exportBackup() {
 
 export function importBackup() { document.getElementById('backup-file-input').click(); }
 
-export function handleBackupFile(e) {
+export function handleFileImport(e) {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
@@ -44,11 +44,111 @@ export function handleBackupFile(e) {
   reader.readAsText(file);
 }
 
+
+
+
+
+
+window.handleFileImport = handleFileImport;
+
+
+export function saveProfileSettings() {
+  if (!S.profile) S.profile = {};
+  const elName = document.getElementById('setting-user-name');
+  const elCareer = document.getElementById('setting-user-career');
+  if (elName) S.profile.name = elName.value;
+  if (elCareer) S.profile.career = elCareer.value;
+  save();
+  alert('Perfil guardado');
+}
+
 export function renderSettings() {
-  // Implementation of renderSettings (if any)
+  // Inject scaffold if not yet in the DOM
+  const view = document.getElementById('view-settings');
+  if (view && !document.getElementById('theme-presets-grid')) {
+    view.innerHTML = `
+      <div style="max-width:700px;margin:0 auto;">
+        <div class="view-title" style="margin-bottom:1.5rem;">Configuración & Perfil</div>
+
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:0.75rem;padding:1.25rem;margin-bottom:1.25rem;">
+          <div style="font-weight:700;margin-bottom:1rem;color:var(--text);">Perfil</div>
+          <div style="display:flex;flex-direction:column;gap:0.75rem;">
+            <div>
+              <label class="f-label">Nombre</label>
+              <input class="f-input" id="setting-user-name" type="text" placeholder="Tu nombre">
+            </div>
+            <div>
+              <label class="f-label">Carrera</label>
+              <input class="f-input" id="setting-user-career" type="text" placeholder="Tu carrera">
+            </div>
+            <button class="btn btn-primary" onclick="saveProfileSettings()">Guardar perfil</button>
+          </div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:0.75rem;padding:1.25rem;margin-bottom:1.25rem;">
+          <div style="font-weight:700;margin-bottom:1rem;color:var(--text);">Tema de color</div>
+          <div id="theme-presets-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.5rem;"></div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:0.75rem;padding:1.25rem;margin-bottom:1.25rem;">
+          <div style="font-weight:700;margin-bottom:0.5rem;color:var(--text);">Datos</div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+            <button class="btn btn-ghost" onclick="exportBackup()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Exportar backup JSON
+            </button>
+            <label class="btn btn-ghost" style="cursor:pointer;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Importar archivo
+              <input type="file" accept=".json,.csv" style="display:none;" onchange="handleFileImport(event)">
+            </label>
+          </div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:0.75rem;padding:1.25rem;">
+          <div style="font-weight:700;margin-bottom:0.5rem;color:var(--text);">Cuenta</div>
+          <button class="btn btn-ghost" onclick="window.handleLogout && window.handleLogout()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Cerrar sesión
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  const elName   = document.getElementById('setting-user-name');
+  const elCareer = document.getElementById('setting-user-career');
+  if (elName   && S.profile) elName.value   = S.profile.name   || 'Fran Giraudo';
+  if (elCareer && S.profile) elCareer.value = S.profile.career || 'Ingeniería en Informática — IUA';
+
+  const grid = document.getElementById('theme-presets-grid');
+  if (!grid) return;
+
+  const currentTheme = S.profile ? (S.profile.theme || 'dark') : 'dark';
+
+  grid.innerHTML = Object.entries(THEMES).map(([key, t]) => {
+    const isSel = key === currentTheme;
+    const textColor = t.isLight ? '#0f172a' : '#eeeeff';
+    const cardBorder = isSel ? t.primary : (t.isLight ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.12)');
+    return `
+      <div onclick="setTheme('${key}')" style="cursor:pointer;background:${t.bg};border:2px solid ${cardBorder};border-radius:0.5rem;padding:0.625rem;display:flex;align-items:center;justify-content:space-between;gap:0.5rem;box-shadow:${isSel?'0 0 10px '+t.primary+'44':'none'};">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div style="width:14px;height:14px;border-radius:50%;background:${t.primary};flex-shrink:0;box-shadow:0 0 4px ${t.primary};"></div>
+          <span style="font-size:0.75rem;font-weight:700;color:${textColor};">${t.name}</span>
+        </div>
+        ${isSel ? `<span style="font-size:0.65rem;font-weight:800;color:${t.primary};">Activo</span>` : ''}
+      </div>`;
+  }).join('');
+}
+
+export function setTheme(themeKey) {
+  if (!S.profile) S.profile = {};
+  S.profile.theme = themeKey;
+  applyTheme(themeKey);
+  save();
+  renderSettings();
 }
 
 window.renderSettings = renderSettings;
+window.setTheme = setTheme;
+window.saveProfileSettings = saveProfileSettings;
 window.exportBackup = exportBackup;
 window.importBackup = importBackup;
-window.handleBackupFile = handleBackupFile;
+window.handleFileImport = handleFileImport;
