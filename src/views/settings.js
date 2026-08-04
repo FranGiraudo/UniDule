@@ -131,7 +131,7 @@ export function renderSettings() {
 
         <div style="background:var(--card);border:1px solid var(--border);border-radius:0.75rem;padding:1.25rem;margin-bottom:1.25rem;">
           <div style="font-weight:700;margin-bottom:1rem;color:var(--text);">Tema de color</div>
-          <div id="theme-presets-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.5rem;"></div>
+          <div id="theme-presets-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.75rem;"></div>
         </div>
 
         <div style="background:var(--card);border:1px solid var(--border);border-radius:0.75rem;padding:1.25rem;margin-bottom:1.25rem;">
@@ -171,7 +171,7 @@ export function renderSettings() {
 
   grid.innerHTML = Object.entries(THEMES).map(([key, t]) => {
     const isSel = key === currentTheme;
-    const textColor = t.isLight ? '#0f172a' : '#eeeeff';
+    const textColor = t.vars['--text'];
     const cardBorder = isSel ? t.primary : (t.isLight ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.12)');
     return `
       <div onclick="setTheme('${key}')" style="cursor:pointer;background:${t.bg};border:2px solid ${cardBorder};border-radius:0.5rem;padding:0.625rem;display:flex;align-items:center;justify-content:space-between;gap:0.5rem;box-shadow:${isSel?'0 0 10px '+t.primary+'44':'none'};">

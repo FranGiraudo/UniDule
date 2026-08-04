@@ -126,6 +126,83 @@ export const THEMES = {
       '--text2': '#9d174d',
       '--primary': '#db2777'
     }
+  },
+  amanecer_morado: {
+    name: 'Amanecer Morado',
+    primary: '#F8B2B2',
+    bg: '#403D88',
+    isLight: false,
+    vars: { '--bg': '#403D88', '--bg2': '#5653A2', '--card': '#474495', '--card2': '#8B639B', '--border': 'rgba(255,255,255,.15)', '--text': '#ffffff', '--text2': '#F8B2B2', '--primary': '#F8B2B2' }
+  },
+  algodon_azucar: {
+    name: 'Algodón de Azúcar',
+    primary: '#C5B3D3',
+    bg: '#FBEFEF',
+    isLight: true,
+    vars: { '--bg': '#FBEFEF', '--bg2': '#FFE2E2', '--card': '#ffffff', '--card2': '#F5CBCB', '--border': '#FFE2E2', '--text': '#4a4a4a', '--text2': '#C5B3D3', '--primary': '#C5B3D3' }
+  },
+  otono_calido: {
+    name: 'Otoño Cálido',
+    primary: '#EC5B38',
+    bg: '#524646',
+    isLight: false,
+    vars: { '--bg': '#524646', '--bg2': '#655757', '--card': '#5a4e4e', '--card2': '#A8A492', '--border': 'rgba(255,255,255,.15)', '--text': '#FCF2E5', '--text2': '#A8A492', '--primary': '#EC5B38' }
+  },
+  frutos_rojos: {
+    name: 'Frutos Rojos',
+    primary: '#F39399',
+    bg: '#5D3140',
+    isLight: false,
+    vars: { '--bg': '#5D3140', '--bg2': '#CF4173', '--card': '#683748', '--card2': '#CF4173', '--border': 'rgba(255,255,255,.15)', '--text': '#F6D8BD', '--text2': '#F39399', '--primary': '#F39399' }
+  },
+  bosque_esmeralda: {
+    name: 'Bosque Esmeralda',
+    primary: '#1B5E20',
+    bg: '#E8F5E9',
+    isLight: true,
+    vars: { '--bg': '#E8F5E9', '--bg2': '#A5D6A7', '--card': '#ffffff', '--card2': '#A5D6A7', '--border': '#A5D6A7', '--text': '#1B5E20', '--text2': '#66BB6A', '--primary': '#1B5E20' }
+  },
+  rojo_fuego: {
+    name: 'Rojo Fuego',
+    primary: '#FFF0C4',
+    bg: '#3E0703',
+    isLight: false,
+    vars: { '--bg': '#3E0703', '--bg2': '#660B05', '--card': '#4d0904', '--card2': '#660B05', '--border': 'rgba(255,255,255,.15)', '--text': '#FFF0C4', '--text2': '#FFF0C4', '--primary': '#FFF0C4' }
+  },
+  carmin_oscuro: {
+    name: 'Carmín Oscuro',
+    primary: '#D84040',
+    bg: '#1D1616',
+    isLight: false,
+    vars: { '--bg': '#1D1616', '--bg2': '#8E1616', '--card': '#2a2020', '--card2': '#8E1616', '--border': 'rgba(255,255,255,.15)', '--text': '#EEEEEE', '--text2': '#D84040', '--primary': '#D84040' }
+  },
+  rosa_vintage: {
+    name: 'Rosa Vintage',
+    primary: '#B03052',
+    bg: '#EBE8DB',
+    isLight: true,
+    vars: { '--bg': '#EBE8DB', '--bg2': '#D76C82', '--card': '#ffffff', '--card2': '#D76C82', '--border': '#D76C82', '--text': '#3D0301', '--text2': '#B03052', '--primary': '#B03052' }
+  },
+  pastel_pop: {
+    name: 'Pastel Pop',
+    primary: '#FF84BA',
+    bg: '#FFEFE3',
+    isLight: true,
+    vars: { '--bg': '#FFEFE3', '--bg2': '#99C2FF', '--card': '#ffffff', '--card2': '#FFDF82', '--border': '#FFDF82', '--text': '#333333', '--text2': '#FF84BA', '--primary': '#FF84BA' }
+  },
+  cielo_estival: {
+    name: 'Cielo Estival',
+    primary: '#CA6180',
+    bg: '#FEFD99',
+    isLight: true,
+    vars: { '--bg': '#FEFD99', '--bg2': '#9ED3DC', '--card': '#ffffff', '--card2': '#FCB7C7', '--border': '#9ED3DC', '--text': '#333333', '--text2': '#CA6180', '--primary': '#CA6180' }
+  },
+  dorado_atardecer: {
+    name: 'Dorado Atardecer',
+    primary: '#FF9D00',
+    bg: '#7B542F',
+    isLight: false,
+    vars: { '--bg': '#7B542F', '--bg2': '#B6771D', '--card': '#8a5e35', '--card2': '#B6771D', '--border': 'rgba(255,255,255,.15)', '--text': '#FFCF71', '--text2': '#FF9D00', '--primary': '#FF9D00' }
   }
 };
 
