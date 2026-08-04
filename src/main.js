@@ -52,31 +52,57 @@ async function checkAuth() {
   }
 }
 
+function setAuthFeedback(msg, isError = true) {
+  const fb = document.getElementById('auth-feedback');
+  if (!fb) return;
+  fb.style.display = 'block';
+  fb.style.color = isError ? '#ef4444' : '#3b82f6';
+  fb.textContent = msg;
+}
+
+function setAuthLoading(isLoading, btnId, defaultText) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = isLoading;
+  btn.style.opacity = isLoading ? '0.7' : '1';
+  btn.textContent = isLoading ? 'Cargando...' : defaultText;
+  const fb = document.getElementById('auth-feedback');
+  if (isLoading && fb) fb.style.display = 'none';
+}
+
 window.handleLogin = async (e) => {
-  e.preventDefault();
+  if (e) e.preventDefault();
   const email = document.getElementById('auth-email').value;
   const pass = document.getElementById('auth-pass').value;
-  if (!email || !pass) return alert('Por favor, completa los datos');
+  if (!email || !pass) return setAuthFeedback('Por favor, completa los datos');
+  
+  setAuthLoading(true, 'btn-login', 'Entrar');
   try {
     await loginUser(email, pass);
-    checkAuth();
+    await checkAuth();
   } catch (err) {
-    alert('Error al iniciar sesión: ' + err.message);
+    setAuthFeedback('Error al iniciar sesión: ' + err.message);
+  } finally {
+    setAuthLoading(false, 'btn-login', 'Entrar');
   }
 }
 
 window.handleRegister = async (e) => {
-  e.preventDefault();
+  if (e) e.preventDefault();
   const email = document.getElementById('auth-email').value;
   const pass = document.getElementById('auth-pass').value;
-  if (!email || !pass) return alert('Por favor, completa los datos');
+  if (!email || !pass) return setAuthFeedback('Por favor, completa los datos');
+  
+  setAuthLoading(true, 'btn-register', 'Registrarse');
   try {
     await registerUser(email, pass);
-    alert('Registro exitoso. Iniciando sesión...');
+    setAuthFeedback('Registro exitoso. Iniciando sesión...', false);
     await loginUser(email, pass);
-    checkAuth();
+    await checkAuth();
   } catch (err) {
-    alert('Error al registrar: ' + err.message);
+    setAuthFeedback('Error al registrar: ' + err.message);
+  } finally {
+    setAuthLoading(false, 'btn-register', 'Registrarse');
   }
 }
 

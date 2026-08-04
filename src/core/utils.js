@@ -5,8 +5,8 @@ export const m2t = m => `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%
 export const t2y = (t, start, ppm) => (t2m(t) - t2m(start)) * ppm;
 export const dur = (s, e, ppm) => (t2m(e) - t2m(s)) * ppm;
 
-export function todayDay(dayJsArray) { 
-  return dayJsArray[new Date().getDay()] || null; 
+export function todayDay() { 
+  return [null,'Lunes','Martes','Miércoles','Jueves','Viernes',null][new Date().getDay()] || null; 
 }
 export function nowMin() { 
   const n = new Date(); 
