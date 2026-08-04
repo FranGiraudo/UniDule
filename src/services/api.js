@@ -179,7 +179,7 @@ export async function saveTask(task) {
     notes: task.notes || '',
     done: task.done || false,
     grade_id: task.gradeId || null
-  });
+  }, { onConflict: 'id' });
 }
 
 export async function saveSeminar(sem) {
@@ -196,7 +196,7 @@ export async function saveSeminar(sem) {
     status: sem.status,
     date: sem.date || null,
     notes: sem.notes || ''
-  });
+  }, { onConflict: 'id' });
 }
 
 export async function deleteTask(id) {
@@ -229,7 +229,7 @@ export async function syncGrades(activeSubjectId, gradesArray) {
       date: g.date || null,
       weight: g.weight || null
     }));
-    await supabase.from('user_grades').upsert(toUpsert);
+    await supabase.from('user_grades').upsert(toUpsert, { onConflict: 'id' });
   }
 }
 

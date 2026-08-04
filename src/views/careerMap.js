@@ -163,7 +163,7 @@ function handleCareerNodeClick(id) {
   openCareerSubDetail(id);
 }
 
-function clearCmHighlight() {
+export function clearCmHighlight() {
   document.querySelectorAll('.cm-edge').forEach(e => {
     e.style.stroke='rgba(255,255,255,.15)'; e.style.opacity='1';
     e.setAttribute('marker-end','url(#cm-arr)');
