@@ -812,3 +812,35 @@ input[type="number"] {
 @media (max-width: 480px) {
   .cs-mini-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ══════════════════════════════════════════════
+   CUSTOM CHECKBOX
+══════════════════════════════════════════════ */
+.f-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  background-color: transparent;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  margin: 0;
+}
+.f-checkbox:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+.f-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
