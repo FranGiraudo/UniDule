@@ -189,6 +189,9 @@ export function setTheme(themeKey) {
   S.profile.theme = themeKey;
   applyTheme(themeKey);
   save();
+  if (window.api) {
+    window.api.syncProfile(S.profile).catch(console.error);
+  }
   renderSettings();
 }
 

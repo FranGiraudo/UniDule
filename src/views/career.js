@@ -991,8 +991,8 @@ window.cseSaveDetail = function(id) {
   closeCareerDetail();
   
   // Forzar re-renderizado directamente
-  if (typeof renderCareer === 'function') renderCareer();
-  else renderView('career');
+  if (isElective) renderCareerElectives();
+  else renderCareer();
 };
 
 // ═══════════════════════════════════════════════════════════
