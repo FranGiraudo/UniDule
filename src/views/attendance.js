@@ -1,5 +1,6 @@
 import { S } from '../core/state.js';
 import { renderSubs } from './subjects.js';
+import { SVG_ICONS } from '../core/icons.js';
 export function renderAtt() {
   const grid=document.getElementById('att-grid');
   if (!S.subjects.length) { grid.innerHTML=`<div class="empty-st" style="grid-column:1/-1;"><div style="display:inline-flex;padding:0.75rem;border-radius:50%;background:color-mix(in srgb, var(--primary) 15%, transparent);color:var(--primary);margin-bottom:0.5rem;">${SVG_ICONS.chart}</div><div>Sin materias.</div></div>`; return; }
