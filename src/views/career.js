@@ -809,3 +809,4 @@ window.csSetGrade = csSetGrade;
 window.openAddSeminarModal = openAddSeminarModal;
 window.saveSeminarModal = saveSeminar;
 window.toggleSeminarStatus = toggleSeminarStatus;
+window.closeCareerDetail = closeCareerDetail;

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>UniSchedule · Horario UTN</title>
   <meta name="description" content="Gestor académico personal — Ingeniería en Informática UTN.">
-  <script type="module" crossorigin src="/assets/index-Drj2TTpJ.js"></script>
+  <script type="module" crossorigin src="/assets/index-B2-7-_Bg.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-BCpFGxmG.css">
 </head>
 <body>
@@ -406,18 +406,16 @@
   </div>
 </div>
 
-<!-- ════ CAREER DETAIL MODAL ════ -->
-<div id="modal-career-detail" class="modal-bd" style="display:none;" onclick="closeBD(event,'modal-career-detail')">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="m-header">
-      <div class="modal-title" id="career-detail-title">Detalle</div>
-      <button class="btn-xs" onclick="closeM('modal-career-detail')">✕</button>
+<!-- ════ CAREER DETAIL PANEL ════ -->
+<div id="career-detail-panel" class="career-detail-panel" style="display:none;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+    <div>
+      <div id="career-detail-title" style="font-size:1.25rem;font-weight:800;color:var(--text);"></div>
+      <div id="career-detail-meta" style="font-size:0.75rem;color:var(--text2);margin-top:0.25rem;"></div>
     </div>
-    <div class="m-body">
-      <div id="career-detail-meta" style="font-size: 13px; color: var(--text2); margin-bottom: 16px; font-weight:600;"></div>
-      <div id="career-detail-body"></div>
-    </div>
+    <button class="btn-xs" onclick="closeCareerDetail()" style="background:var(--bg); border:1px solid var(--border);">✕</button>
   </div>
+  <div id="career-detail-body"></div>
 </div>
 
 <!-- ════ SEMINAR MODAL ════ -->
