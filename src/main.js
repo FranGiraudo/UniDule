@@ -1,4 +1,5 @@
-import { loadState, currentView } from './core/state.js';
+import { loadState, loadStateFromCloud, currentView } from './core/state.js';
+import { STORAGE_KEY } from './core/constants.js';
 import { renderView, updateDate } from './core/router.js';
 import { ensureCareerLoaded } from './views/career.js';
 import { applyTheme } from './core/theme.js';
@@ -25,103 +26,68 @@ function showLogin() {
   if (app) app.style.display = 'none';
 }
 
-import { STORAGE_KEY } from './core/constants.js';
-
 async function checkAuth() {
   try {
-    const state = await fetchFullState();
-    if (state) {
-      const localSStr = localStorage.getItem(STORAGE_KEY);
-      if (localSStr) {
-        try {
-          const localS = JSON.parse(localSStr);
-          let didSync = false;
+    const cloudState = await fetchFullState();
 
-          if (localS.subjects && localS.subjects.length > 0) {
-            const serverSubIds = new Set((state.subjects || []).map(s => s.id));
-            const missingInServer = localS.subjects.filter(s => !serverSubIds.has(s.id));
-            
-            if (missingInServer.length > 0) {
-              console.log(`Encontradas ${missingInServer.length} materias locales no sincronizadas. Sincronizando...`);
-              for (const sub of missingInServer) {
-                try {
-                  await window.api.saveActiveSubject(sub);
-                  if (sub.grades && sub.grades.length > 0) {
-                    await window.api.syncGrades(sub.id, sub.grades);
-                  }
-                } catch(e) { console.error('Error syncing local subject', e); }
-              }
-              didSync = true;
+    if (cloudState) {
+      // Tenemos usuario logueado y datos del servidor.
+      // Leer local para hacer merge antes de sobreescribir.
+      const localRaw = localStorage.getItem(STORAGE_KEY);
+      let localS = null;
+      try { localS = localRaw ? JSON.parse(localRaw) : null; } catch(e) {}
+
+      // Si la nube devolvió subjects vacíos pero tenemos locales, sincronizarlos primero
+      if (cloudState.subjects.length === 0 && localS && localS.subjects && localS.subjects.length > 0) {
+        console.log('Sincronizando materias locales a la nube...');
+        for (const sub of localS.subjects) {
+          try {
+            await window.api.saveActiveSubject(sub);
+            if (sub.grades && sub.grades.length > 0) {
+              await window.api.syncGrades(sub.id, sub.grades);
             }
-          }
-          
-          if (localS.tasks && localS.tasks.length > 0) {
-            const serverTaskIds = new Set((state.tasks || []).map(t => t.id));
-            const missingTasks = localS.tasks.filter(t => !serverTaskIds.has(t.id));
-            
-            if (missingTasks.length > 0) {
-              console.log(`Encontradas ${missingTasks.length} tareas locales no sincronizadas. Sincronizando...`);
-              for (const task of missingTasks) {
-                try { await window.api.saveTask(task); } catch(e) { console.error('Error syncing local task', e); }
-              }
-              didSync = true;
-            }
-          }
-          
-          if (didSync) {
-            const newState = await fetchFullState();
-            if (newState) {
-              // Merge local items that are missing from server (e.g. if RLS blocks SELECT)
-              const mergedState = { ...newState };
-              const sSubIds = new Set((newState.subjects || []).map(s => s.id));
-              const missingSubs = (localS.subjects || []).filter(s => !sSubIds.has(s.id));
-              mergedState.subjects = [...(newState.subjects || []), ...missingSubs];
-              
-              const sTaskIds = new Set((newState.tasks || []).map(t => t.id));
-              const missingTasks = (localS.tasks || []).filter(t => !sTaskIds.has(t.id));
-              mergedState.tasks = [...(newState.tasks || []), ...missingTasks];
-              
-              window.S = mergedState;
-            } else {
-              window.S = localS;
-            }
-          } else {
-            // Even if no sync happened, merge local into state just in case RLS is blocking SELECT
-            const mergedState = { ...(state || {}) };
-            const sSubIds = new Set((mergedState.subjects || []).map(s => s.id));
-            const missingSubs = (localS.subjects || []).filter(s => !sSubIds.has(s.id));
-            mergedState.subjects = [...(mergedState.subjects || []), ...missingSubs];
-            
-            const sTaskIds = new Set((mergedState.tasks || []).map(t => t.id));
-            const missingTasks = (localS.tasks || []).filter(t => !sTaskIds.has(t.id));
-            mergedState.tasks = [...(mergedState.tasks || []), ...missingTasks];
-            
-            window.S = mergedState;
-          }
-        } catch(parseErr) {
-          window.S = state;
+          } catch(e) { console.error('Error subiendo materia local:', sub.name, e); }
         }
-      } else {
-        window.S = state;
+        // Re-fetch con los datos ya subidos
+        const refreshed = await fetchFullState();
+        if (refreshed) {
+          cloudState.subjects = refreshed.subjects;
+          cloudState.tasks = [...cloudState.tasks, ...refreshed.tasks.filter(t => !cloudState.tasks.find(ct => ct.id === t.id))];
+        }
       }
+
+      // Si la nube devolvió tasks vacías pero tenemos locales, sincronizarlas
+      if (cloudState.tasks.length === 0 && localS && localS.tasks && localS.tasks.length > 0) {
+        console.log('Sincronizando tareas locales a la nube...');
+        for (const task of localS.tasks) {
+          try { await window.api.saveTask(task); } catch(e) { console.error('Error subiendo tarea local:', e); }
+        }
+        const refreshed = await fetchFullState();
+        if (refreshed) cloudState.tasks = refreshed.tasks;
+      }
+
+      // Cargar el estado de la nube directamente en S (el módulo exportado que usan todas las vistas)
+      loadStateFromCloud(cloudState);
+
       window.isLoggedIn = true;
       const loginScreen = document.getElementById('login-screen');
       const app = document.getElementById('app');
       if (loginScreen) loginScreen.style.display = 'none';
       if (app) app.style.display = 'flex';
-      
-      loadState();
+
       ensureCareerLoaded();
       applyTheme(localStorage.getItem('theme') || 'dark');
       renderView(currentView);
-      
       updateDate();
       setInterval(updateDate, 60000);
     } else {
+      // No hay usuario logueado: cargar desde localStorage
+      loadState();
       showLogin();
     }
   } catch (e) {
-    console.error(e);
+    console.error('checkAuth error:', e);
+    loadState();
     showLogin();
   }
 }

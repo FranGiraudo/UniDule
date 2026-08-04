@@ -1,4 +1,4 @@
-import { STORAGE_KEY, DEF_SUBJECTS, DEF_TASKS, DEF_CAREER, DEF_SEMINARS, DEF_ELECTIVES, PATCHES } from './constants.js';
+﻿import { STORAGE_KEY, DEF_SUBJECTS, DEF_TASKS, DEF_CAREER, DEF_SEMINARS, DEF_ELECTIVES, PATCHES } from './constants.js';
 import { applyTheme } from './theme.js';
 
 export let S = { subjects:[], tasks:[] };
@@ -19,11 +19,16 @@ export let careerGridSearch = '';
 
 export function loadState() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    let raw = localStorage.getItem(STORAGE_KEY);
+    // Si estamos logueados y tenemos estado cargado en S, usamos ese estado en vez del localStorage
+    if (window.isLoggedIn && window.S && window.S.subjects) {
+      // S ya tiene los datos, no leemos de raw
+      raw = JSON.stringify(window.S);
+    }
     
     if (raw) {
       S = JSON.parse(raw);
-      // Asegurar campos mínimos
+      // Asegurar campos m├¡nimos
       S.subjects = (S.subjects || []).map(s => ({
         absences:0, maxAbsences:6, schedules:[], email:'', code:'',
         grades:[], status:'cursando', allowsPromotion:false, ...s
@@ -31,7 +36,7 @@ export function loadState() {
       S.tasks = (S.tasks || []).map(t => ({
         done:false, notes:'', subjectId:null, dueDate:null, ...t
       }));
-      // Migrar / Sincronizar career
+      // ÔöÇÔöÇ Migrar / Sincronizar career ÔöÇÔöÇ
       if (!S.career || !S.career.subjects || S.career.subjects.length < 30) {
         S.career = { subjects: DEF_CAREER.map(s=>({...s,correlatives:{toCurse:[...s.correlatives.toCurse],toPass:[...s.correlatives.toPass]}})) };
       } else {
@@ -42,6 +47,7 @@ export function loadState() {
           return {
             ...def,
             ...existing,
+            // Conservar el estado guardado del usuario
             status: (existing.status !== undefined && existing.status !== null) ? existing.status : def.status,
             grade: (existing.grade !== null && existing.grade !== undefined) ? existing.grade : def.grade,
             regDate: existing.regDate || def.regDate || null,
@@ -50,9 +56,10 @@ export function loadState() {
           };
         });
       }
+      // ÔöÇÔöÇ Sincronizaci├│n bidireccional entre S.subjects y S.career.subjects ÔöÇÔöÇ
       syncSubjectsAndCareer();
 
-      // MIGRACIÓN: parchear subjects con datos desactualizados
+      // ÔöÇÔöÇ MIGRACI├ôN: parchear subjects que ten├¡an datos desactualizados ÔöÇÔöÇ
       let patched = false;
       S.subjects = S.subjects.map(s => {
         const p = PATCHES[s.id];
@@ -62,13 +69,13 @@ export function loadState() {
         }
         if (s.id === 'gestion2' && s.room === 'A confirmar') {
           patched = true;
-          return { ...s, code:'496', professor:'Vanden, Guillermo', room:'Aula Híbrida 33',
+          return { ...s, code:'496', professor:'Vanden, Guillermo', room:'Aula H├¡brida 33',
             schedules: s.schedules.length ? s.schedules : PATCHES.gestion2.schedules };
         }
         return s;
       });
       if (!S.profile) {
-        S.profile = { name: 'Fran Giraudo', career: 'Ingeniería en Informática — IUA', theme: 'dark' };
+        S.profile = { name: 'Fran Giraudo', career: 'Ingenier├¡a en Inform├ítica ÔÇö IUA', theme: 'dark' };
       }
       if (S.profile && S.profile.theme) {
         applyTheme(S.profile.theme);
@@ -77,7 +84,7 @@ export function loadState() {
     } else {
       S = { subjects: DEF_SUBJECTS.map(s=>({...s})), tasks: DEF_TASKS.map(t=>({...t})),
             career: { subjects: DEF_CAREER.map(s=>({...s,correlatives:{toCurse:[...s.correlatives.toCurse],toPass:[...s.correlatives.toPass]}})) },
-            profile: { name: 'Fran Giraudo', career: 'Ingeniería en Informática — IUA', theme: 'dark' } };
+            profile: { name: 'Fran Giraudo', career: 'Ingenier├¡a en Inform├ítica ÔÇö IUA', theme: 'dark' } };
       syncSubjectsAndCareer();
       if (S.profile && S.profile.theme) {
         applyTheme(S.profile.theme);
@@ -86,79 +93,15 @@ export function loadState() {
     }
 
   } catch(e) {
-    console.error('loadState error:', e);
     S = { subjects: DEF_SUBJECTS.map(s=>({...s})), tasks: DEF_TASKS.map(t=>({...t})),
           career: { subjects: DEF_CAREER.map(s=>({...s,correlatives:{toCurse:[...s.correlatives.toCurse],toPass:[...s.correlatives.toPass]}})) },
-          profile: { name: 'Fran Giraudo', career: 'Ingeniería en Informática — IUA', theme: 'dark' } };
+          profile: { name: 'Fran Giraudo', career: 'Ingenier├¡a en Inform├ítica ÔÇö IUA', theme: 'dark' } };
     syncSubjectsAndCareer();
   }
 }
 
 export function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }
 
-// Carga datos de la nube directamente en S y los persiste en localStorage.
-// Esta es la fuente de verdad cuando el usuario está logueado.
-export function loadStateFromCloud(cloudState) {
-  try {
-    // Materias activas (las que el usuario está cursando este cuatrimestre)
-    S.subjects = (cloudState.subjects || []).map(s => ({
-      absences: 0, maxAbsences: 6, schedules: [], email: '', code: '',
-      grades: [], status: 'cursando', allowsPromotion: false, ...s
-    }));
-
-    // Tareas
-    S.tasks = (cloudState.tasks || []).map(t => ({
-      done: false, notes: '', subjectId: null, dueDate: null, ...t
-    }));
-
-    // Perfil
-    S.profile = cloudState.profile || { name: 'Usuario', career: 'Ingeniería en Informática', theme: 'dark' };
-
-    // Career: usar datos de la nube (user_progress) sobre la base de DEF_CAREER
-    const cloudCareerSubs = cloudState.career && cloudState.career.subjects;
-    if (cloudCareerSubs && cloudCareerSubs.length > 30) {
-      S.career = {
-        subjects: DEF_CAREER.map(def => {
-          const fromCloud = cloudCareerSubs.find(x => String(x.id) === String(def.id) || x.code === def.code);
-          return {
-            ...def,
-            correlatives: { toCurse: [...def.correlatives.toCurse], toPass: [...def.correlatives.toPass] },
-            status: fromCloud ? fromCloud.status : 'pendiente',
-            grade: fromCloud ? fromCloud.grade : null,
-            regDate: fromCloud ? fromCloud.regDate : null,
-            expDate: fromCloud ? fromCloud.expDate : null,
-          };
-        }),
-        electives: cloudState.career.electives || [],
-        seminars: cloudState.career.seminars || []
-      };
-    } else {
-      // La nube no tiene career data todavía: usar local si existe, sino defaults
-      const localRaw = localStorage.getItem(STORAGE_KEY);
-      const localS = localRaw ? JSON.parse(localRaw) : null;
-      if (localS && localS.career && localS.career.subjects && localS.career.subjects.length >= 30) {
-        S.career = localS.career;
-      } else {
-        S.career = {
-          subjects: DEF_CAREER.map(s => ({...s, correlatives:{toCurse:[...s.correlatives.toCurse],toPass:[...s.correlatives.toPass]}})),
-          electives: [],
-          seminars: []
-        };
-      }
-    }
-
-    syncSubjectsAndCareer();
-
-    if (S.profile && S.profile.theme) {
-      applyTheme(S.profile.theme);
-    }
-
-    // Persistir en localStorage para que esté disponible offline y en recargas
-    save();
-  } catch(e) {
-    console.error('loadStateFromCloud error:', e);
-  }
-}
 
 export function syncSubjectsAndCareer() {
   if (!S.career || !S.career.subjects) return;
@@ -175,7 +118,7 @@ export function syncSubjectsAndCareer() {
   const expDayStr = String(expDateObj.getDate()).padStart(2, '0');
   const expFormatted = `${expYearStr}-${expMonthStr}-${expDayStr}`;
 
-  // Mapa de alías para migrar IDs antiguos a los oficiales del plan
+  // Mapa de al├¡as para migrar IDs antiguos a los oficiales del plan
   const idAliasMap = {
     'auditoria': 'cs-aud',
     'fisica2': 'cs-fis2',
@@ -213,7 +156,7 @@ export function syncSubjectsAndCareer() {
     });
   }
 
-  // 3. Reconstruir S.subjects ÚNICAMENTE con las materias que están CURSANDO
+  // 3. Reconstruir S.subjects ├ÜNICAMENTE con las materias que est├ín CURSANDO
   const cursandoSubs = S.career.subjects.filter(cs => cs.status === 'cursando');
   const cleanSubjects = [];
   const processedIds = new Set();
@@ -222,6 +165,7 @@ export function syncSubjectsAndCareer() {
     if (processedIds.has(cs.id)) return;
     processedIds.add(cs.id);
 
+    // Buscar si ya existen datos ingresados previamente por el usuario
     const existing = S.subjects.find(s =>
       s.id === cs.id ||
       (s.code && cs.code && (s.code === cs.code || s.code.slice(-3) === cs.code.slice(-3))) ||
@@ -239,6 +183,7 @@ export function syncSubjectsAndCareer() {
         status: 'cursando'
       });
     } else {
+      // Buscar en los valores por defecto predefinidos
       const defMatch = DEF_SUBJECTS.find(d => d.id === cs.id || d.name.toLowerCase() === cs.name.toLowerCase());
       if (defMatch) {
         cleanSubjects.push({
