@@ -231,15 +231,22 @@ export async function syncGrades(activeSubjectId, gradesArray) {
   }
 
   if (gradesArray && gradesArray.length > 0) {
-    const toUpsert = gradesArray.map(g => ({
-      id: g.id,
-      user_id: user.id,
-      active_subject_id: activeSubjectId,
-      title: g.title || g.type || 'Nota',
-      grade: g.score || g.grade || 0,
-      date: g.date || null,
-      weight: g.weight || null
-    }));
+    const toUpsert = gradesArray.map(g => {
+      // Use score if defined; fallback to grade; if both missing → null (not 0)
+      const rawScore = g.score !== undefined && g.score !== null && g.score !== '' ? g.score
+                     : g.grade !== undefined && g.grade !== null && g.grade !== '' ? g.grade
+                     : null;
+      const numGrade = rawScore !== null ? parseFloat(rawScore) : null;
+      return {
+        id: g.id,
+        user_id: user.id,
+        active_subject_id: activeSubjectId,
+        title: g.title || g.type || 'Nota',
+        grade: (numGrade !== null && !isNaN(numGrade)) ? numGrade : null,
+        date: g.date || null,
+        weight: g.weight || null
+      };
+    });
     const { error } = await supabase.from('user_grades').upsert(toUpsert);
     if (error) throw error;
   }
