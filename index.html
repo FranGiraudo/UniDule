@@ -385,6 +385,88 @@
   </div>
 </div>
 
+<!-- ════ GRADE PROMPT MODAL ════ -->
+<div id="modal-grade-prompt" class="modal-bd" style="display:none;" onclick="closeBD(event,'modal-grade-prompt')">
+  <div class="modal-box modal-sm" onclick="event.stopPropagation()">
+    <div class="m-header">
+      <div class="modal-title">Anotar Nota</div>
+      <button class="btn-xs" onclick="closeM('modal-grade-prompt')">✕</button>
+    </div>
+    <div class="m-body">
+      <input type="hidden" id="grade-prompt-task-id">
+      <p style="margin: 0 0 10px; font-size: 14px; color: var(--text2); font-weight: bold;" id="grade-prompt-sub"></p>
+      <label class="f-label">Calificación (0-10)</label>
+      <input type="number" step="0.5" min="0" max="10" class="f-input" id="grade-prompt-score" placeholder="Ej: 8" style="font-size:24px; font-weight:800; text-align:center;">
+    </div>
+    <div class="m-footer">
+      <button class="btn btn-ghost" onclick="closeM('modal-grade-prompt')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveGradeFromModal()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ CAREER DETAIL MODAL ════ -->
+<div id="modal-career-detail" class="modal-bd" style="display:none;" onclick="closeBD(event,'modal-career-detail')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="m-header">
+      <div class="modal-title" id="career-detail-title">Detalle</div>
+      <button class="btn-xs" onclick="closeM('modal-career-detail')">✕</button>
+    </div>
+    <div class="m-body">
+      <div id="career-detail-meta" style="font-size: 13px; color: var(--text2); margin-bottom: 16px; font-weight:600;"></div>
+      <div id="career-detail-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ SEMINAR MODAL ════ -->
+<div id="modal-seminar" class="modal-bd" style="display:none;" onclick="closeBD(event,'modal-seminar')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="m-header">
+      <div class="modal-title" id="seminar-modal-title">Nuevo Seminario</div>
+      <button class="btn-xs" onclick="closeM('modal-seminar')">✕</button>
+    </div>
+    <div class="m-body">
+      <input type="hidden" id="sem-edit-id">
+      <div class="form-grid">
+        <div style="grid-column: 1 / -1;">
+          <label class="f-label">Nombre del Seminario / Curso *</label>
+          <input type="text" class="f-input" id="sem-name" placeholder="Ej: Machine Learning">
+        </div>
+        <div>
+          <label class="f-label">Código</label>
+          <input type="text" class="f-input" id="sem-code" placeholder="Opcional">
+        </div>
+        <div>
+          <label class="f-label">Categoría</label>
+          <select class="f-input" id="sem-category">
+            <option value="Técnico">Técnico</option>
+            <option value="Habilidades Blandas">Habilidades Blandas</option>
+            <option value="Idiomas">Idiomas</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+        <div>
+          <label class="f-label">Horas *</label>
+          <input type="number" class="f-input" id="sem-hours" min="1" value="30">
+        </div>
+        <div>
+          <label class="f-label">Fecha de finalización</label>
+          <input type="date" class="f-input" id="sem-date">
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <label class="f-label">Notas / Link al certificado</label>
+          <textarea class="f-input" id="sem-notes" style="height:60px;resize:none;" placeholder="https://..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="m-footer">
+      <button class="btn btn-ghost" onclick="closeM('modal-seminar')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveSeminarModal()">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <script type="module" src="/src/main.js"></script>
 </body>
 </html>

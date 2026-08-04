@@ -803,7 +803,10 @@ function csSetGrade(id, val) {
 window.setCareerTab = setCareerTab;
 window.setCareerGridFilter = setCareerGridFilter;
 window.setCareerGridSearch = setCareerGridSearch;
-
-window.setCareerTab = setCareerTab;
-window.setCareerGridFilter = setCareerGridFilter;
-window.setCareerGridSearch = setCareerGridSearch;
+window.openCareerSubDetail = openCareerSubDetail;
+window.csSetStatus = csSetStatus;
+window.csSetGrade = csSetGrade;
+window.openAddSeminarModal = openAddSeminarModal;
+window.saveSeminarModal = saveSeminarModal;
+window.toggleSeminarStatus = toggleSeminarStatus;
+window.delSeminar = delSeminar;
