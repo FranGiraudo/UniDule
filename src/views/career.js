@@ -616,58 +616,190 @@ export function renderCareerStats() {
   const maxBin = Math.max(...bins, 1);
 
   el.innerHTML = `
-    <div class="cs-layout">
+    <style>
+      .premium-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 1.25rem;
+        animation: fadeIn 0.5s ease-out;
+      }
+      .premium-card {
+        background: color-mix(in srgb, var(--card2) 60%, transparent);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .premium-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      }
+      .premium-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      }
+      .premium-ring-col {
+        grid-column: span 6;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      @media (max-width: 900px) {
+        .premium-ring-col { grid-column: span 12; }
+      }
+      .ring-title-badge {
+        font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+        padding: 0.35rem 0.85rem; border-radius: 2rem; margin-bottom: 0.85rem;
+      }
+      .ring-title {
+        font-size: 1.25rem; font-weight: 900; color: var(--text);
+        margin-bottom: 1.5rem; text-align: center; line-height: 1.2;
+      }
+      .ring-stats-box {
+        margin-top: 1.5rem;
+        display: flex; gap: 1.5rem;
+        background: rgba(0,0,0,0.15);
+        padding: 0.75rem 1.25rem;
+        border-radius: 1rem;
+        border: 1px solid rgba(255,255,255,0.05);
+      }
+      .ring-stat-item {
+        display: flex; flex-direction: column; align-items: center;
+      }
+      .ring-stat-val { font-size: 1.15rem; font-weight: 900; color: var(--text); }
+      .ring-stat-lbl { font-size: 0.65rem; color: var(--text2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+      
+      .mini-stats-grid {
+        grid-column: span 12;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+      }
+      @media (max-width: 768px) {
+        .mini-stats-grid { grid-template-columns: repeat(2, 1fr); }
+      }
+      .mini-stat-card {
+        background: linear-gradient(145deg, var(--card2), rgba(0,0,0,0));
+        border: 1px solid var(--border);
+        border-radius: 1rem;
+        padding: 1.25rem;
+        display: flex; flex-direction: column;
+        position: relative; overflow: hidden;
+      }
+      .mini-stat-icon {
+        position: absolute; right: -10px; bottom: -10px;
+        opacity: 0.05; width: 80px; height: 80px;
+      }
+      
+      .histo-card {
+        grid-column: span 12;
+      }
+      
+      @keyframes popIn {
+        0% { opacity: 0; transform: scale(0.9); }
+        100% { opacity: 1; transform: scale(1); }
+      }
+      .svg-ring-bg { stroke: color-mix(in srgb, var(--border) 50%, transparent); }
+    </style>
+
+    <div class="premium-stats-grid">
       <!-- Card Ing. Informática -->
-      <div class="cs-card cs-ring-card">
-        <div style="font-size:0.75rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.25rem;">Título de Grado</div>
-        <div style="font-size:1rem;font-weight:900;color:var(--text);margin-bottom:0.75rem;text-align:center;">Ingeniería en Informática</div>
+      <div class="premium-card premium-ring-col">
+        <div class="ring-title-badge" style="background: rgba(74,222,128,0.15); color: #4ade80;">Título de Grado</div>
+        <div class="ring-title">Ingeniería en Informática</div>
         
-        <svg width="150" height="150" viewBox="0 0 160 160">
-          <circle cx="80" cy="80" r="${R}" fill="none" stroke="var(--border)" stroke-width="12"/>
-          <circle cx="80" cy="80" r="${R}" fill="none" stroke="rgba(167,139,250,.35)" stroke-width="12"
+        <svg width="180" height="180" viewBox="0 0 160 160" style="filter: drop-shadow(0 10px 20px rgba(74,222,128,0.2)); animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);">
+          <defs>
+            <linearGradient id="gradIng" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#4ade80" />
+              <stop offset="100%" stop-color="#3b82f6" />
+            </linearGradient>
+            <linearGradient id="gradIngProy" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="rgba(167,139,250,0.6)" />
+              <stop offset="100%" stop-color="rgba(167,139,250,0.2)" />
+            </linearGradient>
+          </defs>
+          <circle cx="80" cy="80" r="${R}" fill="none" class="svg-ring-bg" stroke-width="14"/>
+          <circle cx="80" cy="80" r="${R}" fill="none" stroke="url(#gradIngProy)" stroke-width="14"
             stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${dashOffProy.toFixed(1)}"
-            stroke-linecap="round" transform="rotate(-90 80 80)" style="transition:stroke-dashoffset .8s ease;"/>
-          <circle cx="80" cy="80" r="${R}" fill="none" stroke="#4ade80" stroke-width="12"
+            stroke-linecap="round" transform="rotate(-90 80 80)" style="transition:stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1);"/>
+          <circle cx="80" cy="80" r="${R}" fill="none" stroke="url(#gradIng)" stroke-width="14"
             stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${dashOffActual.toFixed(1)}"
-            stroke-linecap="round" transform="rotate(-90 80 80)" style="transition:stroke-dashoffset .8s ease;"/>
-          <text x="80" y="72" text-anchor="middle" fill="var(--text)" font-size="24" font-weight="900">${pctActual}%</text>
-          <text x="80" y="88" text-anchor="middle" fill="#4ade80" font-size="9" font-weight="700">Actual</text>
-          <text x="80" y="100" text-anchor="middle" fill="#a78bfa" font-size="8.5">Proy: ${pctProyectado}%</text>
+            stroke-linecap="round" transform="rotate(-90 80 80)" style="transition:stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1) 0.2s;"/>
+          <text x="80" y="76" text-anchor="middle" fill="var(--text)" font-size="32" font-weight="900" font-family="system-ui, sans-serif">${pctActual}%</text>
+          <text x="80" y="94" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="700" letter-spacing="0.05em">ACTUAL</text>
+          <text x="80" y="108" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="600">PROY: ${pctProyectado}%</text>
         </svg>
-        <div style="font-size:0.75rem;color:var(--text2);text-align:center;margin-top:0.5rem;">
-          <b>${aprobadas}</b> aprobadas · <b>${regulares}</b> regulares
+        
+        <div class="ring-stats-box">
+          <div class="ring-stat-item">
+            <span class="ring-stat-val" style="color: #4ade80;">${aprobadas}</span>
+            <span class="ring-stat-lbl">Aprobadas</span>
+          </div>
+          <div style="width: 1px; background: rgba(255,255,255,0.1);"></div>
+          <div class="ring-stat-item">
+            <span class="ring-stat-val" style="color: #a78bfa;">${regulares}</span>
+            <span class="ring-stat-lbl">Regulares</span>
+          </div>
         </div>
       </div>
 
       <!-- Card Título Intermedio -->
-      <div class="cs-card cs-ring-card" style="border-color:rgba(96,165,250,.3);">
-        <div style="font-size:0.75rem;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.25rem;">Título Intermedio</div>
-        <div style="font-size:1rem;font-weight:900;color:var(--text);margin-bottom:0.75rem;text-align:center;">Analista de Sistemas Informáticos</div>
+      <div class="premium-card premium-ring-col">
+        <div class="ring-title-badge" style="background: rgba(96,165,250,0.15); color: #60a5fa;">Título Intermedio</div>
+        <div class="ring-title">Analista de Sistemas Informáticos</div>
         
-        <svg width="150" height="150" viewBox="0 0 160 160">
-          <circle cx="80" cy="80" r="${R}" fill="none" stroke="var(--border)" stroke-width="12"/>
-          <circle cx="80" cy="80" r="${R}" fill="none" stroke="rgba(96,165,250,.35)" stroke-width="12"
+        <svg width="180" height="180" viewBox="0 0 160 160" style="filter: drop-shadow(0 10px 20px rgba(96,165,250,0.2)); animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;">
+          <defs>
+            <linearGradient id="gradAna" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#60a5fa" />
+              <stop offset="100%" stop-color="#a78bfa" />
+            </linearGradient>
+            <linearGradient id="gradAnaProy" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="rgba(251,191,36,0.6)" />
+              <stop offset="100%" stop-color="rgba(251,191,36,0.2)" />
+            </linearGradient>
+          </defs>
+          <circle cx="80" cy="80" r="${R}" fill="none" class="svg-ring-bg" stroke-width="14"/>
+          <circle cx="80" cy="80" r="${R}" fill="none" stroke="url(#gradAnaProy)" stroke-width="14"
             stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - pctAnalistaProyectado/100)).toFixed(1)}"
-            stroke-linecap="round" transform="rotate(-90 80 80)" style="transition:stroke-dashoffset .8s ease;"/>
-          <circle cx="80" cy="80" r="${R}" fill="none" stroke="#60a5fa" stroke-width="12"
+            stroke-linecap="round" transform="rotate(-90 80 80)" style="transition:stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1);"/>
+          <circle cx="80" cy="80" r="${R}" fill="none" stroke="url(#gradAna)" stroke-width="14"
             stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - pctAnalistaActual/100)).toFixed(1)}"
-            stroke-linecap="round" transform="rotate(-90 80 80)" style="transition:stroke-dashoffset .8s ease;"/>
-          <text x="80" y="72" text-anchor="middle" fill="var(--text)" font-size="24" font-weight="900">${pctAnalistaActual}%</text>
-          <text x="80" y="88" text-anchor="middle" fill="#60a5fa" font-size="9" font-weight="700">Actual (1º-3º año)</text>
-          <text x="80" y="100" text-anchor="middle" fill="#93c5fd" font-size="8.5">Proy: ${pctAnalistaProyectado}%</text>
+            stroke-linecap="round" transform="rotate(-90 80 80)" style="transition:stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1) 0.2s;"/>
+          <text x="80" y="76" text-anchor="middle" fill="var(--text)" font-size="32" font-weight="900" font-family="system-ui, sans-serif">${pctAnalistaActual}%</text>
+          <text x="80" y="94" text-anchor="middle" fill="#60a5fa" font-size="10" font-weight="700" letter-spacing="0.05em">ACTUAL</text>
+          <text x="80" y="108" text-anchor="middle" fill="#fbbf24" font-size="9" font-weight="600">PROY: ${pctAnalistaProyectado}%</text>
         </svg>
-        <div style="font-size:0.75rem;color:var(--text2);text-align:center;margin-top:0.5rem;">
-          <b>${analistaAprobadas} / ${analistaTotal}</b> materias aprobadas
+        
+        <div class="ring-stats-box">
+          <div class="ring-stat-item">
+            <span class="ring-stat-val" style="color: #60a5fa;">${analistaAprobadas}</span>
+            <span class="ring-stat-lbl">Aprobadas</span>
+          </div>
+          <div style="width: 1px; background: rgba(255,255,255,0.1);"></div>
+          <div class="ring-stat-item">
+            <span class="ring-stat-val" style="color: var(--text2);">${analistaTotal}</span>
+            <span class="ring-stat-lbl">Total Requeridas</span>
+          </div>
         </div>
       </div>
 
       <!-- Mini Grid de Estadísticas -->
-      <div class="cs-mini-grid" style="grid-column: 1 / -1;">
+      <div class="mini-stats-grid">
         ${(()=>{
           const isL = THEMES[S.profile?.theme||'dark']?.isLight;
           const c = isL 
-            ? ['#16a34a','#7c3aed','#2563eb','#d97706','#7c3aed','#059669','#4f46e5','var(--text2)']
-            : ['#4ade80','#a78bfa','#60a5fa','#fbbf24','#c4b5fd','#34d399','var(--primary)','var(--text2)'];
+            ? ['#16a34a','#7c3aed','#2563eb','#d97706','#e11d48','#059669','#4f46e5','var(--text2)']
+            : ['#4ade80','#a78bfa','#60a5fa','#fbbf24','#f43f5e','#34d399','#818cf8','var(--text2)'];
           return [
             ['Aprobadas Total',  aprobadas,   c[0]],
             ['Regulares Pend.',  regulares,   c[1]],
@@ -677,28 +809,38 @@ export function renderCareerStats() {
             ['Prom. Aprobadas',  avgPass,     c[5]],
             ['Créditos Aprob.',  approvedCred,c[6]],
             ['Créditos Total',   totalCred,   c[7]],
-          ].map(([lbl,val,col])=>`
-            <div class="cs-mini-card">
-              <div class="cs-mini-val" style="color:${col};">${val}</div>
-              <div class="cs-mini-lbl">${lbl}</div>
+          ].map(([lbl,val,col], i)=>`
+            <div class="mini-stat-card" style="animation: popIn 0.4s ease-out ${0.1 * i}s both;">
+              <div style="font-size:2rem; font-weight:900; line-height:1; color:${col}; margin-bottom:0.35rem; font-family:system-ui, sans-serif;">${val}</div>
+              <div style="font-size:0.65rem; color:var(--text2); font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">${lbl}</div>
             </div>`).join('');
         })()}
       </div>
 
       ${allGrades.length >= 2 ? `
-      <div class="cs-card cs-histo-card">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);margin-bottom:14px;">Distribución de Notas (Exámenes Finales)</div>
-        <div style="display:flex;align-items:flex-end;gap:5px;height:90px;">
+      <div class="premium-card histo-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+          <div>
+            <div style="font-size:1.15rem; font-weight:800; color:var(--text);">Distribución de Notas</div>
+            <div style="font-size:0.75rem; color:var(--text2); margin-top:0.25rem;">Histórico de calificaciones en exámenes finales</div>
+          </div>
+          <div style="padding:0.4rem 0.8rem; background:rgba(255,255,255,0.05); border-radius:0.5rem; font-size:0.75rem; font-weight:700;">
+            Mejor nota: <span style="color:#4ade80;">${Math.max(...allGrades)}</span>
+          </div>
+        </div>
+        
+        <div style="display:flex; align-items:flex-end; gap:8px; height:120px; padding:10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
           ${bins.map((count,i) => {
-            const h = count ? Math.max(8,Math.round(count/maxBin*78)) : 2;
+            const h = count ? Math.max(15, Math.round(count/maxBin*100)) : 4;
             const c = i>=4 ? '#4ade80' : '#f87171';
-            return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
-              <div style="font-size:9px;color:var(--text2);min-height:12px;">${count||''}</div>
-              <div style="height:${h}px;width:100%;background:${c};border-radius:3px 3px 0 0;opacity:${count?1:.15};transition:height .4s ease;"></div>
-              <div style="font-size:9px;color:var(--text2);">${i}</div>
+            return `<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; position:relative; group;">
+              <div style="font-size:10px; font-weight:700; color:var(--text); opacity:${count?1:0}; transform:translateY(${count?0:5}px); transition:all 0.3s;">${count||''}</div>
+              <div style="height:${h}px; width:100%; background:linear-gradient(180deg, ${c}, transparent); border-radius:4px 4px 0 0; opacity:${count?0.8:0.1}; transition:all 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow:${count ? `0 0 10px ${c}40` : 'none'}; cursor:pointer;" onmouseover="this.style.opacity='1'; this.style.transform='scaleY(1.05)'" onmouseout="this.style.opacity='${count?0.8:0.1}'; this.style.transform='scaleY(1)'"></div>
+              <div style="font-size:11px; font-weight:600; color:var(--text2); position:absolute; bottom:-25px;">${i}</div>
             </div>`;
           }).join('')}
         </div>
+        <div style="height:35px;"></div>
       </div>` : ''}
     </div>`;
 }

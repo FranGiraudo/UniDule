@@ -300,8 +300,15 @@ export async function saveGrades() {
   s.allowsPromotion = document.getElementById('grades-promotion').checked;
 
   let careerMatch = null;
-  if (S.career && S.career.subjects) {
-    careerMatch = S.career.subjects.find(cs => cs.id === s.id || (cs.code && cs.code === s.code) || cs.name.toLowerCase() === s.name.toLowerCase());
+  let isElective = false;
+  if (S.career) {
+    if (S.career.subjects) {
+      careerMatch = S.career.subjects.find(cs => cs.id === s.id || (cs.code && cs.code === s.code) || cs.name.toLowerCase() === s.name.toLowerCase());
+    }
+    if (!careerMatch && S.career.electives) {
+      careerMatch = S.career.electives.find(ce => ce.id === s.id || (ce.code && ce.code === s.code) || ce.name.toLowerCase() === s.name.toLowerCase());
+      if (careerMatch) isElective = true;
+    }
     if (careerMatch) {
       careerMatch.status = (newStatus === 'aprobado' || newStatus === 'promocionado') ? 'aprobada' : newStatus;
     }
@@ -313,7 +320,7 @@ export async function saveGrades() {
     try {
       await window.api.saveActiveSubject(s);
       await window.api.syncGrades(s.id, s.grades);
-      if (careerMatch) await window.api.syncSubjectProgress(careerMatch.id, 'subject', careerMatch.status, careerMatch.grade, careerMatch.regDate, careerMatch.expDate);
+      if (careerMatch) await window.api.syncSubjectProgress(careerMatch.id, isElective ? 'elective' : 'subject', careerMatch.status, careerMatch.grade, careerMatch.regDate, careerMatch.expDate);
     } catch(e) { console.error(e); }
   }
   closeM('modal-grades');

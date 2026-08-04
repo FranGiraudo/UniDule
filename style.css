@@ -844,3 +844,6 @@ input[type="number"] {
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
+
+input[type="time"]::-webkit-calendar-picker-indicator { display: none; -webkit-appearance: none; }
+
