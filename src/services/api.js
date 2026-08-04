@@ -88,7 +88,7 @@ export async function fetchFullState() {
 
   const careerSubs = (globalSubsData || []).map(g => {
     // user_progress.global_id stores the code (e.g. 'cs-info1'), not the UUID
-    const prog = (progressData || []).find(p => p.global_id === g.code && p.type === 'subject');
+    const prog = (progressData || []).find(p => p.global_id === g.code);
     return {
       ...g,
       id: g.code,  // frontend uses code as the logical id (matches DEF_CAREER)
@@ -101,7 +101,7 @@ export async function fetchFullState() {
   });
 
   const careerElecs = (globalElecsData || []).map(g => {
-    const prog = (progressData || []).find(p => p.global_id === g.code && p.type === 'elective');
+    const prog = (progressData || []).find(p => p.global_id === g.code);
     return {
       ...g,
       id: g.code,
