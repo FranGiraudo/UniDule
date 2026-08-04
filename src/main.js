@@ -1,68 +1,34 @@
-import * as api from './services/api.js';
-const { loginUser, registerUser, fetchFullState, logoutUser } = api;
-window.api = api;
-window.isLoggedIn = false;
+import { loadState, currentView } from './core/state.js';
+import { renderView } from './core/router.js';
+import { updateDate } from './core/router.js';
+import { ensureCareerLoaded } from './views/career.js';
+import { applyTheme } from './core/theme.js';
 
-async function checkAuth() {
-  try {
-    const state = await fetchFullState();
-    if (state) {
-      window.S = state;
-      window.isLoggedIn = true;
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('app').style.display = 'flex';
-      
-      // Init legacy app logic
-      if (typeof window.init === 'function') {
-        window.init();
-      }
-    } else {
-      showLogin();
-    }
-  } catch (e) {
-    console.error(e);
-    showLogin();
-  }
-}
-
-function showLogin() {
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-}
-
-window.handleLogin = async (e) => {
-  e.preventDefault();
-  const email = document.getElementById('auth-email').value;
-  const pass = document.getElementById('auth-pass').value;
-  if (!email || !pass) return alert('Por favor, completa los datos');
-  try {
-    await loginUser(email, pass);
-    checkAuth();
-  } catch (err) {
-    alert('Error al iniciar sesión: ' + err.message);
-  }
-}
-
-window.handleRegister = async (e) => {
-  e.preventDefault();
-  const email = document.getElementById('auth-email').value;
-  const pass = document.getElementById('auth-pass').value;
-  if (!email || !pass) return alert('Por favor, completa los datos');
-  try {
-    await registerUser(email, pass);
-    alert('Registro exitoso. Iniciando sesión...');
-    await loginUser(email, pass);
-    checkAuth();
-  } catch (err) {
-    alert('Error al registrar: ' + err.message);
-  }
-}
-
-window.handleLogout = async () => {
-  await logoutUser();
-  window.location.reload();
-}
+// Import all views so they attach to window (for inline onclick handlers)
+import './views/dashboard.js';
+import './views/schedule.js';
+import './views/subjects.js';
+import './views/tasks.js';
+import './views/attendance.js';
+import './views/career.js';
+import './views/careerMap.js';
+import './views/settings.js';
 
 window.addEventListener('DOMContentLoaded', () => {
-  checkAuth();
+  loadState();
+  ensureCareerLoaded();
+  applyTheme(localStorage.getItem('theme') || 'dark');
+  renderView(currentView);
+  
+  // start date update interval
+  updateDate();
+  setInterval(updateDate, 60000);
+});
+
+// PWA installation logic
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  window.setDeferredPrompt(e);
+  const btn = document.getElementById('install-btn');
+  if (btn) btn.style.display = 'block';
 });
