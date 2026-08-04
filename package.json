@@ -1,0 +1,20 @@
+{
+  "name": "horario",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "bugs": {
+    "url": "https://github.com/FranGiraudo/Horario/issues"
+  },
+  "homepage": "https://github.com/FranGiraudo/Horario#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.112.0",
+    "vite": "^8.2.0"
+  }
+}

@@ -1,0 +1,1351 @@
+{
+  "version": 3,
+  "exportedAt": "2026-08-03T21:54:44.045Z",
+  "data": {
+    "subjects": [
+      {
+        "absences": 0,
+        "maxAbsences": 6,
+        "schedules": [],
+        "email": "",
+        "code": "000456",
+        "grades": [],
+        "status": "cursando",
+        "allowsPromotion": false,
+        "id": "cs-fis2",
+        "name": "Física 2",
+        "color": "#f59e0b",
+        "professor": "A confirmar",
+        "room": "A confirmar"
+      },
+      {
+        "absences": 0,
+        "maxAbsences": 6,
+        "schedules": [
+          {
+            "id": "f1",
+            "day": "Lunes",
+            "startTime": "08:00",
+            "endTime": "10:15",
+            "type": "Clases"
+          },
+          {
+            "id": "f2",
+            "day": "Viernes",
+            "startTime": "11:45",
+            "endTime": "13:45",
+            "type": "Clases"
+          }
+        ],
+        "email": "",
+        "code": "000463",
+        "grades": [],
+        "status": "cursando",
+        "allowsPromotion": false,
+        "id": "cs-bd1",
+        "name": "Base de Datos 1",
+        "color": "#0ea5e9",
+        "professor": "Boggio, A. / Perez, S.",
+        "room": "Aula 28"
+      },
+      {
+        "absences": 0,
+        "maxAbsences": 6,
+        "schedules": [],
+        "email": "",
+        "code": "000467",
+        "grades": [],
+        "status": "cursando",
+        "allowsPromotion": false,
+        "id": "cs-metnum",
+        "name": "Métodos Numéricos",
+        "color": "#a855f7",
+        "professor": "A confirmar",
+        "room": "A confirmar"
+      },
+      {
+        "absences": 0,
+        "maxAbsences": 6,
+        "schedules": [
+          {
+            "id": "c1",
+            "day": "Martes",
+            "startTime": "10:15",
+            "endTime": "12:15",
+            "type": "Clases"
+          }
+        ],
+        "email": "",
+        "code": "000256",
+        "grades": [],
+        "status": "cursando",
+        "allowsPromotion": false,
+        "id": "cs-probest",
+        "name": "Probabilidad y Estadística",
+        "color": "#14b8a6",
+        "professor": "Luczywo, Nadia",
+        "room": "Aula 28"
+      },
+      {
+        "absences": 0,
+        "maxAbsences": 6,
+        "schedules": [
+          {
+            "id": "a1",
+            "day": "Martes",
+            "startTime": "10:35",
+            "endTime": "12:10",
+            "type": "Práctico"
+          },
+          {
+            "id": "a2",
+            "day": "Jueves",
+            "startTime": "14:45",
+            "endTime": "16:20",
+            "type": "Teórico"
+          }
+        ],
+        "email": "",
+        "code": "000478",
+        "grades": [
+          {
+            "id": "msdkn4brwrzb",
+            "type": "Parcial 1",
+            "score": "",
+            "date": "2026-08-11"
+          }
+        ],
+        "status": "cursando",
+        "allowsPromotion": false,
+        "id": "cs-audit",
+        "name": "Auditoría",
+        "color": "#6366f1",
+        "professor": "Tapia, C. / Casanovas, J.I.",
+        "room": "Aula 14"
+      },
+      {
+        "absences": 0,
+        "maxAbsences": 6,
+        "schedules": [
+          {
+            "id": "d1",
+            "day": "Jueves",
+            "startTime": "09:45",
+            "endTime": "12:10",
+            "type": "Teórico-Lab"
+          },
+          {
+            "id": "d2",
+            "day": "Viernes",
+            "startTime": "08:00",
+            "endTime": "09:30",
+            "type": "Práctico-Lab"
+          }
+        ],
+        "email": "",
+        "code": "000471",
+        "grades": [],
+        "status": "cursando",
+        "allowsPromotion": false,
+        "id": "cs-redes1",
+        "name": "Redes 1",
+        "color": "#f97316",
+        "professor": "Giovanardi, E. / Ávila Mattar, C.",
+        "room": "Lab Redes"
+      },
+      {
+        "absences": 0,
+        "maxAbsences": 6,
+        "schedules": [
+          {
+            "id": "e1",
+            "day": "Lunes",
+            "startTime": "14:45",
+            "endTime": "16:20",
+            "type": "Teórico"
+          },
+          {
+            "id": "e2",
+            "day": "Martes",
+            "startTime": "13:55",
+            "endTime": "15:30",
+            "type": "Práctico-Lab"
+          }
+        ],
+        "email": "",
+        "code": "000813",
+        "grades": [],
+        "status": "cursando",
+        "allowsPromotion": false,
+        "id": "cs-progfunc",
+        "name": "Prog. Funcional y Scripting",
+        "color": "#f43f5e",
+        "professor": "Montes, M. / García Mattio, M.",
+        "room": "Aula 14"
+      },
+      {
+        "absences": 0,
+        "maxAbsences": 6,
+        "schedules": [
+          {
+            "id": "b1",
+            "day": "Martes",
+            "startTime": "13:55",
+            "endTime": "15:30",
+            "type": "Teórico-Lab"
+          },
+          {
+            "id": "b2",
+            "day": "Jueves",
+            "startTime": "19:00",
+            "endTime": "20:35",
+            "type": "Práctico-Lab"
+          }
+        ],
+        "email": "",
+        "code": "000806",
+        "grades": [],
+        "status": "cursando",
+        "allowsPromotion": false,
+        "id": "cs-ingweb3",
+        "name": "Ingeniería Web 3",
+        "color": "#ec4899",
+        "professor": "García Mattio, M. / Silvestre, A.",
+        "room": "Aula 26"
+      },
+      {
+        "absences": 0,
+        "maxAbsences": 6,
+        "schedules": [
+          {
+            "id": "g1",
+            "day": "Lunes",
+            "startTime": "11:25",
+            "endTime": "13:00",
+            "type": "Teórico"
+          }
+        ],
+        "email": "",
+        "code": "000496",
+        "grades": [],
+        "status": "cursando",
+        "allowsPromotion": false,
+        "id": "cs-gestemp2",
+        "name": "Gestión de Empresas 2",
+        "color": "#10b981",
+        "professor": "Vanden, Guillermo",
+        "room": "Aula Híbrida 33"
+      }
+    ],
+    "tasks": [],
+    "career": {
+      "subjects": [
+        {
+          "id": "cs-info1",
+          "code": "000450",
+          "name": "Informática 1",
+          "year": 1,
+          "semester": 1,
+          "credits": 6,
+          "status": "aprobada",
+          "grade": 7,
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-teccomp",
+          "code": "000451",
+          "name": "Tecnología de Computadoras",
+          "year": 1,
+          "semester": 1,
+          "credits": 6,
+          "status": "regular",
+          "grade": null,
+          "regDate": "2025-06-17",
+          "expDate": "2027-02-19",
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          }
+        },
+        {
+          "id": "cs-algegeo",
+          "code": "000453",
+          "name": "Álgebra y Geometría",
+          "year": 1,
+          "semester": 1,
+          "credits": 6,
+          "status": "regular",
+          "grade": null,
+          "regDate": "2025-06-18",
+          "expDate": "2027-02-19",
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          }
+        },
+        {
+          "id": "cs-am1a",
+          "code": "000452",
+          "name": "Análisis Matemático 1A",
+          "year": 1,
+          "semester": 1,
+          "credits": 6,
+          "status": "aprobada",
+          "grade": 8,
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-fis1",
+          "code": "000454",
+          "name": "Física 1",
+          "year": 1,
+          "semester": 1,
+          "credits": 6,
+          "status": "regular",
+          "grade": null,
+          "regDate": "2025-06-19",
+          "expDate": "2027-02-19",
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          }
+        },
+        {
+          "id": "cs-info2",
+          "code": "000455",
+          "name": "Informática 2",
+          "year": 1,
+          "semester": 2,
+          "credits": 6,
+          "status": "aprobada",
+          "grade": 10,
+          "correlatives": {
+            "toCurse": [
+              "cs-info1"
+            ],
+            "toPass": [
+              "cs-info1"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-algelin",
+          "code": "000654",
+          "name": "Álgebra Lineal",
+          "year": 1,
+          "semester": 2,
+          "credits": 6,
+          "status": "regular",
+          "grade": null,
+          "regDate": "2025-11-20",
+          "expDate": "2027-07-20",
+          "correlatives": {
+            "toCurse": [
+              "cs-algegeo"
+            ],
+            "toPass": [
+              "cs-algegeo"
+            ]
+          }
+        },
+        {
+          "id": "cs-quimica",
+          "code": "000459",
+          "name": "Química",
+          "year": 1,
+          "semester": 2,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-am1b",
+          "code": "000457",
+          "name": "Análisis Matemático 1B",
+          "year": 1,
+          "semester": 2,
+          "credits": 6,
+          "status": "regular",
+          "grade": null,
+          "regDate": "2025-11-20",
+          "expDate": "2027-07-20",
+          "correlatives": {
+            "toCurse": [
+              "cs-am1a"
+            ],
+            "toPass": [
+              "cs-am1a"
+            ]
+          }
+        },
+        {
+          "id": "cs-fis2",
+          "code": "000456",
+          "name": "Física 2",
+          "year": 1,
+          "semester": 2,
+          "credits": 6,
+          "status": "cursando",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-fis1"
+            ],
+            "toPass": [
+              "cs-fis1"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-ingweb1",
+          "code": "000465",
+          "name": "Ing. Web 1",
+          "year": 2,
+          "semester": 1,
+          "credits": 6,
+          "status": "aprobada",
+          "grade": 8,
+          "correlatives": {
+            "toCurse": [
+              "cs-info2"
+            ],
+            "toPass": [
+              "cs-info2"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-ingsoft1",
+          "code": "000461",
+          "name": "Ingeniería de Software 1",
+          "year": 2,
+          "semester": 1,
+          "credits": 6,
+          "status": "aprobada",
+          "grade": 6,
+          "correlatives": {
+            "toCurse": [
+              "cs-info2"
+            ],
+            "toPass": [
+              "cs-info2"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-bd1",
+          "code": "000463",
+          "name": "Base de Datos 1",
+          "year": 2,
+          "semester": 1,
+          "credits": 6,
+          "status": "cursando",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-info2",
+              "cs-ingsoft1"
+            ],
+            "toPass": [
+              "cs-info2",
+              "cs-ingsoft1"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-am2a",
+          "code": "000462",
+          "name": "Análisis Matemático 2A",
+          "year": 2,
+          "semester": 1,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-am1b"
+            ],
+            "toPass": [
+              "cs-am1b"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-estdisc",
+          "code": "000464",
+          "name": "Estructuras Discretas",
+          "year": 2,
+          "semester": 1,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-algegeo"
+            ],
+            "toPass": [
+              "cs-algegeo"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-info3",
+          "code": "000460",
+          "name": "Informática 3",
+          "year": 2,
+          "semester": 2,
+          "credits": 6,
+          "status": "regular",
+          "grade": null,
+          "regDate": "2025-11-20",
+          "expDate": "2027-07-20",
+          "correlatives": {
+            "toCurse": [
+              "cs-info2"
+            ],
+            "toPass": [
+              "cs-info2"
+            ]
+          }
+        },
+        {
+          "id": "cs-arqcomp1",
+          "code": "000468",
+          "name": "Arquitectura de Comp. 1",
+          "year": 2,
+          "semester": 1,
+          "credits": 6,
+          "status": "regular",
+          "grade": null,
+          "regDate": "2025-11-20",
+          "expDate": "2027-07-20",
+          "correlatives": {
+            "toCurse": [
+              "cs-teccomp"
+            ],
+            "toPass": [
+              "cs-teccomp"
+            ]
+          }
+        },
+        {
+          "id": "cs-am2b",
+          "code": "000466",
+          "name": "Análisis Matemático 2B",
+          "year": 2,
+          "semester": 2,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-am2a"
+            ],
+            "toPass": [
+              "cs-am2a"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-metnum",
+          "code": "000467",
+          "name": "Métodos Numéricos",
+          "year": 3,
+          "semester": 1,
+          "credits": 6,
+          "status": "cursando",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-algelin",
+              "cs-am2a"
+            ],
+            "toPass": [
+              "cs-algelin",
+              "cs-am2a"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-probest",
+          "code": "000256",
+          "name": "Probabilidad y Estadística",
+          "year": 3,
+          "semester": 1,
+          "credits": 6,
+          "status": "cursando",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-am2a"
+            ],
+            "toPass": [
+              "cs-am2a"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-arqcomp2",
+          "code": "000473",
+          "name": "Arquitectura de Comp. 2",
+          "year": 2,
+          "semester": 2,
+          "credits": 6,
+          "status": "regular",
+          "grade": null,
+          "regDate": "2026-06-22",
+          "expDate": "2028-02-19",
+          "correlatives": {
+            "toCurse": [
+              "cs-arqcomp1"
+            ],
+            "toPass": [
+              "cs-arqcomp1"
+            ]
+          }
+        },
+        {
+          "id": "cs-fis3",
+          "code": "000924",
+          "name": "Física 3",
+          "year": 3,
+          "semester": 2,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-fis2",
+              "cs-am2b"
+            ],
+            "toPass": [
+              "cs-fis2",
+              "cs-am2b"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-pds1",
+          "code": "000470",
+          "name": "Proceso de Desarrollo 1",
+          "year": 3,
+          "semester": 1,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-info3"
+            ],
+            "toPass": [
+              "cs-info3"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-sisop",
+          "code": "000477",
+          "name": "Sistemas Operativos",
+          "year": 2,
+          "semester": 2,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-arqcomp1"
+            ],
+            "toPass": [
+              "cs-arqcomp1"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-teocomp",
+          "code": "000475",
+          "name": "Teoría de la Computación",
+          "year": 2,
+          "semester": 2,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-estdisc"
+            ],
+            "toPass": [
+              "cs-estdisc"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-audit",
+          "code": "000478",
+          "name": "Auditoría",
+          "year": 5,
+          "semester": 1,
+          "credits": 6,
+          "status": "cursando",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-derecho",
+          "code": "000479",
+          "name": "Derecho y Ética Profesional",
+          "year": 3,
+          "semester": 2,
+          "credits": 6,
+          "status": "aprobada",
+          "grade": 4,
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-orgemp",
+          "code": "000474",
+          "name": "Organización de Empresas",
+          "year": 3,
+          "semester": 1,
+          "credits": 6,
+          "status": "regular",
+          "grade": null,
+          "regDate": "2025-11-20",
+          "expDate": "2027-07-20",
+          "correlatives": {
+            "toCurse": [
+              "cs-arqcomp2"
+            ],
+            "toPass": [
+              "cs-arqcomp2"
+            ]
+          }
+        },
+        {
+          "id": "cs-pds2",
+          "code": "000476",
+          "name": "Proceso de Desarrollo 2",
+          "year": 3,
+          "semester": 2,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-pds1"
+            ],
+            "toPass": [
+              "cs-pds1"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-redes1",
+          "code": "000471",
+          "name": "Redes 1",
+          "year": 3,
+          "semester": 1,
+          "credits": 6,
+          "status": "cursando",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-sisop"
+            ],
+            "toPass": [
+              "cs-sisop"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-dhs",
+          "code": "000480",
+          "name": "Desarrollo Herramientas SW",
+          "year": 3,
+          "semester": 2,
+          "credits": 7,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-ingles",
+          "code": "000621",
+          "name": "Nivel Idioma Inglés",
+          "year": 3,
+          "semester": 2,
+          "credits": 2,
+          "status": "aprobada",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-ingweb2",
+          "code": "000800",
+          "name": "Ingeniería Web 2",
+          "year": 3,
+          "semester": 2,
+          "credits": 6,
+          "status": "aprobada",
+          "grade": 8,
+          "correlatives": {
+            "toCurse": [
+              "cs-ingweb1",
+              "cs-bd1"
+            ],
+            "toPass": [
+              "cs-ingweb1",
+              "cs-bd1"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-bd2",
+          "code": "000485",
+          "name": "Base de Datos 2",
+          "year": 3,
+          "semester": 1,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-bd1"
+            ],
+            "toPass": [
+              "cs-bd1"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-ingsoft2",
+          "code": "000481",
+          "name": "Ingeniería de Software 2",
+          "year": 4,
+          "semester": 1,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-redes2",
+          "code": "000482",
+          "name": "Redes 2",
+          "year": 4,
+          "semester": 1,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-redes1"
+            ],
+            "toPass": [
+              "cs-redes1"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-economia",
+          "code": "000491",
+          "name": "Economía",
+          "year": 4,
+          "semester": 2,
+          "credits": 6,
+          "status": "regular",
+          "grade": null,
+          "regDate": "2026-06-19",
+          "expDate": "2028-02-19",
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          }
+        },
+        {
+          "id": "cs-progfunc",
+          "code": "000813",
+          "name": "Prog. Funcional y Scripting",
+          "year": 4,
+          "semester": 1,
+          "credits": 6,
+          "status": "cursando",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-tecmov",
+          "code": "000801",
+          "name": "Tecnologías Móviles",
+          "year": 4,
+          "semester": 1,
+          "credits": 6,
+          "status": "aprobada",
+          "grade": 8,
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-linux",
+          "code": "001835",
+          "name": "Fundamentos de Linux",
+          "year": 4,
+          "semester": 1,
+          "credits": 2,
+          "status": "aprobada",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-gestemp1",
+          "code": "000490",
+          "name": "Gestión de Empresas 1",
+          "year": 4,
+          "semester": 1,
+          "credits": 6,
+          "status": "regular",
+          "grade": null,
+          "regDate": "2026-06-19",
+          "expDate": "2028-02-19",
+          "correlatives": {
+            "toCurse": [
+              "cs-orgemp"
+            ],
+            "toPass": [
+              "cs-orgemp"
+            ]
+          }
+        },
+        {
+          "id": "cs-gestproy",
+          "code": "000761",
+          "name": "Gestión de Proyectos Inf.",
+          "year": 4,
+          "semester": 1,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-pds2"
+            ],
+            "toPass": [
+              "cs-pds2"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-modsim",
+          "code": "000489",
+          "name": "Modelos y Simulación",
+          "year": 4,
+          "semester": 2,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-probest"
+            ],
+            "toPass": [
+              "cs-probest"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-redes3",
+          "code": "000486",
+          "name": "Redes 3",
+          "year": 4,
+          "semester": 2,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-redes2"
+            ],
+            "toPass": [
+              "cs-redes2"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-ingweb3",
+          "code": "000806",
+          "name": "Ingeniería Web 3",
+          "year": 4,
+          "semester": 1,
+          "credits": 6,
+          "status": "cursando",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-ingweb2"
+            ],
+            "toPass": [
+              "cs-ingweb2"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-compgraf",
+          "code": "000494",
+          "name": "Computación Gráfica y VA",
+          "year": 5,
+          "semester": 1,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-am2b"
+            ],
+            "toPass": [
+              "cs-am2b"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-gestemp2",
+          "code": "000496",
+          "name": "Gestión de Empresas 2",
+          "year": 4,
+          "semester": 2,
+          "credits": 6,
+          "status": "cursando",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-gestemp1"
+            ],
+            "toPass": [
+              "cs-gestemp1"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-sisrt",
+          "code": "000495",
+          "name": "Sistemas en Tiempo Real",
+          "year": 4,
+          "semester": 2,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-bd2"
+            ],
+            "toPass": [
+              "cs-bd2"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-planneg",
+          "code": "000499",
+          "name": "Plan de Negocios",
+          "year": 5,
+          "semester": 1,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-gestemp2"
+            ],
+            "toPass": [
+              "cs-gestemp2"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-seginf",
+          "code": "000500",
+          "name": "Seguridad Informática",
+          "year": 5,
+          "semester": 1,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-redes3"
+            ],
+            "toPass": [
+              "cs-redes3"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-tfg",
+          "code": "000501",
+          "name": "Trabajo Final de Grado",
+          "year": 5,
+          "semester": 2,
+          "credits": 12,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-pps",
+          "code": "000616",
+          "name": "Práctica Profesional Sup.",
+          "year": 5,
+          "semester": 2,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [],
+            "toPass": []
+          },
+          "regDate": null,
+          "expDate": null
+        },
+        {
+          "id": "cs-ia",
+          "code": "000762",
+          "name": "Inteligencia Artificial",
+          "year": 5,
+          "semester": 1,
+          "credits": 6,
+          "status": "pendiente",
+          "grade": null,
+          "correlatives": {
+            "toCurse": [
+              "cs-economia",
+              "cs-modsim"
+            ],
+            "toPass": [
+              "cs-economia",
+              "cs-modsim"
+            ]
+          },
+          "regDate": null,
+          "expDate": null
+        }
+      ],
+      "electives": [
+        {
+          "id": "cs-pfs",
+          "code": "000813",
+          "name": "Programación Funcional y Scripting",
+          "category": "Desarrollo & Paradigmas",
+          "credits": 4,
+          "status": "cursando",
+          "grade": null
+        },
+        {
+          "id": "cs-tm",
+          "code": "000801",
+          "name": "Tecnologías Móviles (Android / iOS)",
+          "category": "Desarrollo de Software",
+          "credits": 4,
+          "status": "aprobada",
+          "grade": 8
+        },
+        {
+          "id": "cs-iw3",
+          "code": "000806",
+          "name": "Ingeniería Web III (Arquitecturas Cloud)",
+          "category": "Ingeniería Web",
+          "credits": 4,
+          "status": "cursando",
+          "grade": null
+        },
+        {
+          "id": "opt-cyber",
+          "code": "000820",
+          "name": "Ciberseguridad Aplicada & Criptografía",
+          "category": "Seguridad",
+          "credits": 4,
+          "status": "pendiente",
+          "grade": null
+        },
+        {
+          "id": "opt-ia",
+          "code": "000821",
+          "name": "Inteligencia Artificial Aplicada & Machine Learning",
+          "category": "Ciencia de Datos",
+          "credits": 4,
+          "status": "pendiente",
+          "grade": null
+        },
+        {
+          "id": "opt-devops",
+          "code": "000822",
+          "name": "Infraestructura Cloud & DevOps CI/CD",
+          "category": "Infraestructura",
+          "credits": 4,
+          "status": "pendiente",
+          "grade": null
+        }
+      ],
+      "seminars": [
+        {
+          "id": "sem-linux",
+          "code": "001835",
+          "name": "Fundamentos de Linux (Red Hat / OpenSource)",
+          "category": "Seminario Técnico",
+          "hours": 40,
+          "status": "aprobada",
+          "date": "15/05/2024",
+          "notes": "Acreditado (IUA)"
+        },
+        {
+          "id": "sem-1",
+          "code": "001836",
+          "name": "Seminario de Ciberseguridad & Hacking Ético",
+          "category": "Seminario Especializado",
+          "hours": 30,
+          "status": "pendiente",
+          "date": "",
+          "notes": "Requisito de formación continua"
+        },
+        {
+          "id": "sem-2",
+          "code": "001837",
+          "name": "Seminario de Ética Profesional & Responsabilidad Social",
+          "category": "Seminario Institucional",
+          "hours": 20,
+          "status": "pendiente",
+          "date": "10/11/2025",
+          "notes": "Acreditado"
+        },
+        {
+          "id": "sem-3",
+          "code": "001838",
+          "name": "Taller de Metodología de la Investigación / Trabajo Final",
+          "category": "Taller de Grado",
+          "hours": 60,
+          "status": "pendiente",
+          "date": "",
+          "notes": "Requisito para proyecto final de grado"
+        }
+      ]
+    },
+    "profile": {
+      "name": "Fran Giraudo",
+      "career": "Ingeniería en Informática — IUA",
+      "theme": "dark"
+    }
+  }
+}
