@@ -982,17 +982,24 @@ window.cseSaveDetail = function(id) {
   const orig = S.subjects.find(x => x.id === id || (x.code && x.code === s.code) || x.name.toLowerCase() === s.name.toLowerCase());
   if (orig) orig.status = st;
 
-  if (window.api) {
-    window.api.syncSubjectProgress(s.id, isElective ? 'elective' : 'subject', s.status, s.grade, s.regDate, s.expDate).catch(console.error);
-  }
-
   syncSubjectsAndCareer();
   save();
   closeCareerDetail();
-  
-  // Forzar re-renderizado directamente
-  if (isElective) renderCareerElectives();
-  else renderCareer();
+
+  if (window.api) {
+    window.api.syncSubjectProgress(s.id, isElective ? 'elective' : 'subject', s.status, s.grade, s.regDate, s.expDate)
+      .then(() => window.api.fetchFullState())
+      .then(cloudState => {
+        if (cloudState && typeof window.loadStateFromCloud === 'function') {
+          window.loadStateFromCloud(cloudState);
+        }
+        renderCareer();
+      })
+      .catch(console.error);
+  } else {
+    renderCareer();
+  }
+
 };
 
 // ═══════════════════════════════════════════════════════════

@@ -559,12 +559,9 @@ input[type="number"] {
   .mobile-only  { display: flex !important; }
   .desktop-only { display: none !important; }
 
-  /* Sidebar becomes overlay */
+  /* Sidebar completely hidden on mobile (only bottom nav) */
   #sidebar {
-    position: fixed; top: 0; left: 0; height: 100vh;
-    width: 0 !important; min-width: 0 !important;
-    transform: translateX(-100%);
-    transition: transform .3s cubic-bezier(.4,0,.2,1), width .3s;
+    display: none !important;
   }
   #sidebar.mobile-open {
     width: 15rem !important; min-width: 15rem !important;

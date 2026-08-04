@@ -201,10 +201,25 @@ function setupCmPanZoom() {
     drag=true; ox=e.clientX; oy=e.clientY; otx=_cmT.x; oty=_cmT.y;
     canvas.style.cursor='grabbing'; e.preventDefault();
   };
+  canvas.ontouchstart = e => {
+    if (e.target.closest('.cm-node') || e.touches.length !== 1) return;
+    drag=true; ox=e.touches[0].clientX; oy=e.touches[0].clientY; otx=_cmT.x; oty=_cmT.y;
+  };
+
   const mm = e => { if(!drag) return; _cmT.x=otx+e.clientX-ox; _cmT.y=oty+e.clientY-oy; cmApplyTransform(); };
+  const tm = e => { 
+    if(!drag || e.touches.length !== 1) return; 
+    _cmT.x=otx+e.touches[0].clientX-ox; _cmT.y=oty+e.touches[0].clientY-oy; 
+    cmApplyTransform(); 
+    e.preventDefault(); 
+  };
+  
   const mu = () => { drag=false; const c=document.getElementById('cm-canvas'); if(c) c.style.cursor='grab'; };
+  
   window.addEventListener('mousemove', mm);
+  window.addEventListener('touchmove', tm, { passive: false });
   window.addEventListener('mouseup', mu);
+  window.addEventListener('touchend', mu);
   canvas.onwheel = e => { e.preventDefault(); cmZoom(e.deltaY>0?-.08:.08); };
 }
 

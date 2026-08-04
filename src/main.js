@@ -18,6 +18,7 @@ import './views/settings.js';
 const { loginUser, registerUser, fetchFullState, logoutUser } = api;
 window.api = api;
 window.isLoggedIn = false;
+window.loadStateFromCloud = loadStateFromCloud;
 
 function showLogin() {
   const loginScreen = document.getElementById('login-screen');
@@ -96,7 +97,7 @@ async function checkAuth() {
       if (app) app.style.display = 'flex';
 
       ensureCareerLoaded();
-      applyTheme(localStorage.getItem('theme') || 'dark');
+      applyTheme(cloudState.profile?.theme || 'dark');
       renderView(currentView);
       updateDate();
       setInterval(updateDate, 60000);
