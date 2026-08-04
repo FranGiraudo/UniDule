@@ -1,7 +1,7 @@
 import { S, activeDay, setActiveDay } from '../core/state.js';
 import { DAYS, DSHORT, GRID_START, GRID_END, PPM } from '../core/constants.js';
 import { THEMES } from '../core/theme.js';
-import { t2y, dur, t2m, daysUntil, formatDate, todayDay, nowMin } from '../core/utils.js';
+import { t2y, dur, t2m, daysUntil, formatDate, todayDay, nowMin, isMobile } from '../core/utils.js';
 import { SVG_ICONS } from '../core/icons.js';
 export function assignCols(blocks) {
   const sorted=[...blocks].sort((a,b)=>t2m(a.sc.startTime)-t2m(b.sc.startTime));

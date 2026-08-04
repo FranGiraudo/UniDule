@@ -1,6 +1,6 @@
 import { S, save, taskFilter, setTaskFilter } from '../core/state.js';
 import { TYPE_BG, TYPE_FG, TYPE_ICON } from '../core/constants.js';
-import { gid, daysUntil, urgColor, formatDate, confirmDel, showToast } from '../core/utils.js';
+import { gid, daysUntil, urgColor, formatDate, confirmDel, showToast, closeM } from '../core/utils.js';
 import { SVG_ICONS } from '../core/icons.js';
 export function setFilter(f,el) {
   setTaskFilter(f);

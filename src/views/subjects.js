@@ -1,6 +1,6 @@
 import { S, save, syncSubjectsAndCareer, selColor, setSelColor, slots, setSlots, gradesWork, setGradesWork, gradesSubId, setGradesSubId } from '../core/state.js';
 import { DEF_SUBJECTS, COLORS, SUBJECT_STATUS, GRADE_TYPES, DAYS } from '../core/constants.js';
-import { gid, confirmDel, showToast, isMobile } from '../core/utils.js';
+import { gid, confirmDel, showToast, isMobile, closeM } from '../core/utils.js';
 import { SVG_ICONS } from '../core/icons.js';
 export function renderSubs() {
   const n=S.subjects.length;
