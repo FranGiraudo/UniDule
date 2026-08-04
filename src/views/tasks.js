@@ -203,14 +203,20 @@ export async function saveTask() {
     syncTaskWithGrade(task);
     const s = S.subjects.find(x => x.id === task.subjectId);
     if (window.api && s) {
-      try { await window.api.syncGrades(s.id, s.grades); } catch(e) { console.error(e); }
+      try { 
+        await window.api.saveActiveSubject(s);
+        await window.api.syncGrades(s.id, s.grades); 
+      } catch(e) { console.error(e); }
     }
   } else if (existing && existing.gradeId && existing.subjectId) {
     const oldSub = S.subjects.find(s => s.id === existing.subjectId);
     if (oldSub && oldSub.grades) {
       oldSub.grades = oldSub.grades.filter(g => g.id !== existing.gradeId);
       if (window.api) {
-        try { await window.api.syncGrades(oldSub.id, oldSub.grades); } catch(e) { console.error(e); }
+        try { 
+          await window.api.saveActiveSubject(oldSub);
+          await window.api.syncGrades(oldSub.id, oldSub.grades); 
+        } catch(e) { console.error(e); }
       }
     }
     task.gradeId = null;
