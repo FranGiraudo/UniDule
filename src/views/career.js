@@ -755,13 +755,13 @@ export function openCareerSubDetail(id) {
           value="${s.grade!==null?s.grade:''}" placeholder="Ej: 8"
           style="font-size:20px;font-weight:800;text-align:center;">
       </div>
-      <div id="cd-reg-row" style="${(s.status==='regular' || s.status==='aprobada')?'display:flex;gap:10px;':'display:none;'}">
-        <div style="flex:1;">
-          <label class="f-label">Fecha de regularidad</label>
+      <div id="cd-reg-row" style="${(s.status==='regular' || s.status==='aprobada')?'display:grid;grid-template-columns:1fr 1fr;gap:12px;':'display:none;'}">
+        <div>
+          <label class="f-label">Regularidad</label>
           <input type="date" class="f-input" id="cd-regdate" value="${s.regDate||''}" onchange="csAutoUpdateExpDate(this.value)">
         </div>
-        <div style="flex:1;">
-          <label class="f-label">Vencimiento regularidad</label>
+        <div>
+          <label class="f-label">Vencimiento</label>
           <input type="date" class="f-input" id="cd-expdate" value="${s.expDate||''}">
         </div>
       </div>
@@ -790,7 +790,7 @@ function closeCareerDetail() {
 
 window.csToggleStatusUI = function(val) {
   document.getElementById('cd-grade-row').style.display = (val === 'aprobada') ? '' : 'none';
-  document.getElementById('cd-reg-row').style.display = (val === 'regular' || val === 'aprobada') ? 'flex' : 'none';
+  document.getElementById('cd-reg-row').style.display = (val === 'regular' || val === 'aprobada') ? 'grid' : 'none';
 };
 
 window.csAutoUpdateExpDate = function(val) {
@@ -847,7 +847,10 @@ window.cseSaveDetail = function(id) {
   if (!isElective) syncSubjectsAndCareer();
   save();
   closeCareerDetail();
-  renderView(currentView);
+  
+  // Forzar re-renderizado directamente
+  if (typeof renderCareer === 'function') renderCareer();
+  else renderView('career');
 };
 
 // ═══════════════════════════════════════════════════════════
