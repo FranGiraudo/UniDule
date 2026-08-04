@@ -184,7 +184,7 @@ export function openTaskModal(id) {
   }
   document.getElementById('modal-task').style.display='flex';
 }
-export function saveTask() {
+export async function saveTask() {
   const title=document.getElementById('task-title').value.trim();
   if (!title){showToast('Debes ingresar un título para la tarea.', 'error');return;}
   const eid=document.getElementById('task-edit-id').value;
@@ -202,19 +202,25 @@ export function saveTask() {
   if (task.subjectId) {
     syncTaskWithGrade(task);
     const s = S.subjects.find(x => x.id === task.subjectId);
-    if (window.api && s) window.api.syncGrades(s.id, s.grades).catch(console.error);
+    if (window.api && s) {
+      try { await window.api.syncGrades(s.id, s.grades); } catch(e) { console.error(e); }
+    }
   } else if (existing && existing.gradeId && existing.subjectId) {
     const oldSub = S.subjects.find(s => s.id === existing.subjectId);
     if (oldSub && oldSub.grades) {
       oldSub.grades = oldSub.grades.filter(g => g.id !== existing.gradeId);
-      if (window.api) window.api.syncGrades(oldSub.id, oldSub.grades).catch(console.error);
+      if (window.api) {
+        try { await window.api.syncGrades(oldSub.id, oldSub.grades); } catch(e) { console.error(e); }
+      }
     }
     task.gradeId = null;
   }
 
   if (existing) Object.assign(existing,task); else S.tasks.push(task);
   save();
-  if (window.api) window.api.saveTask(task).catch(console.error);
+  if (window.api) {
+    try { await window.api.saveTask(task); } catch(e) { console.error(e); }
+  }
   closeM('modal-task'); renderView(currentView);
 }
 

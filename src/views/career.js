@@ -1,4 +1,5 @@
-import { S, save, activeCareerTab, setActiveCareerTab, selectedCareerNode, setSelectedCareerNode, careerGridFilter, setCareerGridFilterVal, careerGridSearch, setCareerGridSearchVal, syncSubjectsAndCareer } from '../core/state.js';
+import { S, save, activeCareerTab, setActiveCareerTab, selectedCareerNode, setSelectedCareerNode, careerGridFilter, setCareerGridFilterVal, careerGridSearch, setCareerGridSearchVal, syncSubjectsAndCareer, currentView } from '../core/state.js';
+import { renderView } from '../core/router.js';
 import { CAREER_STATUS_CFG, DEF_CAREER, DEF_ELECTIVES, DEF_SEMINARS } from '../core/constants.js';
 import { showToast, openM, closeM } from '../core/utils.js';
 import { SVG_ICONS } from '../core/icons.js';
