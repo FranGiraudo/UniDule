@@ -201,10 +201,13 @@ export function saveTask() {
 
   if (task.subjectId) {
     syncTaskWithGrade(task);
+    const s = S.subjects.find(x => x.id === task.subjectId);
+    if (window.api && s) window.api.syncGrades(s.id, s.grades).catch(console.error);
   } else if (existing && existing.gradeId && existing.subjectId) {
     const oldSub = S.subjects.find(s => s.id === existing.subjectId);
     if (oldSub && oldSub.grades) {
       oldSub.grades = oldSub.grades.filter(g => g.id !== existing.gradeId);
+      if (window.api) window.api.syncGrades(oldSub.id, oldSub.grades).catch(console.error);
     }
     task.gradeId = null;
   }

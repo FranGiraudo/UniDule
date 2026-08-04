@@ -159,6 +159,9 @@ export async function saveActiveSubject(sub) {
 export async function deleteActiveSubject(id) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
+  // First delete associated tasks and grades to prevent 409 FK violation
+  await supabase.from('user_tasks').delete().eq('subject_id', id).eq('user_id', user.id);
+  await supabase.from('user_grades').delete().eq('active_subject_id', id).eq('user_id', user.id);
   await supabase.from('user_active_subjects').delete().eq('id', id).eq('user_id', user.id);
 }
 
@@ -206,19 +209,27 @@ export async function syncGrades(activeSubjectId, gradesArray) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
 
-  await supabase.from('user_grades').delete().eq('active_subject_id', activeSubjectId).eq('user_id', user.id);
+  const { data: existing } = await supabase.from('user_grades').select('id').eq('active_subject_id', activeSubjectId).eq('user_id', user.id);
+  const existingIds = new Set(existing ? existing.map(g => g.id) : []);
+  const incomingIds = new Set(gradesArray ? gradesArray.map(g => g.id) : []);
+
+  for (const id of existingIds) {
+    if (!incomingIds.has(id)) {
+      await supabase.from('user_grades').delete().eq('id', id).eq('user_id', user.id);
+    }
+  }
 
   if (gradesArray && gradesArray.length > 0) {
-    const toInsert = gradesArray.map(g => ({
+    const toUpsert = gradesArray.map(g => ({
       id: g.id,
       user_id: user.id,
       active_subject_id: activeSubjectId,
-      title: g.title,
-      grade: g.grade,
+      title: g.title || g.type || 'Nota',
+      grade: g.score || g.grade || 0,
       date: g.date || null,
       weight: g.weight || null
     }));
-    await supabase.from('user_grades').insert(toInsert);
+    await supabase.from('user_grades').upsert(toUpsert);
   }
 }
 
