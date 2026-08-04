@@ -1,71 +1,45 @@
 const fs = require('fs');
 
-const file = 'src/views/career.js';
-const lines = fs.readFileSync(file, 'utf8').split('\n');
+// 1. Fix career.js
+let career = fs.readFileSync('src/views/career.js', 'utf8');
 
-const statsIdx = lines.findIndex(l => l.includes('data-tab="stats"'));
-const openSeminarIdx = lines.findIndex(l => l.includes('function openAddSeminarModal()'));
+// Replace emojis in filters with colored dots emojis
+career = career.replace('🟩 Aprobadas', '🟢 Aprobadas');
+career = career.replace('🟪 Regulares', '🟣 Regulares');
+career = career.replace('🟦 Cursando', '🔵 Cursando');
+career = career.replace('🟨 Disponibles', '🟡 Disponibles');
+career = career.replace('⬜ Pendientes', '⚪ Pendientes');
 
-if (statsIdx === -1 || openSeminarIdx === -1) {
-  console.error('Could not find boundaries');
-  process.exit(1);
+// Remove SVGs from tabs
+career = career.replace(/<svg[^>]*>.*?<\/svg>Plan/g, 'Plan');
+career = career.replace(/<svg[^>]*>.*?<\/svg>Finales/g, 'Finales');
+career = career.replace(/<svg[^>]*>.*?<\/svg>Estadísticas/g, 'Estadísticas');
+career = career.replace(/<svg[^>]*>.*?<\/svg>Seminarios/g, 'Seminarios');
+career = career.replace(/<svg[^>]*>.*?<\/svg>Electivas/g, 'Electivas');
+career = career.replace(/<svg[^>]*>.*?<\/svg>Mapa/g, 'Mapa');
+
+fs.writeFileSync('src/views/career.js', career);
+console.log('Fixed career.js filters and tabs');
+
+// 2. Fix index.html export PDF button
+let index = fs.readFileSync('index.html', 'utf8');
+
+// The export PDF button is currently inside the view-header of view-schedule
+// <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+// Let's improve the positioning and ensure there's no emoji. 
+// I'll update the button HTML just in case.
+const oldBtn = `<button class="btn btn-ghost btn-sm" onclick="exportPDF()" title="Exportar horario a PDF">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Exportar PDF
+          </button>`;
+const newBtn = `<button class="btn btn-primary btn-sm" onclick="exportPDF()" title="Exportar horario a PDF" style="display:flex;align-items:center;gap:6px;border-radius:20px;padding:6px 14px;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <span style="font-weight:600;">Exportar PDF</span>
+          </button>`;
+
+if (index.includes(oldBtn)) {
+  index = index.replace(oldBtn, newBtn);
+  fs.writeFileSync('index.html', index);
+  console.log('Fixed index.html export PDF button');
+} else {
+  console.log('Export PDF button not found exactly, it might already be different.');
 }
-
-const before = lines.slice(0, statsIdx);
-const after = lines.slice(openSeminarIdx - 3); // keep the separator comment
-
-const middle = `        <button class="career-tab" data-tab="stats" onclick="setCareerTab('stats')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>Estadísticas
-        </button>
-        <button class="career-tab" data-tab="seminars" onclick="setCareerTab('seminars')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6.5 6H20"/></svg>Seminarios
-        </button>
-        <button class="career-tab" data-tab="electives" onclick="setCareerTab('electives')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>Electivas
-        </button>
-        <button class="career-tab" data-tab="map" onclick="setCareerTab('map')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>Mapa
-        </button>
-      </div>
-      <div id="career-grid-container"></div>
-      <div id="career-map-container"       style="display:none;"></div>
-      <div id="career-seminars-container"  style="display:none;"></div>
-      <div id="career-electives-container" style="display:none;"></div>
-      <div id="career-finals-container"    style="display:none;"></div>
-      <div id="career-stats-container"     style="display:none;"></div>
-    \`;
-  }
-
-  if      (activeCareerTab === 'grid')      renderCareerGrid();
-  else if (activeCareerTab === 'map')       renderCareerMap();
-  else if (activeCareerTab === 'seminars')  renderCareerSeminars();
-  else if (activeCareerTab === 'electives') renderCareerElectives();
-  else if (activeCareerTab === 'finals')    renderCareerFinals();
-  else                                      renderCareerStats();
-}
-
-export function setCareerTab(tab) {
-  setActiveCareerTab(tab);
-  document.querySelectorAll('.career-tab').forEach(t =>
-    t.classList.toggle('active', t.dataset.tab === tab)
-  );
-  ['career-grid-container','career-map-container','career-seminars-container','career-electives-container','career-finals-container','career-stats-container'].forEach(pid => {
-    const el = document.getElementById(pid);
-    if (el) el.style.display = 'none';
-  });
-  const panelId = {
-    grid: 'career-grid-container',
-    map: 'career-map-container',
-    seminars: 'career-seminars-container',
-    electives: 'career-electives-container',
-    finals: 'career-finals-container',
-    stats: 'career-stats-container'
-  }[tab];
-  const panelEl = document.getElementById(panelId);
-  if (panelEl) panelEl.style.display = '';
-  renderCareer();
-}`;
-
-const finalContent = before.join('\n') + '\n' + middle + '\n' + after.join('\n');
-fs.writeFileSync(file, finalContent, 'utf8');
-console.log('Fixed career.js successfully.');

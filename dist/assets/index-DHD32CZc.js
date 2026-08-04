@@ -309,22 +309,22 @@
       </div>
       <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.25rem;" id="career-tabs-bar">
         <button class="career-tab active" data-tab="grid" onclick="setCareerTab('grid')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Plan
+          Plan
         </button>
         <button class="career-tab" data-tab="finals" onclick="setCareerTab('finals')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Finales
+          Finales
         </button>
         <button class="career-tab" data-tab="stats" onclick="setCareerTab('stats')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>Estadísticas
+          Estadísticas
         </button>
         <button class="career-tab" data-tab="seminars" onclick="setCareerTab('seminars')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6.5 6H20"/></svg>Seminarios
+          Seminarios
         </button>
         <button class="career-tab" data-tab="electives" onclick="setCareerTab('electives')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>Electivas
+          Electivas
         </button>
         <button class="career-tab" data-tab="map" onclick="setCareerTab('map')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>Mapa
+          Mapa
         </button>
       </div>
       <div id="career-grid-container"></div>
@@ -342,11 +342,11 @@
       <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
         <select class="f-input" onchange="setCareerGridFilter(this.value)" style="font-size:0.75rem;padding:0.375rem 0.625rem;">
           <option value="all"       selected>Todos los estados</option>
-          <option value="aprobada"  >🟩 Aprobadas</option>
-          <option value="regular"   >🟪 Regulares</option>
-          <option value="cursando"  >🟦 Cursando</option>
-          <option value="disponible">🟨 Disponibles</option>
-          <option value="bloqueada" >⬜ Pendientes/Bloqueadas</option>
+          <option value="aprobada"  >🟢 Aprobadas</option>
+          <option value="regular"   >🟣 Regulares</option>
+          <option value="cursando"  >🔵 Cursando</option>
+          <option value="disponible">🟡 Disponibles</option>
+          <option value="bloqueada" >⚪ Pendientes/Bloqueadas</option>
         </select>
       </div>
     </div>`+([1,2,3,4,5].map(e=>{let t=n.filter(t=>t.year===e);if(!t.length)return``;let r=n.filter(t=>t.year===e&&t.status===`aprobada`).length,i=n.filter(t=>t.year===e).length,a=i?Math.round(r/i*100):0;return`
