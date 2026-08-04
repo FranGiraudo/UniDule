@@ -3,6 +3,7 @@ import { DEF_SUBJECTS, COLORS, SUBJECT_STATUS, GRADE_TYPES, DAYS, EXAM_TYPES } f
 import { gid, confirmDel, showToast, isMobile, closeM } from '../core/utils.js';
 import { SVG_ICONS } from '../core/icons.js';
 import { renderView } from '../core/router.js';
+import { getComputedStatus } from './career.js';
 
 export function renderSubs() {
   const n=S.subjects.length;
@@ -66,7 +67,14 @@ export function openSubModal(id) {
 
   const careerSel = document.getElementById('sub-career-select');
   if (careerSel && S.career && S.career.subjects) {
-    const sorted = [...S.career.subjects].sort((a,b) => (a.year - b.year) || (a.semester - b.semester) || a.name.localeCompare(b.name));
+    let availableSubs = S.career.subjects;
+    if (!isEdit) {
+      availableSubs = availableSubs.filter(s => getComputedStatus(s) === 'disponible');
+    } else {
+      // Si estamos editando, mostrar solo la materia actual o las disponibles
+      availableSubs = availableSubs.filter(s => s.id === id || getComputedStatus(s) === 'disponible');
+    }
+    const sorted = [...availableSubs].sort((a,b) => (a.year - b.year) || (a.semester - b.semester) || a.name.localeCompare(b.name));
     careerSel.innerHTML = `<option value="">— Seleccionar materia del plan —</option>` +
       sorted.map(cs => `<option value="${cs.id}">${cs.year}° Año ${cs.semester}° Sem: ${cs.name} (${cs.code||'Sin cód'})</option>`).join('');
   }
@@ -149,6 +157,12 @@ export function saveSub() {
   if (!name){alert('Nombre requerido.');return;}
   const eid=document.getElementById('sub-edit-id').value;
   const existing=S.subjects.find(s=>s.id===eid);
+  
+  if (!existing && !eid) {
+    alert('Debes seleccionar una materia disponible del plan.');
+    return;
+  }
+  
   const statusEl = document.getElementById('sub-status');
   const statusVal = statusEl ? statusEl.value : (existing ? existing.status : 'cursando');
   const sub={
