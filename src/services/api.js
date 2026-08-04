@@ -106,7 +106,9 @@ export async function fetchFullState() {
       ...g,
       id: g.code,
       status: prog ? prog.status : 'pendiente',
-      grade: prog ? parseFloat(prog.grade) : null
+      grade: prog ? parseFloat(prog.grade) : null,
+      regDate: prog ? prog.reg_date : null,
+      expDate: prog ? prog.exp_date : null
     };
   });
 

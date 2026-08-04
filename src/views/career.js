@@ -747,15 +747,25 @@ export function openCareerSubDetail(id) {
       <span class="career-status-badge" style="background:${cfg.bg};color:${cfg.color};border:1px solid ${cfg.border};font-size:12px;padding:.3rem .75rem;align-self:flex-start;">${cfg.label}</span>
       <div>
         <label class="f-label">Estado</label>
-        <select class="f-input" id="cd-status" onchange="csSetStatus('${id}',this.value)">${statusOpts}</select>
+        <select class="f-input" id="cd-status" onchange="csToggleStatusUI(this.value)">${statusOpts}</select>
       </div>
       <div id="cd-grade-row" style="${s.status==='aprobada'?'':'display:none;'}">
         <label class="f-label">Nota final (0 – 10)</label>
         <input type="number" class="f-input" id="cd-grade" min="0" max="10" step="0.5"
           value="${s.grade!==null?s.grade:''}" placeholder="Ej: 8"
-          style="font-size:20px;font-weight:800;text-align:center;"
-          oninput="var v=parseFloat(this.value);this.style.color=isNaN(v)?'var(--text)':v>=4?'#4ade80':'#f87171';csSetGrade('${id}',this.value)">
+          style="font-size:20px;font-weight:800;text-align:center;">
       </div>
+      <div id="cd-reg-row" style="${(s.status==='regular' || s.status==='aprobada')?'display:flex;gap:10px;':'display:none;'}">
+        <div style="flex:1;">
+          <label class="f-label">Fecha de regularidad</label>
+          <input type="date" class="f-input" id="cd-regdate" value="${s.regDate||''}" onchange="csAutoUpdateExpDate(this.value)">
+        </div>
+        <div style="flex:1;">
+          <label class="f-label">Vencimiento regularidad</label>
+          <input type="date" class="f-input" id="cd-expdate" value="${s.expDate||''}">
+        </div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:10px;width:100%;" onclick="cseSaveDetail('${id}')">Guardar cambios</button>
       <div>
         <div class="f-label" style="margin-bottom:6px;">Para cursar (necesitás regular)</div>
         ${needsHtml}
@@ -778,7 +788,21 @@ function closeCareerDetail() {
   clearCmHighlight();
 }
 
-function csSetStatus(id, status) {
+window.csToggleStatusUI = function(val) {
+  document.getElementById('cd-grade-row').style.display = (val === 'aprobada') ? '' : 'none';
+  document.getElementById('cd-reg-row').style.display = (val === 'regular' || val === 'aprobada') ? 'flex' : 'none';
+};
+
+window.csAutoUpdateExpDate = function(val) {
+  if (!val) return;
+  const d = new Date(val + 'T00:00:00');
+  d.setMonth(d.getMonth() + 18);
+  const expStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const expEl = document.getElementById('cd-expdate');
+  if (expEl) expEl.value = expStr;
+};
+
+window.cseSaveDetail = function(id) {
   let s = S.career.subjects.find(x => x.id === id);
   let isElective = false;
   if (!s && S.career.electives) {
@@ -786,49 +810,45 @@ function csSetStatus(id, status) {
     isElective = true;
   }
   if (!s) return;
-  
-  s.status = status;
-  if (status !== 'aprobada') s.grade = null;
-  if (window.api) window.api.syncSubjectProgress(s.id, isElective ? 'elective' : 'subject', s.status, s.grade, s.regDate, s.expDate).catch(console.error);
 
-  if (status === 'regular') {
-    const now = new Date();
-    const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-    const expDateObj = new Date(now.getFullYear() + 1, now.getMonth() + 6, now.getDate());
-    const expStr = `${expDateObj.getFullYear()}-${String(expDateObj.getMonth()+1).padStart(2,'0')}-${String(expDateObj.getDate()).padStart(2,'0')}`;
-    if (!s.regDate) s.regDate = todayStr;
-    if (!s.expDate) s.expDate = expStr;
+  const st = document.getElementById('cd-status').value;
+  s.status = st;
+  
+  if (st === 'aprobada') {
+    const gv = parseFloat(document.getElementById('cd-grade').value);
+    s.grade = isNaN(gv) ? null : Math.min(10, Math.max(0, gv));
+  } else {
+    s.grade = null;
+  }
+
+  if (st === 'regular' || st === 'aprobada') {
+    let rv = document.getElementById('cd-regdate').value;
+    let ev = document.getElementById('cd-expdate').value;
+    if (st === 'regular' && !rv) {
+      const now = new Date();
+      rv = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+      const expDateObj = new Date(now.getFullYear() + 1, now.getMonth() + 6, now.getDate());
+      ev = `${expDateObj.getFullYear()}-${String(expDateObj.getMonth()+1).padStart(2,'0')}-${String(expDateObj.getDate()).padStart(2,'0')}`;
+    }
+    s.regDate = rv || null;
+    s.expDate = ev || null;
+  } else {
+    s.regDate = null;
+    s.expDate = null;
   }
 
   const orig = S.subjects.find(x => x.id === id || (x.code && x.code === s.code) || x.name.toLowerCase() === s.name.toLowerCase());
-  if (orig) {
-    orig.status = status;
+  if (orig) orig.status = st;
+
+  if (window.api) {
+    window.api.syncSubjectProgress(s.id, isElective ? 'elective' : 'subject', s.status, s.grade, s.regDate, s.expDate).catch(console.error);
   }
 
-  const gr = document.getElementById('cd-grade-row');
-  if (gr) gr.style.display = status==='aprobada' ? '' : 'none';
   if (!isElective) syncSubjectsAndCareer();
   save();
+  closeCareerDetail();
   renderView(currentView);
-}
-
-function csSetGrade(id, val) {
-  let s = S.career.subjects.find(x => x.id === id);
-  let isElective = false;
-  if (!s && S.career.electives) {
-    s = S.career.electives.find(x => x.id === id);
-    isElective = true;
-  }
-  if (!s) return;
-  const v = parseFloat(val);
-  s.grade = isNaN(v) ? null : Math.min(10, Math.max(0, v));
-  if (s.grade !== null && s.grade >= 4 && s.status !== 'aprobada') {
-    s.status = 'aprobada';
-  }
-  if (!isElective) syncSubjectsAndCareer();
-  save();
-  renderView(currentView);
-}
+};
 
 // ═══════════════════════════════════════════════════════════
 //  VIEW: CONFIGURACIÓN & PERFIL & TEMAS & BACKUP (CSV / JSON)
