@@ -68,25 +68,19 @@ export function confirmDel(type, id) {
   const msg = type==='subject' ? '¿Eliminar materia y sus tareas?'
             : type==='task' ? '¿Eliminar tarea?'
             : '¿Eliminar calificación?';
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.style.display = 'flex';
-  overlay.innerHTML = `
-    <div class="modal">
-      <div class="modal-title" style="color:#ef4444">${SVG_ICONS.alert} Confirmar Eliminación</div>
-      <p style="font-size:14px;color:var(--text);margin-top:10px;">${msg}</p>
-      <div style="display:flex;gap:12px;margin-top:20px;">
-        <button class="btn btn-ghost" style="flex:1" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
-        <button class="btn btn-primary" style="flex:1;background:#ef4444;color:#fff" onclick="window.__confirmDel_cb(); this.closest('.modal-overlay').remove()">Eliminar</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(overlay);
-  window.__confirmDel_cb = () => {
-    if (type === 'subject' && window.delSubject) window.delSubject(id);
-    else if (type === 'task' && window.delTask) window.delTask(id);
-    delete window.__confirmDel_cb;
-  };
+  const titleEl = document.getElementById('confirm-title');
+  const msgEl = document.getElementById('confirm-msg');
+  const btnEl = document.getElementById('confirm-ok');
+  if (titleEl) titleEl.innerHTML = `<span style="color:#ef4444">${SVG_ICONS.alert} Confirmar Eliminación</span>`;
+  if (msgEl) msgEl.textContent = msg;
+  if (btnEl) {
+    btnEl.onclick = () => {
+      if (type === 'subject' && window.delSubject) window.delSubject(id);
+      else if (type === 'task' && window.delTask) window.delTask(id);
+      closeM('modal-confirm');
+    };
+  }
+  openM('modal-confirm');
 }
 
 export function openM(id) { const e = document.getElementById(id); if(e) e.style.display='flex'; }
