@@ -11,44 +11,46 @@
   <link rel="apple-touch-icon" href="./logo.jpg">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <script type="module" crossorigin src="/assets/index-DPhWLZAR.js"></script>
+  <script type="module" crossorigin src="/assets/index-8he64JmK.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-BT8CGGEl.css">
 </head>
 <body>
 <div id="login-screen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at top right, var(--bg2), var(--bg));z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;">
   <div style="background:var(--card2);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);padding:2.5rem 2rem;border-radius:24px;box-shadow:0 24px 48px rgba(0,0,0,0.5);width:100%;max-width:420px;text-align:center;border:1px solid var(--border2);">
-    <div style="display:inline-flex;align-items:center;justify-content:center;width:140px;height:140px;border-radius:24px;margin-bottom:0.5rem;box-shadow:0 8px 24px rgba(0,0,0,0.3);overflow:hidden;">
-      <img src="./logo.jpg" style="width:100%;height:100%;object-fit:cover;" alt="UniDule Logo">
+    <div style="display:inline-flex;align-items:center;justify-content:center;width:96px;height:96px;border-radius:28px;margin-bottom:1rem;box-shadow:0 12px 32px rgba(0,0,0,0.3);background:linear-gradient(270deg, var(--primary), var(--text2), var(--primary));background-size:200% 200%;animation:gradFlow 3s ease infinite;color:var(--bg);">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
     </div>
-    <p style="color:var(--text-muted);margin-bottom:2rem;font-size:0.95rem;">Tu gestor académico personal</p>
+    <h1 style="font-size:1.75rem;font-weight:900;margin-bottom:0.25rem;color:var(--text);">UniDule</h1>
+    <p style="color:var(--text-muted);margin-bottom:2rem;font-size:0.95rem;font-weight:500;">Tu gestor académico personal</p>
     
-    <div style="display:flex;background:var(--card);border-radius:12px;padding:4px;margin-bottom:1.5rem;border:1px solid var(--border);">
-      <button type="button" id="tab-login" onclick="window.switchAuthTab('login')" style="flex:1;padding:0.75rem;border-radius:8px;font-weight:600;background:var(--card2);color:var(--text);border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,0.2);transition:all 0.2s;cursor:pointer;">Iniciar Sesión</button>
-      <button type="button" id="tab-register" onclick="window.switchAuthTab('register')" style="flex:1;padding:0.75rem;border-radius:8px;font-weight:600;background:transparent;color:var(--text-muted);border:1px solid transparent;transition:all 0.2s;cursor:pointer;">Crear Cuenta</button>
+    <div style="position:relative;display:flex;background:var(--card);border-radius:12px;padding:4px;margin-bottom:1.5rem;border:1px solid var(--border);box-shadow:inset 0 2px 4px rgba(0,0,0,0.05);">
+      <div id="tab-slider" style="position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);background:var(--card2);border:1px solid var(--border);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.15);transition:transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);z-index:0;"></div>
+      <button type="button" id="tab-login" onclick="window.switchAuthTab('login')" style="flex:1;position:relative;z-index:1;padding:0.75rem;border-radius:8px;font-weight:600;background:transparent;color:var(--text);border:none;cursor:pointer;transition:color 0.3s;">Iniciar Sesión</button>
+      <button type="button" id="tab-register" onclick="window.switchAuthTab('register')" style="flex:1;position:relative;z-index:1;padding:0.75rem;border-radius:8px;font-weight:600;background:transparent;color:var(--text-muted);border:none;cursor:pointer;transition:color 0.3s;">Crear Cuenta</button>
     </div>
 
     <form id="auth-form" onsubmit="window.handleAuthSubmit(event)">
       <div style="text-align:left;margin-bottom:1rem;">
         <label style="display:block;margin-bottom:0.5rem;font-size:0.85rem;color:var(--text-muted);font-weight:600;">Correo Electrónico</label>
-        <input type="email" id="auth-email" placeholder="alumno@iua.edu.ar" style="width:100%;padding:0.875rem 1rem;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.2);color:var(--text);font-size:1rem;transition:border-color 0.2s;outline:none;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" required>
+        <input type="email" id="auth-email" placeholder="alumno@iua.edu.ar" style="width:100%;padding:0.875rem 1rem;border-radius:12px;border:1px solid var(--border);background:color-mix(in srgb, var(--card) 50%, transparent);color:var(--text);font-size:1rem;transition:border-color 0.2s, box-shadow 0.2s;outline:none;" onfocus="this.style.borderColor='var(--primary)';this.style.boxShadow='0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent)';" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';" required>
       </div>
       
       <div style="text-align:left;margin-bottom:1.5rem;position:relative;">
         <label style="display:block;margin-bottom:0.5rem;font-size:0.85rem;color:var(--text-muted);font-weight:600;">Contraseña</label>
-        <input type="password" id="auth-pass" placeholder="••••••••" style="width:100%;padding:0.875rem 2.5rem 0.875rem 1rem;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.2);color:var(--text);font-size:1rem;transition:border-color 0.2s;outline:none;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" required>
-        <button type="button" onclick="window.togglePasswordVisibility()" style="position:absolute;right:12px;top:34px;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center;z-index:10;">
+        <input type="password" id="auth-pass" placeholder="••••••••" style="width:100%;padding:0.875rem 2.5rem 0.875rem 1rem;border-radius:12px;border:1px solid var(--border);background:color-mix(in srgb, var(--card) 50%, transparent);color:var(--text);font-size:1rem;transition:border-color 0.2s, box-shadow 0.2s;outline:none;" onfocus="this.style.borderColor='var(--primary)';this.style.boxShadow='0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent)';" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';" required>
+        <button type="button" onclick="window.togglePasswordVisibility()" style="position:absolute;right:12px;top:34px;background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center;z-index:10;transition:color 0.2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-muted)'">
           <svg id="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
       </div>
 
       <div id="auth-plan-wrapper" style="text-align:left;margin-bottom:1.5rem;display:none;">
         <label style="display:block;margin-bottom:0.5rem;font-size:0.85rem;color:var(--text-muted);font-weight:600;">Plan de Estudio</label>
-        <select id="auth-plan" style="width:100%;padding:0.875rem 1rem;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.2);color:var(--text);font-size:1rem;transition:border-color 0.2s;outline:none;appearance:none;cursor:pointer;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+        <select id="auth-plan" style="width:100%;padding:0.875rem 1rem;border-radius:12px;border:1px solid var(--border);background:color-mix(in srgb, var(--card) 50%, transparent);color:var(--text);font-size:1rem;transition:border-color 0.2s, box-shadow 0.2s;outline:none;appearance:none;cursor:pointer;" onfocus="this.style.borderColor='var(--primary)';this.style.boxShadow='0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent)';" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
           <option value="2026">Plan 2026 (Ing. Informática IUA)</option>
           <option value="2016">Plan 2016 (Ing. Informática IUA)</option>
         </select>
         <div style="position:absolute;right:16px;top:38px;pointer-events:none;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
       </div>
 

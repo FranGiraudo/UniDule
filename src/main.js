@@ -138,26 +138,19 @@ window.switchAuthTab = (mode) => {
   const tabLogin = document.getElementById('tab-login');
   const tabRegister = document.getElementById('tab-register');
   const btnSubmit = document.getElementById('btn-auth-submit');
+  const slider = document.getElementById('tab-slider');
   
   if (mode === 'login') {
-    tabLogin.style.background = 'var(--card)';
     tabLogin.style.color = 'var(--text)';
-    tabLogin.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-    
-    tabRegister.style.background = 'transparent';
     tabRegister.style.color = 'var(--text-muted)';
-    tabRegister.style.boxShadow = 'none';
+    if(slider) slider.style.transform = 'translateX(0)';
     
     btnSubmit.textContent = 'Iniciar Sesión';
     document.getElementById('auth-plan-wrapper').style.display = 'none';
   } else {
-    tabRegister.style.background = 'var(--card)';
     tabRegister.style.color = 'var(--text)';
-    tabRegister.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-    
-    tabLogin.style.background = 'transparent';
     tabLogin.style.color = 'var(--text-muted)';
-    tabLogin.style.boxShadow = 'none';
+    if(slider) slider.style.transform = 'translateX(100%)';
     
     btnSubmit.textContent = 'Crear Cuenta';
     document.getElementById('auth-plan-wrapper').style.display = 'block';
