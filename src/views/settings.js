@@ -58,9 +58,74 @@ export function handleFileImport(e) {
 
 
 
+export function exportScheduleToClipboard() {
+  const scheds = (S.subjects || []).filter(s => s.schedules && s.schedules.length > 0).map(s => ({
+    id: s.id,
+    code: s.code,
+    name: s.name,
+    professor: s.professor,
+    room: s.room,
+    schedules: s.schedules
+  }));
+  if (scheds.length === 0) {
+    showToast('No tenés horarios cargados para compartir.', 'error');
+    return;
+  }
+  const payload = { type: 'unidule-schedule', v: 1, data: scheds };
+  const encoded = btoa(encodeURIComponent(JSON.stringify(payload)));
+  navigator.clipboard.writeText(encoded).then(() => {
+    showToast('¡Horario copiado! Pasáselo a un compañero.', 'success');
+  }).catch(() => {
+    prompt('Copia este código y pasáselo a tu compañero:', encoded);
+  });
+}
 
+export function importScheduleFromCode() {
+  const code = prompt('Pegá acá el código de horario que te pasaron:');
+  if (!code) return;
+  try {
+    const decoded = JSON.parse(decodeURIComponent(atob(code)));
+    if (decoded.type !== 'unidule-schedule' || !Array.isArray(decoded.data)) throw new Error('Invalid type');
+    
+    let addedCount = 0;
+    decoded.data.forEach(extSub => {
+      // Find matching subject by id or code
+      let localSub = S.subjects.find(s => s.id === extSub.id || (s.code && s.code === extSub.code) || s.name.toLowerCase() === extSub.name.toLowerCase());
+      if (localSub) {
+        localSub.schedules = extSub.schedules;
+        if (!localSub.professor) localSub.professor = extSub.professor;
+        if (!localSub.room) localSub.room = extSub.room;
+        addedCount++;
+      } else {
+        // If they don't have it, create it
+        localSub = {
+          id: extSub.id,
+          code: extSub.code || '',
+          name: extSub.name,
+          color: '#6366f1',
+          professor: extSub.professor || '',
+          room: extSub.room || '',
+          email: '', maxAbsences: 6, absences: 0, grades: [], status: 'cursando', allowsPromotion: false,
+          schedules: extSub.schedules
+        };
+        S.subjects.push(localSub);
+        addedCount++;
+      }
+      if (window.api) {
+        window.api.saveActiveSubject(localSub).catch(e => console.error('Error guardando materia importada', e));
+      }
+    });
+    
+    save();
+    showToast(`Se importaron los horarios de ${addedCount} materia(s).`, 'success');
+  } catch(e) {
+    console.error(e);
+    showToast('Código inválido. Asegurate de copiarlo completo.', 'error');
+  }
+}
 
-
+window.exportScheduleToClipboard = exportScheduleToClipboard;
+window.importScheduleFromCode = importScheduleFromCode;
 window.handleFileImport = handleFileImport;
 
 
@@ -134,13 +199,25 @@ export function renderSettings() {
           <div id="theme-presets-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.75rem;"></div>
         </div>
 
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:0.75rem;padding:1.25rem;margin-bottom:1.25rem;">
-          <div style="font-weight:700;margin-bottom:0.5rem;color:var(--text);">Datos</div>
+        <div style="background:color-mix(in srgb, var(--primary) 10%, transparent);border:1px solid color-mix(in srgb, var(--primary) 30%, transparent);border-radius:0.75rem;padding:1.25rem;margin-bottom:1.25rem;">
+          <div style="font-weight:700;margin-bottom:0.5rem;color:var(--primary);display:flex;align-items:center;gap:6px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            Compartir Horario
+          </div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:1rem;line-height:1.4;">Compartí tu grilla de horarios con compañeros, o pegá un código que te hayan pasado para no cargar todo a mano.</p>
           <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
-            <button class="btn btn-ghost" onclick="exportBackup()">
+            <button class="btn btn-primary btn-sm" onclick="exportScheduleToClipboard()">Copiar mi horario</button>
+            <button class="btn btn-ghost btn-sm" onclick="importScheduleFromCode()">Importar con código</button>
+          </div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:0.75rem;padding:1.25rem;margin-bottom:1.25rem;">
+          <div style="font-weight:700;margin-bottom:0.5rem;color:var(--text);">Datos y Respaldo</div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+            <button class="btn btn-ghost btn-sm" onclick="exportBackup()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Exportar backup JSON
             </button>
-            <label class="btn btn-ghost" style="cursor:pointer;">
+            <label class="btn btn-ghost btn-sm" style="cursor:pointer;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Importar archivo
               <input type="file" accept=".json,.csv" style="display:none;" onchange="handleFileImport(event)">
             </label>
