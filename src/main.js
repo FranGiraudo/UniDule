@@ -149,6 +149,7 @@ window.switchAuthTab = (mode) => {
     tabRegister.style.boxShadow = 'none';
     
     btnSubmit.textContent = 'Iniciar Sesión';
+    document.getElementById('auth-plan-wrapper').style.display = 'none';
   } else {
     tabRegister.style.background = 'var(--card)';
     tabRegister.style.color = 'var(--text)';
@@ -159,6 +160,7 @@ window.switchAuthTab = (mode) => {
     tabLogin.style.boxShadow = 'none';
     
     btnSubmit.textContent = 'Crear Cuenta';
+    document.getElementById('auth-plan-wrapper').style.display = 'block';
   }
 };
 
@@ -207,6 +209,7 @@ window.handleRegister = async (e) => {
   if (e) e.preventDefault();
   const email = document.getElementById('auth-email').value;
   const pass = document.getElementById('auth-pass').value;
+  const planId = document.getElementById('auth-plan').value;
   if (!email || !pass) return setAuthFeedback('Por favor, completa los datos');
   
   setAuthLoading(true, 'btn-auth-submit', 'Registrando...');
@@ -214,6 +217,16 @@ window.handleRegister = async (e) => {
     await registerUser(email, pass);
     setAuthFeedback('Registro exitoso. Iniciando sesión...', false);
     await loginUser(email, pass);
+    
+    if (window.api && window.api.syncProfile) {
+      await window.api.syncProfile({
+        name: 'Usuario',
+        career: 'Ingeniería en Informática — IUA',
+        theme: 'dark',
+        plan_id: planId
+      });
+    }
+    
     await checkAuth();
   } catch (err) {
     setAuthFeedback('Error al registrar: ' + err.message);
