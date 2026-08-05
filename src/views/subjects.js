@@ -182,8 +182,15 @@ export async function saveSub() {
   if (existing) Object.assign(existing,sub); else S.subjects.push(sub);
 
   let careerMatch = null;
-  if (S.career && S.career.subjects) {
-    careerMatch = S.career.subjects.find(cs => cs.id === sub.id || (cs.code && cs.code === sub.code) || cs.name.toLowerCase() === sub.name.toLowerCase());
+  let isElective = false;
+  if (S.career) {
+    if (S.career.subjects) {
+      careerMatch = S.career.subjects.find(cs => cs.id === sub.id || (cs.code && cs.code === sub.code) || cs.name.toLowerCase() === sub.name.toLowerCase());
+    }
+    if (!careerMatch && S.career.electives) {
+      careerMatch = S.career.electives.find(ce => ce.id === sub.id || (ce.code && ce.code === sub.code) || ce.name.toLowerCase() === sub.name.toLowerCase());
+      if (careerMatch) isElective = true;
+    }
     if (careerMatch) {
       careerMatch.id = sub.id;
       careerMatch.status = (statusVal === 'aprobado' || statusVal === 'promocionado') ? 'aprobada' : statusVal;
