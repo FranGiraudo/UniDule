@@ -499,6 +499,7 @@ export async function saveNoteData() {
   save();
   renderNotes();
   closeM('modal-note');
+  showToast('Nota guardada', 'success');
 
   if (window.api) {
     try {
@@ -523,6 +524,7 @@ export async function deleteNoteFromModal() {
   save();
   renderNotes();
   closeM('modal-note');
+  showToast('Nota eliminada', 'success');
   
   if (window.api && !id.startsWith('local-')) {
     try { await window.api.deleteNote(id); }
