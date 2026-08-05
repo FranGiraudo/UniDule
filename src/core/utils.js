@@ -85,9 +85,11 @@ export function confirmDel(type, id) {
 
 export function openM(id) { const e = document.getElementById(id); if(e) e.style.display='flex'; }
 export function closeM(id) { const e = document.getElementById(id); if(e) e.style.display='none'; }
+export function closeBD(e, id) { if(e.target.id === id) closeM(id); }
 
 window.openM = openM;
 window.closeM = closeM;
+window.closeBD = closeBD;
 window.confirmDel = confirmDel;
 window.gid = gid;
 window.showToast = showToast;

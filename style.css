@@ -469,6 +469,20 @@ body {
 }
 .f-input:focus { border-color: var(--primary); box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--primary) 15%, transparent); background: var(--card2); }
 .f-input::placeholder { color: var(--text2); }
+
+select.f-input, input[type="date"].f-input {
+  appearance: none; -webkit-appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%237777aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="6 9 12 15 18 9"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.25rem;
+  cursor: pointer;
+}
+input[type="date"].f-input { position: relative; }
+input[type="date"].f-input::-webkit-calendar-picker-indicator {
+  opacity: 0; width: 100%; height: 100%; position: absolute; top: 0; left: 0; cursor: pointer;
+}
 select.f-input option { background: var(--card2, var(--bg)); color: var(--text); }
 
 /* Quitar spinners/flechitas de scroll en inputs numéricos */
