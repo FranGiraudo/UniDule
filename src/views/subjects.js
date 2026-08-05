@@ -368,3 +368,170 @@ window.addGrade = addGrade;
 window.rmGrade = rmGrade;
 window.updGrade = updGrade;
 window.saveGrades = saveGrades;
+
+// --- NOTES (Phase 1) ---
+export function switchSubjectsTab(tab) {
+  const tMat = document.getElementById('tab-mis-materias');
+  const tNot = document.getElementById('tab-mis-notas');
+  const cMat = document.getElementById('subjects-grid');
+  const cNot = document.getElementById('notes-container');
+  const bAddS = document.getElementById('btn-add-subject');
+  const bAddN = document.getElementById('btn-add-note');
+
+  if (tab === 'materias') {
+    tMat.classList.add('active'); tNot.classList.remove('active');
+    cMat.style.display = 'grid'; cNot.style.display = 'none';
+    bAddS.style.display = 'block'; bAddN.style.display = 'none';
+  } else {
+    tNot.classList.add('active'); tMat.classList.remove('active');
+    cNot.style.display = 'block'; cMat.style.display = 'none';
+    bAddN.style.display = 'block'; bAddS.style.display = 'none';
+    renderNotes();
+  }
+}
+
+function parseMd(md) {
+  if (!md) return '';
+  let html = md
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, '<code style="background:color-mix(in srgb, var(--text) 10%, transparent);padding:2px 4px;border-radius:4px;font-size:0.9em;">$1</code>')
+    .replace(/^- (.*)$/gm, '<li>$1</li>');
+  html = html.replace(/\n/g, '<br>');
+  return html;
+}
+
+export function renderNotes() {
+  const query = (document.getElementById('notes-search').value || '').toLowerCase();
+  const grid = document.getElementById('notes-grid');
+  let notes = S.notes || [];
+  
+  if (query) {
+    notes = notes.filter(n => 
+      n.title.toLowerCase().includes(query) || 
+      (n.content && n.content.toLowerCase().includes(query))
+    );
+  }
+  
+  if (!notes.length) {
+    grid.innerHTML = `<div class="empty-st" style="grid-column:1/-1;"><div style="display:inline-flex;padding:0.75rem;border-radius:50%;background:color-mix(in srgb, var(--primary) 15%, transparent);color:var(--primary);margin-bottom:0.5rem;">${SVG_ICONS.book}</div><div style="font-weight:700;">No hay notas guardadas</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = notes.map(n => {
+    const sub = S.subjects.find(s => s.id === n.subject_id);
+    const subName = sub ? sub.name : 'Materia Desconocida';
+    const subColor = sub ? sub.color : 'var(--primary)';
+    
+    return `<div class="sub-card" style="cursor:pointer;" onclick="window.openNoteModal('${n.id}')">
+      <div class="sub-card-accent" style="background:${subColor};"></div>
+      <div class="sub-card-body" style="display:flex;flex-direction:column;height:100%;">
+        <div style="font-size:10px;font-weight:700;color:${subColor};margin-bottom:4px;text-transform:uppercase;">${subName}</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+          <div style="font-size:15px;font-weight:800;line-height:1.2;">${n.title}</div>
+          <div style="font-size:11px;color:var(--text2);font-weight:600;white-space:nowrap;margin-left:8px;">${n.note_date}</div>
+        </div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.5;flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;">
+          ${parseMd(n.content)}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+export function openNoteModal(id = null) {
+  const isEdit = !!id;
+  document.getElementById('note-modal-title').textContent = isEdit ? 'Editar Nota' : 'Nueva Nota';
+  
+  const sel = document.getElementById('note-subject');
+  sel.innerHTML = S.subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  
+  if (isEdit) {
+    const n = (S.notes || []).find(x => x.id === id);
+    if (!n) return;
+    document.getElementById('note-edit-id').value = n.id;
+    sel.value = n.subject_id;
+    document.getElementById('note-title').value = n.title;
+    document.getElementById('note-date').value = n.note_date;
+    document.getElementById('note-content').value = n.content || '';
+    document.getElementById('note-delete-btn').style.display = 'block';
+  } else {
+    document.getElementById('note-edit-id').value = '';
+    document.getElementById('note-title').value = '';
+    const now = new Date();
+    document.getElementById('note-date').value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    document.getElementById('note-content').value = '';
+    document.getElementById('note-delete-btn').style.display = 'none';
+  }
+  
+  document.getElementById('modal-note').style.display = 'flex';
+}
+
+export async function saveNoteData() {
+  const id = document.getElementById('note-edit-id').value;
+  const subjId = document.getElementById('note-subject').value;
+  const title = document.getElementById('note-title').value.trim();
+  const date = document.getElementById('note-date').value;
+  const content = document.getElementById('note-content').value.trim();
+
+  if (!title || !subjId || !date) {
+    showToast('Faltan campos obligatorios');
+    return;
+  }
+
+  S.notes = S.notes || [];
+  let noteObj = null;
+
+  if (id) {
+    noteObj = S.notes.find(n => n.id === id);
+    if (noteObj) {
+      noteObj.subject_id = subjId;
+      noteObj.title = title;
+      noteObj.note_date = date;
+      noteObj.content = content;
+    }
+  } else {
+    const tempId = 'local-' + Date.now();
+    noteObj = { id: tempId, subject_id: subjId, title, note_date: date, content };
+    S.notes.push(noteObj);
+  }
+
+  save();
+  renderNotes();
+  closeM('modal-note');
+
+  if (window.api) {
+    try {
+      const saved = await window.api.saveNote(noteObj);
+      if (!id && saved && saved.id) {
+        // Swap local id for real UUID
+        const n = S.notes.find(x => x.id === noteObj.id);
+        if (n) n.id = saved.id;
+        save();
+        renderNotes();
+      }
+    } catch(e) { console.error('Error saving note to cloud', e); }
+  }
+}
+
+export async function deleteNoteFromModal() {
+  const id = document.getElementById('note-edit-id').value;
+  if (!id) return;
+  if (!confirm('¿Eliminar nota?')) return;
+  
+  S.notes = (S.notes || []).filter(n => n.id !== id);
+  save();
+  renderNotes();
+  closeM('modal-note');
+  
+  if (window.api && !id.startsWith('local-')) {
+    try { await window.api.deleteNote(id); }
+    catch(e) { console.error('Error deleting note from cloud', e); }
+  }
+}
+
+window.switchSubjectsTab = switchSubjectsTab;
+window.renderNotes = renderNotes;
+window.openNoteModal = openNoteModal;
+window.saveNoteData = saveNoteData;
+window.deleteNoteFromModal = deleteNoteFromModal;

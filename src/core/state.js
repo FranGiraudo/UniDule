@@ -1,7 +1,7 @@
 import { STORAGE_KEY, DEF_SUBJECTS, DEF_TASKS, DEF_CAREER, DEF_SEMINARS, DEF_ELECTIVES, PATCHES } from './constants.js';
 import { applyTheme } from './theme.js';
 
-export let S = { subjects:[], tasks:[] };
+export let S = { subjects:[], tasks:[], notes:[] };
 
 export let currentView = 'dashboard';
 export let taskFilter = 'all';
@@ -31,6 +31,7 @@ export function loadState() {
       S.tasks = (S.tasks || []).map(t => ({
         done:false, notes:'', subjectId:null, dueDate:null, ...t
       }));
+      S.notes = S.notes || [];
       // Migrar / Sincronizar career
       if (!S.career || !S.career.subjects || S.career.subjects.length < 30) {
         S.career = { subjects: DEF_CAREER.map(s=>({...s,correlatives:{toCurse:[...s.correlatives.toCurse],toPass:[...s.correlatives.toPass]}})) };
@@ -66,7 +67,7 @@ export function loadState() {
       }
       if (patched) save();
     } else {
-      S = { subjects: DEF_SUBJECTS.map(s=>({...s})), tasks: DEF_TASKS.map(t=>({...t})),
+      S = { subjects: DEF_SUBJECTS.map(s=>({...s})), tasks: DEF_TASKS.map(t=>({...t})), notes: [],
             career: { subjects: DEF_CAREER.map(s=>({...s,correlatives:{toCurse:[...s.correlatives.toCurse],toPass:[...s.correlatives.toPass]}})) },
             profile: { name: 'Fran Giraudo', career: 'Ingeniería en Informática — IUA', theme: 'dark' } };
       syncSubjectsAndCareer();
@@ -101,6 +102,9 @@ export function loadStateFromCloud(cloudState) {
     S.tasks = (cloudState.tasks || []).map(t => ({
       done: false, notes: '', subjectId: null, dueDate: null, ...t
     }));
+
+    // Notas
+    S.notes = cloudState.notes || [];
 
     // Perfil
     S.profile = cloudState.profile || { name: 'Usuario', career: 'Ingeniería en Informática', theme: 'dark' };

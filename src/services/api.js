@@ -43,7 +43,8 @@ export async function fetchFullState() {
     supabase.from('user_seminars').select('*').eq('user_id', uid),
     supabase.from('global_subjects').select('*').eq('plan_id', planId).order('year').order('semester'),
     supabase.from('global_electives').select('*').eq('plan_id', planId),
-    supabase.from('user_progress').select('*').eq('user_id', uid)
+    supabase.from('user_progress').select('*').eq('user_id', uid),
+    supabase.from('user_notes').select('*').eq('user_id', uid).order('note_date', { ascending: false })
   ]);
 
   results.forEach((r, i) => {
@@ -57,7 +58,8 @@ export async function fetchFullState() {
     { data: seminarsData },
     { data: globalSubsData },
     { data: globalElecsData },
-    { data: progressData }
+    { data: progressData },
+    { data: notesData }
   ] = results;
 
   const profile = profileData || { name: user.email.split('@')[0], career: 'Ingeniería en Informática', theme: 'dark' };
@@ -129,7 +131,8 @@ export async function fetchFullState() {
       subjects: careerSubs,
       electives: careerElecs,
       seminars: (seminarsData || [])
-    }
+    },
+    notes: (notesData || [])
   };
 }
 
@@ -325,4 +328,44 @@ export async function syncEntireStateToCloud(state) {
       await supabase.from('user_progress').upsert(toInsert, { onConflict: 'user_id, global_id' });
     }
   }
+}
+
+// --- Notas (Phase 1) ---
+export async function fetchNotes() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+  const { data, error } = await supabase.from('user_notes').select('*').eq('user_id', user.id).order('note_date', { ascending: false });
+  if (error) { console.error('Error fetching notes:', error); return []; }
+  return data || [];
+}
+
+export async function saveNote(note) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not logged in');
+  
+  const payload = {
+    user_id: user.id,
+    subject_id: note.subject_id,
+    title: note.title,
+    content: note.content,
+    note_date: note.note_date,
+    updated_at: new Date().toISOString()
+  };
+  
+  if (note.id) {
+    const { data, error } = await supabase.from('user_notes').update(payload).eq('id', note.id).select().single();
+    if (error) throw error;
+    return data;
+  } else {
+    const { data, error } = await supabase.from('user_notes').insert([payload]).select().single();
+    if (error) throw error;
+    return data;
+  }
+}
+
+export async function deleteNote(noteId) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  const { error } = await supabase.from('user_notes').delete().eq('id', noteId).eq('user_id', user.id);
+  if (error) throw error;
 }
