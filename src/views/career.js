@@ -20,12 +20,8 @@ export function ensureCareerLoaded() {
 
 export function getComputedStatus(sub) {
   if (sub.status !== 'pendiente') return sub.status;
-  const all = S.career.subjects;
-  const met = (sub.correlatives.toCurse || []).every(id => {
-    const dep = all.find(x => x.id === id);
-    return dep && (dep.status === 'regular' || dep.status === 'aprobada');
-  });
-  return met ? 'disponible' : 'bloqueada';
+  // REMOVED correlative blocks for equivalencies
+  return 'disponible';
 }
 
 function getDaysToExpiration(expDateStr) {
