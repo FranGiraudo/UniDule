@@ -136,19 +136,20 @@ export async function fetchFullState() {
 export async function syncProfile(profile) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
-  await supabase.from('user_profiles').upsert({
+  const { error } = await supabase.from('user_profiles').upsert({
     id: user.id,
     name: profile.name,
     career: profile.career,
     theme: profile.theme,
     plan_id: profile.plan_id
   });
+  if (error) console.error('Error in syncProfile:', error);
 }
 
 export async function syncSubjectProgress(globalId, type, status, grade, regDate, expDate) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
-  await supabase.from('user_progress').upsert({
+  const { error } = await supabase.from('user_progress').upsert({
     user_id: user.id,
     global_id: globalId,
     type,
@@ -157,6 +158,7 @@ export async function syncSubjectProgress(globalId, type, status, grade, regDate
     reg_date: regDate || null,
     exp_date: expDate || null
   }, { onConflict: 'user_id,global_id' });
+  if (error) console.error('Error in syncSubjectProgress:', error);
 }
 
 export async function saveActiveSubject(sub) {

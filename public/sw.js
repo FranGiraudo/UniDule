@@ -2,7 +2,7 @@
    UniSchedule — Service Worker  (cache-first, offline)
 ═══════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'unischedule-v4';
+const CACHE_NAME = 'unischedule-v5';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -32,8 +32,12 @@ self.addEventListener('activate', e => {
 
 // ─── FETCH: cache-first strategy ──────────────────
 self.addEventListener('fetch', e => {
-  // Only handle GET requests to same origin or Google Fonts
+  // Only handle GET requests
   if (e.request.method !== 'GET') return;
+
+  const url = new URL(e.request.url);
+  // Do NOT cache API requests to Supabase
+  if (url.hostname.includes('supabase.co')) return;
 
   e.respondWith(
     caches.match(e.request).then(cached => {
