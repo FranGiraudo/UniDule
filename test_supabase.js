@@ -6,12 +6,10 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function test() {
-  const { data, error } = await supabase.from('global_subjects').select('plan_id, id');
-  console.log('Total subjects:', data.length);
-  const byPlan = data.reduce((acc, curr) => {
-    acc[curr.plan_id] = (acc[curr.plan_id] || 0) + 1;
-    return acc;
-  }, {});
-  console.log('By plan:', byPlan);
+  const { data, error } = await supabase.from('global_subjects')
+    .select('id, name, year, semester, layout_row')
+    .eq('plan_id', '2026')
+    .in('name', ['Sistemas de Comunicaciones', 'Procesos de Software I', 'Electiva I - Desarrollo de Herramientas de Software']);
+  console.log('Results:', data, error);
 }
 test();

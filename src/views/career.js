@@ -598,7 +598,7 @@ export function renderCareerStats() {
   const pctAnalistaProyectado = analistaTotal ? Math.round(((analistaAprobadas + analistaRegulares) / analistaTotal) * 100) : 0;
 
   // Promedios
-  const allGrades = subs.filter(s => s.grade !== null).map(s => s.grade);
+  const allGrades = subs.map(s => s.grade).filter(g => g !== null && g !== '' && !isNaN(parseFloat(g))).map(g => parseFloat(g));
   const passGrades = allGrades.filter(g => g >= 4);
   const avg = allGrades.length ? (allGrades.reduce((a, b) => a + b, 0) / allGrades.length).toFixed(2) : '—';
   const avgPass = passGrades.length ? (passGrades.reduce((a, b) => a + b, 0) / passGrades.length).toFixed(2) : '—';
@@ -805,8 +805,8 @@ export function renderCareerStats() {
             ['Regulares Pend.',  regulares,   c[1]],
             ['Cursando',         cursandoN,   c[2]],
             ['Disponibles',      disponible,  c[3]],
-            ['Promedio General', avg,         c[4]],
-            ['Prom. Aprobadas',  avgPass,     c[5]],
+            ['Promedio',         avgPass,     c[4]],
+            ['Avance Carrera',   pctActual + '%', c[5]],
             ['Créditos Aprob.',  approvedCred,c[6]],
             ['Créditos Total',   totalCred,   c[7]],
           ].map(([lbl,val,col], i)=>`
