@@ -352,7 +352,7 @@ export async function saveNote(note) {
     updated_at: new Date().toISOString()
   };
   
-  if (note.id) {
+  if (note.id && !String(note.id).startsWith('local-')) {
     const { data, error } = await supabase.from('user_notes').update(payload).eq('id', note.id).select().single();
     if (error) throw error;
     return data;
