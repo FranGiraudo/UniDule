@@ -232,7 +232,7 @@ export function syncSubjectsAndCareer() {
     if (existing) {
       cleanSubjects.push({
         ...existing,
-        id: cs.id,
+        id: (existing.id && existing.id.length >= 20 && !existing.id.startsWith('cs-') && !existing.id.startsWith('local-')) ? existing.id : crypto.randomUUID(),
         name: cs.name,
         code: cs.code || existing.code,
         professor: cs.professor || existing.professor || '',
@@ -244,14 +244,14 @@ export function syncSubjectsAndCareer() {
       if (defMatch) {
         cleanSubjects.push({
           ...defMatch,
-          id: cs.id,
+          id: crypto.randomUUID(),
           professor: cs.professor || defMatch.professor || '',
           room: cs.room || defMatch.room || '',
           status: 'cursando'
         });
       } else {
         cleanSubjects.push({
-          id: cs.id,
+          id: crypto.randomUUID(),
           name: cs.name,
           code: cs.code || '',
           color: '#6366f1',

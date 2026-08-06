@@ -38,25 +38,25 @@ async function checkAuth() {
       let localS = null;
       try { localS = localRaw ? JSON.parse(localRaw) : null; } catch(e) {}
 
-      // Si la nube devolvió subjects vacíos pero tenemos locales, sincronizarlos primero
       if (cloudState.subjects.length === 0 && localS && localS.subjects && localS.subjects.length > 0) {
-        const realSubs = localS.subjects.filter(s => !['cs-aud','cs-ge2','cs-fis2','cs-iw3','cs-mn','cs-pe','cs-red1','cs-pfs'].includes(s.id));
-        if (realSubs.length > 0) {
-          console.log('Sincronizando materias locales a la nube...');
-          for (const sub of realSubs) {
-            try {
-              await window.api.saveActiveSubject(sub);
-              if (sub.grades && sub.grades.length > 0) {
-                await window.api.syncGrades(sub.id, sub.grades);
-              }
-            } catch(e) { console.error('Error subiendo materia local:', sub.name, e); }
-          }
-          // Re-fetch con los datos ya subidos
-          const refreshed = await fetchFullState();
-          if (refreshed) {
-            cloudState.subjects = refreshed.subjects;
-            cloudState.tasks = [...cloudState.tasks, ...refreshed.tasks.filter(t => !cloudState.tasks.find(ct => ct.id === t.id))];
-          }
+        console.log('Sincronizando materias locales a la nube...');
+        for (const sub of localS.subjects) {
+          try {
+            // Fix legacy IDs before uploading to avoid RLS 42501 conflicts
+            if (!sub.id || sub.id.startsWith('cs-') || sub.id.startsWith('local-') || sub.id.length < 20) {
+              sub.id = crypto.randomUUID();
+            }
+            await window.api.saveActiveSubject(sub);
+            if (sub.grades && sub.grades.length > 0) {
+              await window.api.syncGrades(sub.id, sub.grades);
+            }
+          } catch(e) { console.error('Error subiendo materia local:', sub.name, e); }
+        }
+        // Re-fetch con los datos ya subidos
+        const refreshed = await fetchFullState();
+        if (refreshed) {
+          cloudState.subjects = refreshed.subjects;
+          cloudState.tasks = [...cloudState.tasks, ...refreshed.tasks.filter(t => !cloudState.tasks.find(ct => ct.id === t.id))];
         }
       }
 
