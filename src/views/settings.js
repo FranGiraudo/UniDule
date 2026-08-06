@@ -197,6 +197,7 @@ export function renderSettings() {
               <label class="f-label">Plan de Estudio</label>
               <select class="f-input" id="setting-user-plan" onchange="document.getElementById('btn-migration').style.display = (this.value === '2026' && S.profile.plan_id !== '2026') ? 'block' : 'none'" style="width:100%; border:1px solid var(--border); padding:0.75rem; background:var(--bg); color:var(--text); border-radius:0.5rem; outline:none; font-family:inherit;">
                 <option value="2016">Plan 2016</option>
+                <option value="unc-derecho">Abogacía UNC</option>
                 <option value="2026">Plan 2026</option>
               </select>
               <button id="btn-migration" class="btn btn-secondary" style="margin-top:0.5rem; width:100%; display:none; border:1px solid var(--primary); color:var(--primary); background:transparent;" onclick="openMigrationModal()">Ver Resumen de Migración</button>
@@ -320,6 +321,8 @@ window.openMigrationModal = async () => {
     const derived = calculateDerivedProgress(allProgress);
     const alerts = calculateLostRegularities(derived, globalSubs26 || []);
 
+    window._latestMigrationDerived = derived;
+    
     let html = '<div style="font-size:0.95rem; color:var(--text); padding:0 0.5rem;">';
     html += '<p style="margin-bottom:1.5rem; color:var(--text-muted); line-height:1.5;">Este es el resumen de impacto si cambias al Plan 2026. Tu progreso actual se mapear\xE1 autom\xE1ticamente a las nuevas materias de forma din\xE1mica, manteniendo tu plan original intacto.</p>';
     
@@ -375,11 +378,44 @@ window.openMigrationModal = async () => {
   }
 };
 
-window.confirmMigration = () => {
+window.confirmMigration = async () => {
+  if (!window._latestMigrationDerived) return;
   const planSelect = document.getElementById('setting-user-plan');
   if (planSelect) {
     planSelect.value = '2026';
-    saveProfileSettings();
+    if (!S.profile) S.profile = {};
+    S.profile.plan_id = '2026';
+    
+    if (!S.career) S.career = { subjects: [], electives: [], seminars: [] };
+    if (!S.career.subjects) S.career.subjects = [];
+    
+    window._latestMigrationDerived.forEach(d => {
+      let sub = S.career.subjects.find(s => s.code === d.global_id || s.id === d.global_id);
+      if (!sub) {
+        sub = { id: d.global_id, code: d.global_id, name: '', status: d.status, grade: d.grade };
+        S.career.subjects.push(sub);
+      } else {
+        sub.status = d.status;
+        sub.grade = d.grade;
+      }
+    });
+    
+    save();
     window.closeM('modal-migration');
+    showToast('Migrando progreso...', 'info');
+
+    if (window.api) {
+      try {
+        await window.api.syncProfile(S.profile);
+        await window.api.syncEntireStateToCloud(S);
+        showToast('¡Migración exitosa al Plan 2026!', 'success');
+        setTimeout(() => window.location.reload(), 1200);
+      } catch (e) {
+        console.error(e);
+        showToast('Error sincronizando migración', 'error');
+      }
+    } else {
+      window.location.reload();
+    }
   }
 };
