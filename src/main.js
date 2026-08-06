@@ -95,6 +95,11 @@ async function checkAuth() {
       const app = document.getElementById('app');
       if (loginScreen) loginScreen.style.display = 'none';
       if (app) app.style.display = 'flex';
+      
+      const navMigration = document.getElementById('nav-migration');
+      if (navMigration) {
+        navMigration.style.display = (cloudState.profile?.plan_id === '2016') ? 'flex' : 'none';
+      }
 
       ensureCareerLoaded();
       applyTheme(cloudState.profile?.theme || 'dark');

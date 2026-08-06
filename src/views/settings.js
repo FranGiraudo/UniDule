@@ -151,6 +151,13 @@ export async function saveProfileSettings() {
   if (elCareer) S.profile.career = elCareer.value;
   if (elPlan && S.profile.plan_id !== elPlan.value) {
     S.profile.plan_id = elPlan.value;
+    if (elPlan.value === 'unc-derecho') {
+      S.profile.career = 'Abogacía — UNC';
+      if (elCareer) elCareer.value = 'Abogacía — UNC';
+    } else {
+      S.profile.career = 'Ingeniería en Informática — IUA';
+      if (elCareer) elCareer.value = 'Ingeniería en Informática — IUA';
+    }
     planChanged = true;
   }
 
