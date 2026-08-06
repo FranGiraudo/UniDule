@@ -146,4 +146,22 @@ export const DEF_ELECTIVES = [
   { id: 'opt-sr', code: '000816', name: 'Sistemas de Radioenlace', category: 'Optativa Informática 2017', credits: 0, status: 'pendiente', grade: null }
 ];
 
+// ============================================================================
+// PLAN 2026 Y MOTOR DE EQUIVALENCIAS (FASE 1)
+// ============================================================================
 
+// El nuevo plan 2026 (Placeholder hasta que el usuario pase los datos)
+export const DEF_CAREER_2026 = [
+  // Ejemplos ficticios para estructura
+  {id:'cs26-info1',    code:'260450', name:'Informática 1 (2026)', year:1,semester:1,credits:6,status:'pendiente',correlatives:{toCurse:[], toPass:[]}},
+  {id:'cs26-math',     code:'260452', name:'Matemática Avanzada', year:1,semester:1,credits:6,status:'pendiente',correlatives:{toCurse:[], toPass:[]}},
+  {id:'cs26-arq',      code:'260468', name:'Arquitectura Integrada', year:2,semester:1,credits:8,status:'pendiente',correlatives:{toCurse:['260450'], toPass:['260450']}}
+];
+
+// Reglas de equivalencia (Placeholder)
+export const EQUIVALENCIES_2016_TO_2026 = {
+  // 'CodigoMateria2026': { regla... }
+  '260450': { type: 'one_to_one', oldCode: '000450' }, // Info 1 -> Info 1 (2026)
+  '260452': { type: 'extra', oldCode: '000452', extraDetails: 'Requiere examen extra de Python' }, // AM1A -> Mat Avanzada + Examen
+  '260468': { type: 'many_to_one', oldCodes: ['000468', '000473'] } // Arq 1 + Arq 2 -> Arq Integrada
+};

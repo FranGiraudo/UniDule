@@ -59,6 +59,19 @@ export function loadState() {
         }
         return s;
       });
+      
+      // MIGRACIÓN: arreglar IDs viejos (cs- o local-) para que sean UUIDs y evitar colisiones RLS
+      S.subjects.forEach(s => {
+        if (!s.id || s.id.startsWith('cs-') || s.id.startsWith('local-') || s.id.length < 20) {
+          const newId = crypto.randomUUID();
+          // Update dependencies
+          S.tasks.filter(t => t.subjectId === s.id).forEach(t => t.subjectId = newId);
+          S.notes.filter(n => n.subject_id === s.id).forEach(n => n.subject_id = newId);
+          s.id = newId;
+          patched = true;
+        }
+      });
+      
       if (!S.profile) {
         S.profile = { name: 'Fran Giraudo', career: 'Ingeniería en Informática — IUA', theme: 'dark' };
       }
