@@ -202,7 +202,7 @@ export function renderSettings() {
             </div>
             <div>
               <label class="f-label">Plan de Estudio</label>
-              <select class="f-input" id="setting-user-plan" onchange="document.getElementById('btn-migration').style.display = (this.value === '2026' && S.profile.plan_id !== '2026') ? 'block' : 'none'">
+              <select class="f-input" id="setting-user-plan" onchange="document.getElementById('btn-migration').style.display = (this.value === '2026' && S.profile.plan_id !== '2026') ? 'block' : 'none'" style="width:100%; border:1px solid var(--border); padding:0.75rem; background:var(--bg); color:var(--text); border-radius:0.5rem; outline:none; font-family:inherit;">
                 <option value="2016">Plan 2016</option>
                 <option value="unc-derecho">Abogacía UNC</option>
                 <option value="2026">Plan 2026</option>
