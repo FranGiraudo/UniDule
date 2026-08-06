@@ -1,6 +1,6 @@
 import { S, save, loadState } from '../core/state.js';
 import { THEMES, applyTheme } from '../core/theme.js';
-import { showToast } from '../core/utils.js';
+import { showToast, gid } from '../core/utils.js';
 import { SVG_ICONS } from '../core/icons.js';
 import { navigate } from '../core/router.js';
 
@@ -99,7 +99,7 @@ export function importScheduleFromCode() {
       } else {
         // If they don't have it, create it
         localSub = {
-          id: 'local-' + Date.now() + '-' + Math.floor(Math.random()*1000), // MUST be a new ID, not extSub.id
+          id: gid(), // MUST be a new UUID, not extSub.id
           code: extSub.code || '',
           name: extSub.name,
           color: '#6366f1',

@@ -1,7 +1,7 @@
 import { S, save, activeCareerTab, setActiveCareerTab, selectedCareerNode, setSelectedCareerNode, careerGridFilter, setCareerGridFilterVal, careerGridSearch, setCareerGridSearchVal, syncSubjectsAndCareer, currentView } from '../core/state.js';
 import { renderView } from '../core/router.js';
 import { CAREER_STATUS_CFG, DEF_CAREER, DEF_ELECTIVES, DEF_SEMINARS } from '../core/constants.js';
-import { showToast, openM, closeM } from '../core/utils.js';
+import { showToast, openM, closeM, gid } from '../core/utils.js';
 import { SVG_ICONS } from '../core/icons.js';
 import { THEMES } from '../core/theme.js';
 import { renderCareerMap, clearCmHighlight, highlightCareerMapNodes } from './careerMap.js';
@@ -193,7 +193,7 @@ function saveSeminar() {
   if (!S.career.seminars) S.career.seminars = DEF_SEMINARS.map(s=>({...s}));
   
   S.career.seminars.push({
-    id: 'sem-' + Date.now(),
+    id: gid(),
     code,
     name,
     category,

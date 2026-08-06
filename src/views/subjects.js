@@ -222,7 +222,7 @@ export function openGradesModal(subId) {
     const cs = S.career.subjects.find(x => x.id === subId || (x.code && subId && (x.code === subId || x.code.slice(-3) === subId.slice(-3))));
     if (cs) {
       s = {
-        id: cs.id, name: cs.name, code: cs.code || '',
+        id: gid(), name: cs.name, code: cs.code || '',
         color: '#6366f1', professor: '', room: '', email: '',
         maxAbsences: 6, absences: 0, grades: [],
         status: cs.status || 'cursando', allowsPromotion: false, schedules: []
@@ -496,8 +496,7 @@ export async function saveNoteData() {
       noteObj.content = content;
     }
   } else {
-    const tempId = 'local-' + Date.now();
-    noteObj = { id: tempId, subject_id: subjId, title, note_date: date, content };
+    noteObj = { id: gid(), subject_id: subjId, title, note_date: date, content };
     S.notes.push(noteObj);
   }
 

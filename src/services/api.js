@@ -169,6 +169,7 @@ export async function saveActiveSubject(sub) {
   if (!user) return null;
   
   const payload = {
+    id: sub.id,
     user_id: user.id,
     code: sub.code || '',
     name: sub.name,
@@ -183,15 +184,9 @@ export async function saveActiveSubject(sub) {
     schedule: sub.schedules || []
   };
 
-  if (sub.id && !String(sub.id).startsWith('local-')) {
-    const { data, error } = await supabase.from('user_active_subjects').update(payload).eq('id', sub.id).select().single();
-    if (error) { console.error('Update error:', error); throw error; }
-    return data;
-  } else {
-    const { data, error } = await supabase.from('user_active_subjects').insert([payload]).select().single();
-    if (error) { console.error('Insert error:', error); throw error; }
-    return data;
-  }
+  const { data, error } = await supabase.from('user_active_subjects').upsert(payload).select().single();
+  if (error) { console.error('Upsert error active subject:', error); throw error; }
+  return data;
 }
 
 export async function deleteActiveSubject(id) {
@@ -208,6 +203,7 @@ export async function saveTask(task) {
   if (!user) return null;
   
   const payload = {
+    id: task.id,
     user_id: user.id,
     title: task.title,
     subject_id: task.subjectId || null,
@@ -218,15 +214,9 @@ export async function saveTask(task) {
     grade_id: task.gradeId || null
   };
 
-  if (task.id && !String(task.id).startsWith('local-')) {
-    const { data, error } = await supabase.from('user_tasks').update(payload).eq('id', task.id).select().single();
-    if (error) { console.error('Error update task:', error); throw error; }
-    return data;
-  } else {
-    const { data, error } = await supabase.from('user_tasks').insert([payload]).select().single();
-    if (error) { console.error('Error insert task:', error); throw error; }
-    return data;
-  }
+  const { data, error } = await supabase.from('user_tasks').upsert(payload).select().single();
+  if (error) { console.error('Upsert task error:', error); throw error; }
+  return data;
 }
 
 export async function saveSeminar(sem) {
@@ -234,6 +224,7 @@ export async function saveSeminar(sem) {
   if (!user) return null;
   
   const payload = {
+    id: sem.id,
     user_id: user.id,
     code: sem.code,
     name: sem.name,
@@ -244,15 +235,9 @@ export async function saveSeminar(sem) {
     notes: sem.notes || ''
   };
 
-  if (sem.id && !String(sem.id).startsWith('local-')) {
-    const { data, error } = await supabase.from('user_seminars').update(payload).eq('id', sem.id).select().single();
-    if (error) throw error;
-    return data;
-  } else {
-    const { data, error } = await supabase.from('user_seminars').insert([payload]).select().single();
-    if (error) throw error;
-    return data;
-  }
+  const { data, error } = await supabase.from('user_seminars').upsert(payload).select().single();
+  if (error) { console.error('Upsert seminar error:', error); throw error; }
+  return data;
 }
 
 export async function deleteTask(id) {
@@ -369,6 +354,7 @@ export async function saveNote(note) {
   if (!user) throw new Error('Not logged in');
   
   const payload = {
+    id: note.id,
     user_id: user.id,
     subject_id: note.subject_id,
     title: note.title,
@@ -377,15 +363,9 @@ export async function saveNote(note) {
     updated_at: new Date().toISOString()
   };
   
-  if (note.id && !String(note.id).startsWith('local-')) {
-    const { data, error } = await supabase.from('user_notes').update(payload).eq('id', note.id).select().single();
-    if (error) throw error;
-    return data;
-  } else {
-    const { data, error } = await supabase.from('user_notes').insert([payload]).select().single();
-    if (error) throw error;
-    return data;
-  }
+  const { data, error } = await supabase.from('user_notes').upsert(payload).select().single();
+  if (error) { console.error('Upsert note error:', error); throw error; }
+  return data;
 }
 
 export async function deleteNote(noteId) {
