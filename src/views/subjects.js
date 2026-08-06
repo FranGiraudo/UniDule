@@ -201,7 +201,12 @@ export async function saveSub() {
   save();
   if (window.api) {
     try {
-      await window.api.saveActiveSubject(sub);
+      const saved = await window.api.saveActiveSubject(sub);
+      if (saved && saved.id && sub.id !== saved.id) {
+        sub.id = saved.id;
+        if (careerMatch) careerMatch.id = saved.id;
+        save();
+      }
       if (careerMatch) await window.api.syncSubjectProgress(careerMatch.id, isElective ? 'elective' : 'subject', careerMatch.status, careerMatch.grade, careerMatch.regDate, careerMatch.expDate);
     } catch(e) {
       console.error(e);

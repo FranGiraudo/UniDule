@@ -233,7 +233,11 @@ export async function saveTask() {
     save();
     if (window.api) {
       try { 
-        await window.api.saveTask(task); 
+        const savedTask = await window.api.saveTask(task);
+        if (savedTask && savedTask.id && task.id !== savedTask.id) {
+          task.id = savedTask.id;
+          save();
+        }
       } catch(e) { 
         console.error(e); 
         alert('Error al guardar la tarea en la nube: ' + e.message);

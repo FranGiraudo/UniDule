@@ -99,7 +99,7 @@ export function importScheduleFromCode() {
       } else {
         // If they don't have it, create it
         localSub = {
-          id: extSub.id,
+          id: 'local-' + Date.now() + '-' + Math.floor(Math.random()*1000), // MUST be a new ID, not extSub.id
           code: extSub.code || '',
           name: extSub.name,
           color: '#6366f1',
@@ -112,7 +112,12 @@ export function importScheduleFromCode() {
         addedCount++;
       }
       if (window.api) {
-        window.api.saveActiveSubject(localSub).catch(e => console.error('Error guardando materia importada', e));
+        window.api.saveActiveSubject(localSub).then(saved => {
+          if (saved && saved.id && localSub.id !== saved.id) {
+            localSub.id = saved.id;
+            save();
+          }
+        }).catch(e => console.error('Error guardando materia importada', e));
       }
     });
     

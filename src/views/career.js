@@ -205,7 +205,14 @@ function saveSeminar() {
   
   const sem = S.career.seminars[S.career.seminars.length - 1];
   save();
-  if (window.api && window.api.saveSeminar) window.api.saveSeminar(sem).catch(console.error);
+  if (window.api && window.api.saveSeminar) {
+    window.api.saveSeminar(sem).then(saved => {
+      if (saved && saved.id && sem.id !== saved.id) {
+        sem.id = saved.id;
+        save();
+      }
+    }).catch(console.error);
+  }
   closeM('modal-seminar');
   renderCareerSeminars();
 }

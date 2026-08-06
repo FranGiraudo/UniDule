@@ -166,10 +166,9 @@ export async function syncSubjectProgress(globalId, type, status, grade, regDate
 
 export async function saveActiveSubject(sub) {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
+  if (!user) return null;
   
-  const { error } = await supabase.from('user_active_subjects').upsert({
-    id: sub.id,
+  const payload = {
     user_id: user.id,
     code: sub.code || '',
     name: sub.name,
@@ -182,8 +181,17 @@ export async function saveActiveSubject(sub) {
     status: sub.status || 'cursando',
     allows_promotion: sub.allowsPromotion || false,
     schedule: sub.schedules || []
-  });
-  if (error) throw error;
+  };
+
+  if (sub.id && !String(sub.id).startsWith('local-')) {
+    const { data, error } = await supabase.from('user_active_subjects').update(payload).eq('id', sub.id).select().single();
+    if (error) { console.error('Update error:', error); throw error; }
+    return data;
+  } else {
+    const { data, error } = await supabase.from('user_active_subjects').insert([payload]).select().single();
+    if (error) { console.error('Insert error:', error); throw error; }
+    return data;
+  }
 }
 
 export async function deleteActiveSubject(id) {
@@ -197,10 +205,9 @@ export async function deleteActiveSubject(id) {
 
 export async function saveTask(task) {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
+  if (!user) return null;
   
-  const { error } = await supabase.from('user_tasks').upsert({
-    id: task.id,
+  const payload = {
     user_id: user.id,
     title: task.title,
     subject_id: task.subjectId || null,
@@ -209,16 +216,24 @@ export async function saveTask(task) {
     notes: task.notes || '',
     done: task.done || false,
     grade_id: task.gradeId || null
-  });
-  if (error) throw error;
+  };
+
+  if (task.id && !String(task.id).startsWith('local-')) {
+    const { data, error } = await supabase.from('user_tasks').update(payload).eq('id', task.id).select().single();
+    if (error) { console.error('Error update task:', error); throw error; }
+    return data;
+  } else {
+    const { data, error } = await supabase.from('user_tasks').insert([payload]).select().single();
+    if (error) { console.error('Error insert task:', error); throw error; }
+    return data;
+  }
 }
 
 export async function saveSeminar(sem) {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
+  if (!user) return null;
   
-  await supabase.from('user_seminars').upsert({
-    id: sem.id,
+  const payload = {
     user_id: user.id,
     code: sem.code,
     name: sem.name,
@@ -227,7 +242,17 @@ export async function saveSeminar(sem) {
     status: sem.status,
     date: sem.date || null,
     notes: sem.notes || ''
-  });
+  };
+
+  if (sem.id && !String(sem.id).startsWith('local-')) {
+    const { data, error } = await supabase.from('user_seminars').update(payload).eq('id', sem.id).select().single();
+    if (error) throw error;
+    return data;
+  } else {
+    const { data, error } = await supabase.from('user_seminars').insert([payload]).select().single();
+    if (error) throw error;
+    return data;
+  }
 }
 
 export async function deleteTask(id) {
