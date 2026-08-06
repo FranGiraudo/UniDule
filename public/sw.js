@@ -2,7 +2,7 @@
    UniSchedule — Service Worker  (cache-first, offline)
 ═══════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'unischedule-v7';
+const CACHE_NAME = 'unischedule-v8';
 const CORE_ASSETS = [
   './',
   './index.html',
