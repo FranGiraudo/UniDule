@@ -195,10 +195,11 @@ export function renderSettings() {
             </div>
             <div>
               <label class="f-label">Plan de Estudio</label>
-              <select class="f-input" id="setting-user-plan" style="width:100%; border:1px solid var(--border); padding:0.75rem; background:var(--bg); color:var(--text); border-radius:0.5rem; outline:none; font-family:inherit;">
+              <select class="f-input" id="setting-user-plan" onchange="document.getElementById('btn-migration').style.display = (this.value === '2026' && S.profile.plan_id !== '2026') ? 'block' : 'none'" style="width:100%; border:1px solid var(--border); padding:0.75rem; background:var(--bg); color:var(--text); border-radius:0.5rem; outline:none; font-family:inherit;">
                 <option value="2016">Plan 2016</option>
                 <option value="2026">Plan 2026</option>
               </select>
+              <button id="btn-migration" class="btn btn-secondary" style="margin-top:0.5rem; width:100%; display:none; border:1px solid var(--primary); color:var(--primary); background:transparent;" onclick="openMigrationModal()">Ver Resumen de Migración</button>
             </div>
             <button class="btn btn-primary" onclick="saveProfileSettings()">Guardar perfil</button>
           </div>
@@ -288,3 +289,90 @@ window.saveProfileSettings = saveProfileSettings;
 window.exportBackup = exportBackup;
 window.importBackup = importBackup;
 window.handleFileImport = handleFileImport;
+
+window.openMigrationModal = async () => {
+  if (!S.profile) return;
+  if (S.profile.plan_id === '2026') {
+    showToast('Ya estás en el Plan 2026.', 'info');
+    return;
+  }
+  
+  const modalBody = document.getElementById('migration-modal-body');
+  if (!modalBody) return;
+  
+  modalBody.innerHTML = '<div style="padding:2rem; text-align:center; color:var(--text2);">Calculando simulación...</div>';
+  window.openM('modal-migration');
+
+  try {
+    const { calculateDerivedProgress, calculateLostRegularities, EQUIVALENCES_16_TO_26 } = await import('../core/migrationEngine.js');
+    
+    // Fetch 2026 subjects from API since we are currently on 2016
+    const { data: globalSubs26 } = await window.api.supabase.from('global_subjects').select('*').eq('plan_id', '2026');
+    
+    const allProgress = [...(S.career.subjects || []), ...(S.career.electives || [])].map(s => ({
+      global_id: s.id,
+      status: s.status,
+      grade: s.grade,
+      reg_date: s.regDate,
+      exp_date: s.expDate
+    }));
+
+    const derived = calculateDerivedProgress(allProgress);
+    const alerts = calculateLostRegularities(derived, globalSubs26 || []);
+
+    let html = '<div style="font-size:14px; color:var(--text);">';
+    html += '<div style="margin-bottom:1rem;">Este es el resumen de impacto si cambias al Plan 2026. Tu progreso actual se mapeará automáticamente a las nuevas materias de forma dinámica, manteniendo tu plan original intacto.</div>';
+    
+    if (alerts.length > 0) {
+      html += '<div style="background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.4); border-radius:0.5rem; padding:1rem; margin-bottom:1rem;">';
+      html += '<div style="font-weight:bold; color:#fbbf24; margin-bottom:0.5rem;">⚠️ Materias en riesgo de perder regularidad</div>';
+      html += '<ul style="margin:0; padding-left:1.5rem; font-size:13px; color:var(--text2);">';
+      alerts.forEach(a => html += '<li><strong>' + a.subjectAtRisk + '</strong> requiere final de <em>' + a.missingFinal + '</em></li>');
+      html += '</ul></div>';
+    } else {
+      html += '<div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.4); color:#10b981; border-radius:0.5rem; padding:1rem; margin-bottom:1rem; font-weight:bold;">✅ ¡Excelente! No perdés ninguna regularidad por el cambio de plan.</div>';
+    }
+
+    html += '<div style="font-weight:bold; margin-bottom:0.5rem;">Equivalencias Aplicadas:</div>';
+    html += '<div style="display:flex; flex-direction:column; gap:0.5rem; font-size:13px; color:var(--text2); max-height:200px; overflow-y:auto; padding-right:0.5rem;">';
+    
+    // Find applied equivalences
+    let equivalencesCount = 0;
+    derived.filter(d => d.is_derived).forEach(d => {
+       const sub26 = globalSubs26.find(g => g.code === d.global_id);
+       const rule = EQUIVALENCES_16_TO_26[d.global_id];
+       if (sub26 && rule) {
+         equivalencesCount++;
+         let stateColor = d.status === 'aprobada' ? '#10b981' : (d.status === 'regular' ? '#fbbf24' : 'var(--text3)');
+         html += '<div style="background:var(--card); border:1px solid var(--border); padding:0.5rem; border-radius:0.25rem;">';
+         html += '<div style="color:var(--text); font-weight:bold; display:flex; justify-content:space-between;">';
+         html += '<span>' + sub26.name + '</span>';
+         html += '<span style="font-size:11px; font-weight:bold; color:' + stateColor + '; background:var(--bg); padding:2px 6px; border-radius:4px;">' + d.status.toUpperCase() + '</span>';
+         html += '</div>';
+         html += '<div style="font-size:12px; color:var(--text3); margin-top:4px;">Desde: ' + rule.req16.join(' + ') + (rule.type==='parcial'?' (Parcial)':'') + '</div>';
+         html += '</div>';
+       }
+    });
+    
+    if (equivalencesCount === 0) {
+      html += '<div style="color:var(--text3); font-style:italic;">No hay materias equivalentes aprobadas o regulares aún.</div>';
+    }
+    
+    html += '</div>';
+    html += '</div>';
+
+    modalBody.innerHTML = html;
+  } catch(e) {
+    console.error(e);
+    modalBody.innerHTML = '<div style="color:#ef4444; padding:1rem;">Error al calcular simulación.</div>';
+  }
+};
+
+window.confirmMigration = () => {
+  const planSelect = document.getElementById('setting-user-plan');
+  if (planSelect) {
+    planSelect.value = '2026';
+    saveProfileSettings();
+    window.closeM('modal-migration');
+  }
+};

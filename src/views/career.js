@@ -88,6 +88,7 @@ export function renderCareer() {
         <div class="view-title" style="margin-bottom:0.25rem;">Plan de Carrera</div>
         <div class="view-sub">Ingeniería en Informática — UTN</div>
       </div>
+      <div id="career-migration-alert"></div>
       <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.25rem;" id="career-tabs-bar">
         <button class="career-tab active" data-tab="grid" onclick="setCareerTab('grid')">
           Plan
@@ -115,6 +116,28 @@ export function renderCareer() {
       <div id="career-finals-container"    style="display:none;"></div>
       <div id="career-stats-container"     style="display:none;"></div>
     `;
+  }
+
+  const alertContainer = document.getElementById('career-migration-alert');
+  if (alertContainer) {
+    if (S.profile && S.profile.plan_id === '2026' && S.career.migrationAlerts && S.career.migrationAlerts.length > 0) {
+      let html = `<div style="background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.4); border-radius:0.75rem; padding:1rem; margin-bottom:1rem;">`;
+      html += `<div style="font-weight:bold; color:#fbbf24; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Alerta de Simulación: Materias en Riesgo
+               </div>`;
+      html += `<div style="color:var(--text); font-size:14px; margin-bottom:0.5rem;">Por el cambio de plan, las siguientes materias quedarían regulares pero <strong>sin final disponible</strong> o perderían su regularidad por falta de correlativas aprobadas:</div>`;
+      html += `<ul style="margin:0; padding-left:1.5rem; color:var(--text2); font-size:13px; line-height:1.6;">`;
+      S.career.migrationAlerts.forEach(alert => {
+        html += `<li><strong>${alert.subjectAtRisk}</strong> requiere final de: <em>${alert.missingFinal}</em></li>`;
+      });
+      html += `</ul></div>`;
+      alertContainer.innerHTML = html;
+      alertContainer.style.display = 'block';
+    } else {
+      alertContainer.style.display = 'none';
+      alertContainer.innerHTML = '';
+    }
   }
 
   if      (activeCareerTab === 'grid')      renderCareerGrid();

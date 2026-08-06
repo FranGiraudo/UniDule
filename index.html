@@ -569,6 +569,22 @@ Puedes usar:
   </div>
 </div>
 
+<div id="modal-migration" class="modal-bd" style="display:none;" onclick="closeBD(event,'modal-migration')">
+  <div class="modal-box modal-md" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Simulación de Cambio de Plan</div>
+      <button class="btn-xs" onclick="closeM('modal-migration')">✕</button>
+    </div>
+    <div class="modal-body" id="migration-modal-body" style="max-height:60vh; overflow-y:auto;">
+      <!-- Content injected by JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="confirmMigration()">Confirmar Cambio (Plan 2026)</button>
+      <button class="btn btn-ghost" onclick="closeM('modal-migration')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <script type="module" src="/src/main.js"></script>
 <script>
   if ('serviceWorker' in navigator) {

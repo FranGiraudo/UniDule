@@ -62,6 +62,15 @@ export async function fetchFullState() {
     { data: notesData }
   ] = results;
 
+  let finalProgressData = progressData || [];
+  let migrationAlerts = [];
+  if (planId === '2026') {
+    // Import dynamically or assume it's imported at the top
+    const { calculateDerivedProgress, calculateLostRegularities } = await import('../core/migrationEngine.js');
+    finalProgressData = calculateDerivedProgress(finalProgressData);
+    migrationAlerts = calculateLostRegularities(finalProgressData, globalSubsData || []);
+  }
+
   const profile = profileData || { name: user.email.split('@')[0], career: 'Ingeniería en Informática', theme: 'dark' };
 
   const activeSubs = (activeSubsData || []).map(s => {
@@ -89,8 +98,7 @@ export async function fetchFullState() {
   });
 
   const careerSubs = (globalSubsData || []).map(g => {
-    // user_progress.global_id stores the code (e.g. 'cs-info1'), not the UUID
-    const prog = (progressData || []).find(p => p.global_id === g.code);
+    const prog = finalProgressData.find(p => p.global_id === g.code);
     return {
       ...g,
       id: g.code,  // frontend uses code as the logical id (matches DEF_CAREER)
@@ -103,7 +111,7 @@ export async function fetchFullState() {
   });
 
   const careerElecs = (globalElecsData || []).map(g => {
-    const prog = (progressData || []).find(p => p.global_id === g.code);
+    const prog = finalProgressData.find(p => p.global_id === g.code);
     return {
       ...g,
       id: g.code,
@@ -130,7 +138,8 @@ export async function fetchFullState() {
     career: {
       subjects: careerSubs,
       electives: careerElecs,
-      seminars: (seminarsData || [])
+      seminars: (seminarsData || []),
+      migrationAlerts
     },
     notes: (notesData || [])
   };
