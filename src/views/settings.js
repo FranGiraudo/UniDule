@@ -117,7 +117,12 @@ export function importScheduleFromCode() {
             localSub.id = saved.id;
             save();
           }
-        }).catch(e => console.error('Error guardando materia importada', e));
+        }).catch(e => {
+          console.error('Error guardando materia importada', e);
+          if (e.code === '42501' || (e.message && e.message.includes('row-level security'))) {
+            alert('🚨 ERROR DE PERMISOS (42501) 🚨\n\nSupabase bloqueó el guardado. Esto significa que NO ejecutaste los permisos SQL en tu panel de Supabase.\n\nPor favor, copiá el script SQL que te pasó el asistente en el chat y ejecutalo en el SQL Editor de tu Supabase. Si no lo hacés, la app NO te va a dejar guardar nada.');
+          }
+        });
       }
     });
     
