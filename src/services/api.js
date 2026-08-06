@@ -102,6 +102,8 @@ export async function fetchFullState() {
     const prog = finalProgressData.find(p => p.global_id === g.code);
     return {
       ...g,
+      year: parseInt(g.year, 10) || 1,
+      semester: parseInt(g.semester, 10) || 1,
       id: g.code,  // frontend uses code as the logical id (matches DEF_CAREER)
       correlatives: g.correlatives || { toCurse: [], toPass: [] },
       status: prog ? prog.status : 'pendiente',
