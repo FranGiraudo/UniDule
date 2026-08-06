@@ -220,7 +220,7 @@ function setupCmPanZoom() {
   window.addEventListener('touchmove', tm, { passive: false });
   window.addEventListener('mouseup', mu);
   window.addEventListener('touchend', mu);
-  canvas.onwheel = e => { e.preventDefault(); cmZoom(e.deltaY>0?-.08:.08); };
+  canvas.onwheel = e => { e.preventDefault(); cmZoom(e.deltaY>0?-.03:.03); };
 }
 
 window._internalNodeClick = function(id) {

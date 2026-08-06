@@ -320,21 +320,22 @@ window.openMigrationModal = async () => {
     const derived = calculateDerivedProgress(allProgress);
     const alerts = calculateLostRegularities(derived, globalSubs26 || []);
 
-    let html = '<div style="font-size:0.95rem; color:var(--text);">';
-    html += '<p style="margin-bottom:1.5rem; color:var(--text-muted); line-height:1.5;">Este es el resumen de impacto si cambias al Plan 2026. Tu progreso actual se mapeará automáticamente a las nuevas materias de forma dinámica, manteniendo tu plan original intacto.</p>';
+    let html = '<div style="font-size:0.95rem; color:var(--text); padding:0 0.5rem;">';
+    html += '<p style="margin-bottom:1.5rem; color:var(--text-muted); line-height:1.5;">Este es el resumen de impacto si cambias al Plan 2026. Tu progreso actual se mapear\xE1 autom\xE1ticamente a las nuevas materias de forma din\xE1mica, manteniendo tu plan original intacto.</p>';
     
     if (alerts.length > 0) {
-      html += '<div style="background:color-mix(in srgb, var(--primary) 10%, transparent); border:1px solid color-mix(in srgb, var(--primary) 30%, transparent); border-radius:0.75rem; padding:1.25rem; margin-bottom:1.5rem;">';
-      html += '<div style="font-weight:600; color:var(--primary); margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> Materias en riesgo de perder regularidad</div>';
-      html += '<ul style="margin:0; padding-left:1.75rem; font-size:0.9rem; color:var(--text); line-height:1.6;">';
-      alerts.forEach(a => html += '<li><strong>' + a.subjectAtRisk + '</strong> requiere final de <em>' + a.missingFinal + '</em></li>');
+      html += '<div style="background:color-mix(in srgb, var(--primary) 8%, transparent); border:1px solid color-mix(in srgb, var(--primary) 25%, transparent); border-radius:1rem; padding:1.25rem; margin-bottom:1.5rem; box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 5%, transparent);">';
+      html += '<div style="font-weight:600; font-size:1rem; color:var(--primary); margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> Materias en riesgo</div>';
+      html += '<p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem; margin-top:-0.5rem;">Al cambiar de plan perder\xE1s la regularidad de estas materias por falta de correlativas aprobadas en el nuevo plan:</p>';
+      html += '<ul style="margin:0; padding-left:1.5rem; font-size:0.9rem; color:var(--text); line-height:1.6; display:flex; flex-direction:column; gap:0.5rem;">';
+      alerts.forEach(a => html += '<li><strong>' + a.subjectAtRisk + '</strong> (falta final de <em>' + a.missingFinal + '</em>)</li>');
       html += '</ul></div>';
     } else {
-      html += '<div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); color:#10b981; border-radius:0.75rem; padding:1rem; margin-bottom:1.5rem; font-weight:500; display:flex; align-items:center; gap:0.5rem;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> No perdés ninguna regularidad por el cambio de plan.</div>';
+      html += '<div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); color:#10b981; border-radius:1rem; padding:1.25rem; margin-bottom:1.5rem; font-weight:500; display:flex; align-items:center; gap:0.75rem; box-shadow: 0 4px 12px rgba(16,185,129,0.05);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> <span style="line-height:1.4;">\xA1Excelente! No perd\xE9s ninguna regularidad por el cambio de plan.</span></div>';
     }
 
     html += '<h3 style="font-size:1.1rem; font-weight:600; margin-bottom:1rem; color:var(--text);">Equivalencias Aplicadas</h3>';
-    html += '<div style="display:flex; flex-direction:column; gap:0.75rem; max-height:250px; overflow-y:auto; padding-right:0.5rem;">';
+    html += '<div style="display:flex; flex-direction:column; gap:0.75rem;">';
     
     // Find applied equivalences
     let equivalencesCount = 0;
@@ -344,18 +345,24 @@ window.openMigrationModal = async () => {
        if (sub26 && rule) {
          equivalencesCount++;
          let stateColor = d.status === 'aprobada' ? '#10b981' : (d.status === 'regular' ? '#fbbf24' : 'var(--text-muted)');
-         html += '<div style="background:var(--card); border:1px solid var(--border); padding:0.75rem; border-radius:0.5rem;">';
-         html += '<div style="color:var(--text); font-weight:600; display:flex; justify-content:space-between; align-items:center;">';
-         html += '<span>' + sub26.name + '</span>';
-         html += '<span style="font-size:0.75rem; font-weight:600; color:' + stateColor + '; background:var(--bg); padding:0.25rem 0.5rem; border-radius:1rem;">' + d.status.toUpperCase() + '</span>';
+         let stateBg = d.status === 'aprobada' ? 'rgba(16,185,129,0.1)' : (d.status === 'regular' ? 'rgba(251,191,36,0.1)' : 'var(--bg)');
+         
+         html += '<div style="background:var(--card); border:1px solid var(--border); padding:1rem; border-radius:0.75rem; display:flex; flex-direction:column; gap:0.5rem; transition:transform 0.2s; box-shadow:0 2px 4px rgba(0,0,0,0.02);">';
+         html += '<div style="color:var(--text); font-weight:600; display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem; flex-wrap:wrap;">';
+         html += '<span style="line-height:1.3; flex:1; min-width:200px;">' + sub26.name + '</span>';
+         html += '<span style="font-size:0.75rem; font-weight:700; color:' + stateColor + '; background:' + stateBg + '; padding:0.25rem 0.6rem; border-radius:1rem; white-space:nowrap; border: 1px solid ' + stateColor + '40;">' + d.status.toUpperCase() + '</span>';
          html += '</div>';
-         html += '<div style="font-size:0.85rem; color:var(--text-muted); margin-top:0.25rem;">Derivado de: ' + rule.req16.join(' + ') + (rule.type==='parcial'?' (Parcial)':'') + '</div>';
+         html += '<div style="font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:0.35rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3v18"/><path d="M3 10h18"/><path d="m14 6 3-3 3 3"/></svg> Derivado de: ' + rule.req16.map(c => {
+             // Try to find the name of the 2016 subject
+             const oldSub = S.career.subjects?.find(s => s.code === c || s.id === c) || S.career.electives?.find(s => s.code === c || s.id === c);
+             return oldSub ? oldSub.name : c;
+         }).join(' + ') + (rule.type==='parcial'?' (Parcial)':'') + '</div>';
          html += '</div>';
        }
     });
     
     if (equivalencesCount === 0) {
-      html += '<div style="color:var(--text-muted); font-style:italic; padding:1rem; text-align:center; border:1px dashed var(--border); border-radius:0.5rem;">No tenés materias aprobadas o regulares que apliquen a equivalencias todavía.</div>';
+      html += '<div style="color:var(--text-muted); font-style:italic; padding:1.5rem; text-align:center; border:1px dashed var(--border); border-radius:0.75rem; background:var(--card);">No ten\xE9s materias aprobadas o regulares que apliquen a equivalencias todav\xEDa.</div>';
     }
     
     html += '</div>';
