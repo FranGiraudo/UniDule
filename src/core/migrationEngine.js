@@ -13,56 +13,56 @@ export const STATUS_PRECEDENCE = {
 // Mapa de equivalencias: { target2026_code: { type: 'direct' | 'parcial', req16: ['code1', 'code2'] } }
 // basándose en el listado de reglas definido.
 export const EQUIVALENCES_16_TO_26 = {
-  'cs26-002': { type: 'direct', req16: ['000452', '000457'] }, // Análisis Matemático I <- 1A + 1B
-  'cs26-001': { type: 'direct', req16: ['000453', '000654'] }, // Álgebra y Geometría Analítica <- Álgebra y Geo + Álgebra Lineal
-  'cs26-004': { type: 'direct', req16: ['000454'] },           // Física I <- Física 1
-  'cs26-003': { type: 'direct', req16: ['000450', '000455'] }, // Paradigmas de Prog I <- Info 1 + Info 2
-  'cs26-005': { type: 'direct', req16: ['000451'] },           // Tecnología de Computadoras
-  'cs26-009': { type: 'direct', req16: ['000490'] },           // Organización Empresarial e Ind <- Gestión de Empresas 1
-  'cs26-007': { type: 'direct', req16: ['000450'] },           // Técnicas de Desarrollo <- Info 1
-  'cs26-008': { type: 'direct', req16: ['000450', '000451'] }, // Sistemas de Información <- Info 1 + Tec de Comp
-  'cs26-010': { type: 'direct', req16: ['000460'] },           // Estructuras de Datos <- Info 3
-  'cs26-013': { type: 'direct', req16: ['000462', '000466'] }, // Análisis Matemático II <- 2A + 2B
-  'cs26-011': { type: 'direct', req16: ['000456'] },           // Física II <- Física 2
-  'cs26-012': { type: 'direct', req16: ['000464'] },           // Matemática Discreta <- Estructuras Discretas
-  'cs26-014': { type: 'direct', req16: ['000465'] },           // Paradigmas II <- Ing Web 1
-  'cs26-016': { type: 'direct', req16: ['000468'] },           // Arquitectura de Comp <- Arq Comp 1
-  'cs26-017': { type: 'direct', req16: ['000463'] },           // Base de Datos I <- Base de Datos 1
-  'cs26-018': { type: 'direct', req16: ['000256'] },           // Probabilidad y Estadística
-  'cs26-019': { type: 'direct', req16: ['000456', '000924'] }, // Física III <- Física 2 + Física 3
-  'cs26-015': { type: 'direct', req16: ['000461'] },           // Ingeniería de Requerimientos <- Ing de Software 1
-  'cs26-020': { type: 'direct', req16: ['000461'] },           // Taller de Integración I <- Ing de Software 1
-  'cs26-021': { type: 'direct', req16: ['000471'] },           // Sistemas de Comunicaciones <- Redes 1
-  'cs26-022': { type: 'direct', req16: ['000470'] },           // Procesos de Software I <- Proceso de Desarrollo 1
-  'cs26-023': { type: 'direct', req16: ['000475'] },           // Teoría de la Computación
-  'cs26-024': { type: 'direct', req16: ['000477'] },           // Sistemas Operativos
-  'cs26-025': { type: 'direct', req16: ['000813'] },           // Paradigmas III <- Prog. Funcional y Scripting
-  'cs26-027': { type: 'direct', req16: ['000467'] },           // Análisis y Cálculo Numérico <- Métodos Numéricos
-  'cs26-026': { type: 'direct', req16: ['000800'] },           // Desarrollo Web Seguro <- Ingeniería Web 2
-  'cs26-029': { type: 'direct', req16: ['000476'] },           // Procesos de Software II <- Proceso de Des 2
-  'cs26-030': { type: 'direct', req16: ['000485'] },           // Bases de Datos II <- Base de Datos 2
-  'cs26-031': { type: 'direct', req16: ['000476', '000800'] }, // Taller de Integración II <- Proceso 2 + Ing Web 2
-  'cs26-052': { type: 'direct', req16: ['000480'] },           // Electiva I <- Desarrollo Herramientas SW
-  'cs26-032': { type: 'direct', req16: ['000809'] },           // Taller de Integración III <- Arq Orientada a Servicios
-  'cs26-036': { type: 'direct', req16: ['000496', '000499'] }, // Proyectos de Ing <- Gestión de Emp 2 + Plan de Negocios
-  'cs26-038': { type: 'direct', req16: ['000489'] },           // Modelos y Simulación
-  'cs26-033': { type: 'direct', req16: ['000806'] },           // Ingeniería Web <- Ingeniería Web 3
-  'cs26-034': { type: 'direct', req16: ['000801'] },           // Desarrollo de App Móviles <- Tecnologías Móviles
-  'cs26-035': { type: 'direct', req16: ['000479'] },           // Legislación para Ingeniería <- Derecho y Ética
-  'cs26-042': { type: 'direct', req16: ['000761'] },           // Gestión de Proyectos TIC <- Gestión de Proyectos Inf
-  'cs26-041': { type: 'direct', req16: ['000482', '000486'] }, // Electiva II <- Redes 2 + Redes 3
-  'cs26-040': { type: 'direct', req16: ['001636'] },           // Electiva III <- Blockchain
-  'cs26-039': { type: 'direct', req16: ['000494'] },           // Electiva IV <- Computación Gráfica
-  'cs26-037': { type: 'parcial', req16: ['000473'] },          // Electiva V <- Arq de Comp 2 (Parcial)
-  'cs26-043': { type: 'direct', req16: ['000762'] },           // Inteligencia Artificial
-  'cs26-046': { type: 'direct', req16: ['000491'] },           // Economía para Ingeniería <- Economía
-  'cs26-047': { type: 'direct', req16: ['000500'] },           // Seguridad Informática
-  'cs26-051': { type: 'direct', req16: ['000481'] },           // Calidad de Software <- Ingeniería de Software 2
-  'cs26-049': { type: 'direct', req16: ['000478'] },           // Auditoría e Informática Forense <- Auditoría
-  'cs26-050': { type: 'direct', req16: ['000495'] },           // Electiva VI <- Sistemas en Tiempo Real
-  'cs26-048': { type: 'parcial', req16: ['000481'] },          // Electiva VII <- Ingeniería de Software 2 (Parcial)
-  'cs26-045': { type: 'direct', req16: ['000616'] },           // Práctica Profesional Supervisada (Assuming PPS code 045)
-  'cs26-028': { type: 'direct', req16: ['000621'] }            // Inglés para Ingeniería
+  'cs26-002': { type: 'direct', req16: ['cs-am1a', 'cs-am1b'] }, // Análisis Matemático I <- 1A + 1B
+  'cs26-001': { type: 'direct', req16: ['cs-algegeo', 'cs-algelin'] }, // Álgebra y Geometría Analítica <- Álgebra y Geo + Álgebra Lineal
+  'cs26-004': { type: 'direct', req16: ['cs-fis1'] },           // Física I <- Física 1
+  'cs26-003': { type: 'direct', req16: ['cs-info1', 'cs-info2'] }, // Paradigmas de Prog I <- Info 1 + Info 2
+  'cs26-005': { type: 'direct', req16: ['cs-teccomp'] },           // Tecnología de Computadoras
+  'cs26-009': { type: 'direct', req16: ['cs-gestemp1'] },           // Organización Empresarial e Ind <- Gestión de Empresas 1
+  'cs26-007': { type: 'direct', req16: ['cs-info1'] },           // Técnicas de Desarrollo <- Info 1
+  'cs26-008': { type: 'direct', req16: ['cs-info1', 'cs-teccomp'] }, // Sistemas de Información <- Info 1 + Tec de Comp
+  'cs26-010': { type: 'direct', req16: ['cs-info3'] },           // Estructuras de Datos <- Info 3
+  'cs26-013': { type: 'direct', req16: ['cs-am2a', 'cs-am2b'] }, // Análisis Matemático II <- 2A + 2B
+  'cs26-011': { type: 'direct', req16: ['cs-fis2'] },           // Física II <- Física 2
+  'cs26-012': { type: 'direct', req16: ['cs-estdisc'] },           // Matemática Discreta <- Estructuras Discretas
+  'cs26-014': { type: 'direct', req16: ['cs-ingweb1'] },           // Paradigmas II <- Ing Web 1
+  'cs26-016': { type: 'direct', req16: ['cs-arqcomp1'] },           // Arquitectura de Comp <- Arq Comp 1
+  'cs26-017': { type: 'direct', req16: ['cs-bd1'] },           // Base de Datos I <- Base de Datos 1
+  'cs26-018': { type: 'direct', req16: ['cs-probest'] },           // Probabilidad y Estadística
+  'cs26-019': { type: 'direct', req16: ['cs-fis2', 'cs-fis3'] }, // Física III <- Física 2 + Física 3
+  'cs26-015': { type: 'direct', req16: ['cs-ingsoft1'] },           // Ingeniería de Requerimientos <- Ing de Software 1
+  'cs26-020': { type: 'direct', req16: ['cs-ingsoft1'] },           // Taller de Integración I <- Ing de Software 1
+  'cs26-021': { type: 'direct', req16: ['cs-redes1'] },           // Sistemas de Comunicaciones <- Redes 1
+  'cs26-022': { type: 'direct', req16: ['cs-pds1'] },           // Procesos de Software I <- Proceso de Desarrollo 1
+  'cs26-023': { type: 'direct', req16: ['cs-teocomp'] },           // Teoría de la Computación
+  'cs26-024': { type: 'direct', req16: ['cs-sisop'] },           // Sistemas Operativos
+  'cs26-025': { type: 'direct', req16: ['cs-progfunc'] },           // Paradigmas III <- Prog. Funcional y Scripting
+  'cs26-027': { type: 'direct', req16: ['cs-metnum'] },           // Análisis y Cálculo Numérico <- Métodos Numéricos
+  'cs26-026': { type: 'direct', req16: ['cs-ingweb2'] },           // Desarrollo Web Seguro <- Ingeniería Web 2
+  'cs26-029': { type: 'direct', req16: ['cs-pds2'] },           // Procesos de Software II <- Proceso de Des 2
+  'cs26-030': { type: 'direct', req16: ['cs-bd2'] },           // Bases de Datos II <- Base de Datos 2
+  'cs26-031': { type: 'direct', req16: ['cs-pds2', 'cs-ingweb2'] }, // Taller de Integración II <- Proceso 2 + Ing Web 2
+  'cs26-052': { type: 'direct', req16: ['cs-dhs'] },           // Electiva I <- Desarrollo Herramientas SW
+  'cs26-032': { type: 'direct', req16: ['cs-arqoriser'] },           // Taller de Integración III <- Arq Orientada a Servicios
+  'cs26-036': { type: 'direct', req16: ['cs-gestemp2', 'cs-planneg'] }, // Proyectos de Ing <- Gestión de Emp 2 + Plan de Negocios
+  'cs26-038': { type: 'direct', req16: ['cs-modsim'] },           // Modelos y Simulación
+  'cs26-033': { type: 'direct', req16: ['cs-ingweb3'] },           // Ingeniería Web <- Ingeniería Web 3
+  'cs26-034': { type: 'direct', req16: ['cs-tecmov'] },           // Desarrollo de App Móviles <- Tecnologías Móviles
+  'cs26-035': { type: 'direct', req16: ['cs-derecho'] },           // Legislación para Ingeniería <- Derecho y Ética
+  'cs26-042': { type: 'direct', req16: ['cs-gestproy'] },           // Gestión de Proyectos TIC <- Gestión de Proyectos Inf
+  'cs26-041': { type: 'direct', req16: ['cs-redes2', 'cs-redes3'] }, // Electiva II <- Redes 2 + Redes 3
+  'cs26-040': { type: 'direct', req16: ['cs-blockchain'] },           // Electiva III <- Blockchain
+  'cs26-039': { type: 'direct', req16: ['cs-compgraf'] },           // Electiva IV <- Computación Gráfica
+  'cs26-037': { type: 'parcial', req16: ['cs-arqcomp2'] },          // Electiva V <- Arq de Comp 2 (Parcial)
+  'cs26-043': { type: 'direct', req16: ['cs-ia'] },           // Inteligencia Artificial
+  'cs26-046': { type: 'direct', req16: ['cs-economia'] },           // Economía para Ingeniería <- Economía
+  'cs26-047': { type: 'direct', req16: ['cs-seginf'] },           // Seguridad Informática
+  'cs26-051': { type: 'direct', req16: ['cs-ingsoft2'] },           // Calidad de Software <- Ingeniería de Software 2
+  'cs26-049': { type: 'direct', req16: ['cs-audit'] },           // Auditoría e Informática Forense <- Auditoría
+  'cs26-050': { type: 'direct', req16: ['cs-sisrt'] },           // Electiva VI <- Sistemas en Tiempo Real
+  'cs26-048': { type: 'parcial', req16: ['cs-ingsoft2'] },          // Electiva VII <- Ingeniería de Software 2 (Parcial)
+  'cs26-045': { type: 'direct', req16: ['cs-pps'] },           // Práctica Profesional Supervisada (Assuming PPS code 045)
+  'cs26-028': { type: 'direct', req16: ['cs-ingles'] }            // Inglés para Ingeniería
 };
 
 /**
