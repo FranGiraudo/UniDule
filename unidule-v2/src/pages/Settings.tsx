@@ -7,7 +7,7 @@ import { useState, useRef } from 'react';
 import { PlanSimulationModal } from '../components/career/PlanSimulationModal';
 
 export function Settings() {
-  const { session, profile, theme, setTheme } = useStore();
+  const { session, profile, theme, setTheme, career, tasks, schedule_classes } = useStore();
   const [showSim, setShowSim] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -45,6 +45,43 @@ export function Settings() {
     };
     reader.readAsText(file);
     e.target.value = '';
+  };
+
+  const handleExportData = () => {
+    const dataToExport = { career, tasks, schedule_classes };
+    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `unidule_backup_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleGenerateCode = async () => {
+    const dataToExport = { career, tasks, schedule_classes };
+    const jsonStr = JSON.stringify(dataToExport);
+    try {
+      const code = btoa(encodeURIComponent(jsonStr));
+      await navigator.clipboard.writeText(code);
+      alert('¡Código generado y copiado al portapapeles!');
+    } catch (e) {
+      alert('Error generando el código. Puede que tus datos sean demasiado extensos.');
+    }
+  };
+
+  const handleInputCode = () => {
+    const code = prompt('Pegá el código que te compartieron aquí:');
+    if (!code) return;
+    try {
+      const decodedStr = decodeURIComponent(atob(code));
+      const data = JSON.parse(decodedStr);
+      alert('¡Código leído correctamente! (La sincronización completa se agregará pronto)');
+    } catch (e) {
+      alert('El código ingresado no es válido o está corrupto.');
+    }
   };
 
   return (
@@ -127,8 +164,8 @@ export function Settings() {
             Compartí tu grilla de horarios con compañeros, o pegá un código que te hayan pasado para no cargar todo a mano.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <button className="btn btn-primary">Generar Código</button>
-            <button className="btn btn-ghost">Ingresar Código</button>
+            <button className="btn btn-primary" onClick={handleGenerateCode}>Generar Código</button>
+            <button className="btn btn-ghost" onClick={handleInputCode}>Ingresar Código</button>
           </div>
         </div>
 
@@ -141,7 +178,7 @@ export function Settings() {
             Sincronización en la nube activa.
           </p>
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>
-            <button className="btn btn-ghost">Exportar mis datos (JSON)</button>
+            <button className="btn btn-ghost" onClick={handleExportData}>Exportar mis datos (JSON)</button>
             <input type="file" accept=".json" style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileChange} />
             <button className="btn btn-ghost" onClick={handleImportClick}>
               <Upload size={16} style={{ marginRight: '6px' }} /> Importar desde JSON
