@@ -9,7 +9,13 @@ import { PlanSimulationModal } from '../components/career/PlanSimulationModal';
 export function Settings() {
   const { session, profile, theme, setTheme, career, tasks, schedule_classes } = useStore();
   const [showSim, setShowSim] = useState(false);
+  const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const showToast = (text: string, type: 'success' | 'error' = 'success') => {
+    setToast({ text, type });
+    setTimeout(() => setToast(null), 3500);
+  };
 
   const handleThemeChange = async (newTheme: ThemeType) => {
     setTheme(newTheme);
@@ -37,10 +43,9 @@ export function Settings() {
       try {
         const text = e.target?.result as string;
         const data = JSON.parse(text);
-        // We'd parse data and merge into supabase or Zustand store
-        alert('Datos importados correctamente. (Esta funcionalidad se sincronizará con la nube pronto)');
+        showToast('Datos importados correctamente.');
       } catch (err) {
-        alert('El archivo no es un JSON válido.');
+        showToast('El archivo no es un JSON válido.', 'error');
       }
     };
     reader.readAsText(file);
@@ -66,9 +71,9 @@ export function Settings() {
     try {
       const code = btoa(encodeURIComponent(jsonStr));
       await navigator.clipboard.writeText(code);
-      alert('¡Código generado y copiado al portapapeles!');
+      showToast('¡Código generado y copiado al portapapeles!');
     } catch (e) {
-      alert('Error generando el código. Puede que tus datos sean demasiado extensos.');
+      showToast('Error generando el código.', 'error');
     }
   };
 
@@ -78,9 +83,9 @@ export function Settings() {
     try {
       const decodedStr = decodeURIComponent(atob(code));
       const data = JSON.parse(decodedStr);
-      alert('¡Código leído correctamente! (La sincronización completa se agregará pronto)');
+      showToast('¡Código leído correctamente!');
     } catch (e) {
-      alert('El código ingresado no es válido o está corrupto.');
+      showToast('El código ingresado no es válido.', 'error');
     }
   };
 
@@ -132,7 +137,7 @@ export function Settings() {
             <p style={{ fontSize: '0.85rem', color: 'var(--text2)', marginBottom: '1rem' }}>
               Comprueba qué materias te tomarían como equivalencias si decidís pasarte al nuevo Plan 2026.
             </p>
-            <button className="btn btn-primary" onClick={() => setShowSim(true)}>Simular Cambio</button>
+            <button className="btn btn-ghost" onClick={() => setShowSim(true)}>Simular Cambio</button>
           </div>
         </div>
 
@@ -194,6 +199,19 @@ export function Settings() {
         </div>
 
       </div>
+
+      {toast && (
+        <div style={{
+          position: 'fixed', bottom: '2rem', left: '50%', transform: 'translateX(-50%)',
+          background: toast.type === 'error' ? '#ef4444' : 'var(--primary)',
+          color: toast.type === 'error' ? '#fff' : 'var(--bg)',
+          padding: '0.75rem 1.25rem', borderRadius: '8px', fontSize: '0.875rem', fontWeight: 600,
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          zIndex: 9999, animation: 'fadeUp 0.3s ease'
+        }}>
+          {toast.text}
+        </div>
+      )}
 
       {showSim && <PlanSimulationModal onClose={() => setShowSim(false)} />}
     </div>
