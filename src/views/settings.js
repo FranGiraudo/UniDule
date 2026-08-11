@@ -202,16 +202,25 @@ export function renderSettings() {
             </div>
             <div>
               <label class="f-label">Plan de Estudio</label>
-              <select class="f-input" id="setting-user-plan" onchange="document.getElementById('btn-migration').style.display = (this.value === '2026' && S.profile.plan_id !== '2026') ? 'block' : 'none'" style="width:100%; border:1px solid var(--border); padding:0.75rem; background:var(--bg); color:var(--text); border-radius:0.5rem; outline:none; font-family:inherit;">
+              <select class="f-input" id="setting-user-plan" style="width:100%; border:1px solid var(--border); padding:0.75rem; background:var(--bg); color:var(--text); border-radius:0.5rem; outline:none; font-family:inherit;">
                 <option value="2016">Plan 2016</option>
                 <option value="unc-derecho">Abogacía UNC</option>
                 <option value="2026">Plan 2026</option>
               </select>
-              <button id="btn-migration" class="btn btn-secondary" style="margin-top:0.5rem; width:100%; display:none; border:1px solid var(--primary); color:var(--primary); background:transparent;" onclick="openMigrationModal()">Ver Resumen de Migración</button>
             </div>
             <button class="btn btn-primary" onclick="saveProfileSettings()">Guardar perfil</button>
           </div>
         </div>
+
+        ${S.profile.plan_id === '2016' ? `
+        <div style="background:color-mix(in srgb, var(--primary) 10%, transparent);border:1px solid color-mix(in srgb, var(--primary) 30%, transparent);border-radius:0.75rem;padding:1.25rem;margin-bottom:1.25rem;">
+          <div style="font-weight:700;margin-bottom:0.5rem;color:var(--primary);display:flex;align-items:center;gap:6px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            Simular Cambio de Plan
+          </div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:1rem;line-height:1.4;">Comprueba qué materias te tomarían como equivalencias si decidís pasarte al nuevo <b>Plan 2026</b>.</p>
+          <button class="btn btn-primary" style="width:100%;" onclick="openMigrationModal()">Ver Resumen de Migración</button>
+        </div>` : ''}
 
         <div style="background:var(--card);border:1px solid var(--border);border-radius:0.75rem;padding:1.25rem;margin-bottom:1.25rem;">
           <div style="font-weight:700;margin-bottom:1rem;color:var(--text);">Tema de color</div>
@@ -362,7 +371,7 @@ window.openMigrationModal = async () => {
          html += '<span style="line-height:1.3; flex:1; min-width:200px;">' + sub26.name + '</span>';
          html += '<span style="font-size:0.75rem; font-weight:700; color:' + stateColor + '; background:' + stateBg + '; padding:0.25rem 0.6rem; border-radius:1rem; white-space:nowrap; border: 1px solid ' + stateColor + '40;">' + d.status.toUpperCase() + '</span>';
          html += '</div>';
-         html += '<div style="font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:0.35rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3v18"/><path d="M3 10h18"/><path d="m14 6 3-3 3 3"/></svg> Derivado de: ' + rule.req16.map(c => {
+         html += '<div style="font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:0.35rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></svg> Derivado de: ' + rule.req16.map(c => {
              // Try to find the name of the 2016 subject
              const oldSub = S.career.subjects?.find(s => s.code === c || s.id === c) || S.career.electives?.find(s => s.code === c || s.id === c);
              return oldSub ? oldSub.name : c;

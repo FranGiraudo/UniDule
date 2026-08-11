@@ -144,7 +144,7 @@ export function renderCareer() {
   else if (activeCareerTab === 'map') {
     const mapSubs = S.career.subjects.map(s => {
       const cs = getComputedStatus(s);
-      return { ...s, cfg: CAREER_STATUS_CFG[cs] || CAREER_STATUS_CFG.pendiente };
+      return { ...s, computedStatus: cs, cfg: CAREER_STATUS_CFG[cs] || CAREER_STATUS_CFG.pendiente };
     });
     renderCareerMap('career-map-container', mapSubs, (id) => {
       setSelectedCareerNode(id);

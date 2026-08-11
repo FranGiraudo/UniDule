@@ -210,6 +210,22 @@ export const THEMES = {
     bg: '#1A0B2E',
     isLight: false,
     vars: { '--bg': '#1A0B2E', '--bg2': '#FF00FF', '--card': '#2B0F4C', '--card2': '#4C128B', '--border': '#00FFCC', '--text': '#FFFF00', '--text2': '#00FFCC', '--primary': '#39FF14' }
+  },
+  keychron_ps1: {
+    name: '⌨️ Keychron / PS1',
+    primary: '#CC2929',
+    bg: '#D8D5CE',
+    isLight: true,
+    vars: {
+      '--bg':     '#D8D5CE',   // platino claro — cuerpo PS1 limpio
+      '--bg2':    '#CCCAC2',   // gris ceniza
+      '--card':   '#E2E0DA',   // tecla cream clara
+      '--card2':  '#ECEAE5',   // card elevada
+      '--border': '#B2AFA6',   // borde neutro
+      '--text':   '#1C1814',   // tinta oscura
+      '--text2':  '#6A6258',   // texto secundario sepia leve
+      '--primary':'#CC2929'
+    }
   }
 };
 
@@ -220,4 +236,6 @@ export function applyTheme(themeKey) {
   Object.entries(theme.vars).forEach(([k, v]) => {
     root.style.setProperty(k, v);
   });
+  // Toggle retro class for keychron_ps1
+  document.body.classList.toggle('theme-kps1', themeKey === 'keychron_ps1');
 }
