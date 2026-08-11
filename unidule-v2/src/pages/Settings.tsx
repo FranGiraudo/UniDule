@@ -103,13 +103,13 @@ export function Settings() {
           <div className="form-grid" style={{ gridTemplateColumns: '1fr', gap: '1rem' }}>
             <div>
               <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text2)', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block' }}>Nombre</label>
-              <div style={{ padding: '0.75rem', background: 'var(--bg)', borderRadius: '8px', border: '1px solid var(--border)', color: 'var(--text)' }}>
-                {profile?.full_name || 'Estudiante'}
+              <div className="f-input" style={{ padding: '0.75rem', background: 'var(--bg)', borderRadius: '8px', color: 'var(--text)' }}>
+                {profile?.name || 'Estudiante'}
               </div>
             </div>
             <div>
               <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text2)', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block' }}>Carrera</label>
-              <div style={{ padding: '0.75rem', background: 'var(--bg)', borderRadius: '8px', border: '1px solid var(--border)', color: 'var(--text)' }}>
+              <div className="f-input" style={{ padding: '0.75rem', background: 'var(--bg)', borderRadius: '8px', color: 'var(--text)' }}>
                 {profile?.career || 'Ingeniería en Informática — IUA'}
               </div>
             </div>
@@ -122,7 +122,7 @@ export function Settings() {
             <BookOpen size={20} style={{ color: 'var(--primary)' }} /> Plan de Estudio
           </h3>
           
-          <div style={{ background: 'color-mix(in srgb, var(--primary) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--primary) 20%, transparent)', padding: '1rem', borderRadius: '8px', marginBottom: '1.25rem' }}>
+          <div className="card" style={{ background: 'color-mix(in srgb, var(--primary) 10%, transparent)', padding: '1rem', marginBottom: '1.25rem', borderColor: 'color-mix(in srgb, var(--primary) 20%, transparent)' }}>
             <div style={{ fontWeight: 800, color: 'var(--primary)', marginBottom: '0.25rem' }}>Plan {profile?.plan_id || '2016'}</div>
             <div style={{ fontSize: '0.85rem', color: 'var(--text2)' }}>Este es tu plan de estudios activo actualmente.</div>
           </div>
@@ -132,7 +132,7 @@ export function Settings() {
             <p style={{ fontSize: '0.85rem', color: 'var(--text2)', marginBottom: '1rem' }}>
               Comprueba qué materias te tomarían como equivalencias si decidís pasarte al nuevo Plan 2026.
             </p>
-            <button className="btn btn-secondary" onClick={() => setShowSim(true)}>Simular Cambio</button>
+            <button className="btn btn-primary" onClick={() => setShowSim(true)}>Simular Cambio</button>
           </div>
         </div>
 
@@ -147,7 +147,7 @@ export function Settings() {
             value={theme}
             onChange={(e) => handleThemeChange(e.target.value as ThemeType)}
             className="f-input"
-            style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)', outline: 'none' }}
+            style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: 'var(--bg)', color: 'var(--text)', outline: 'none' }}
           >
             {Object.entries(THEMES).map(([key, t]) => (
               <option key={key} value={key}>{t.name}</option>
