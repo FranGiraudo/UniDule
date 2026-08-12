@@ -16,6 +16,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     });
 
     document.body.classList.toggle('theme-kps1', themeKey === 'keychron_ps1');
+    const is3D = themeKey === 'keychron_ps1' || themeKey.endsWith('_3d');
+    document.body.classList.toggle('theme-3d', is3D);
   }, [themeKey]);
 
   return <>{children}</>;
