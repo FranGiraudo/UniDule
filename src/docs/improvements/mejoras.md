@@ -97,6 +97,33 @@
 - **Resumen:** `user_profiles.name` (`supabase/schema.sql:48`) se setea una única vez al registrarse, con el prefijo del email como valor por defecto (`handle_new_user()`, `supabase/schema.sql:152-159`). `Settings.tsx:312-336` lo muestra en un `<div>` de solo lectura con pinta de input, y en todo el repo `user_profiles` solo se actualiza para `theme` (`Settings.tsx:111`) — no existe ninguna forma de cambiar el nombre mostrado.
 - **Plan:** `src/docs/improvements/MEJ-010-nombre-perfil-editable.md`
 
+### MEJ-011 — `FinalsTab` usa las correlativas de cursada para decidir si podés rendir el final
+
+- **Categoría:** Nueva Funcionalidad
+- **Impacto:** Medio
+- **Esfuerzo:** Medio
+- **Estado:** Propuesta
+- **Resumen:** `global_subjects.correlatives` (`supabase/schema.sql:20`) es `{"toCurse": [...], "toPass": [...]}` — dos conjuntos de correlativas distintos, poblados en `database/seeds/seed_global.mjs` para las 40+ materias del plan, y ya presentes como dos arrays separados en el estado de la app pre-Supabase (`scripts/legacy/state_original.js`). `useDataSync.ts:99` solo mapea `toCurse` a `Subject.correlatives`; `toPass` se lee de Supabase y se descarta. `FinalsTab.tsx:59-62,169-172` usa esas correlativas de cursada para decidir si un final está "Habilitado para rendir" — la variable se llama `missingToPass` pero consume datos de `toCurse`.
+- **Plan:** `src/docs/improvements/MEJ-011-correlativas-toPass-finales.md`
+
+### MEJ-012 — Lógica de filtrado de `GridTab` duplicada entre el chequeo de vacío y el render
+
+- **Categoría:** Developer Experience / Performance
+- **Impacto:** Bajo
+- **Esfuerzo:** Bajo
+- **Estado:** Propuesta
+- **Resumen:** `GridTab.tsx:20-36` (`hasAnySubjects`) y `GridTab.tsx:106-120` (dentro del `.map()` de renderizado) repiten carácter por carácter el mismo filtrado por año, búsqueda y estado. El filtro completo corre dos veces por render, y un cambio futuro a la lógica de filtrado aplicado en un solo lugar puede desincronizar el empty-state de lo que realmente se renderiza.
+- **Plan:** `src/docs/improvements/MEJ-012-filtro-duplicado-gridtab.md`
+
+### MEJ-013 — `allowsPromotion` se guarda en 8 puntos del código y no se muestra en ninguno
+
+- **Categoría:** Producto / UX
+- **Impacto:** Medio
+- **Esfuerzo:** Bajo
+- **Estado:** Propuesta
+- **Resumen:** `Subject.allowsPromotion` (`shared/types/index.ts:38`) se escribe y lee de punta a punta — `subjects/lib/api.ts:24,44,63,91`, `useDataSync.ts:116`, el checkbox "Habilita promoción" en `GradesModal.tsx:19,47,133-137`, y el export/import de `Settings.tsx:153,195,268` — pero ninguna vista lo muestra después de guardado: ni la tarjeta de `Subjects.tsx`, ni `GridTab`, ni `SubjectDetailModal`. El usuario tiene que reabrir `GradesModal` de cada materia para recordar cuáles tiene marcadas.
+- **Plan:** `src/docs/improvements/MEJ-013-mostrar-promocion-habilitada.md`
+
 ## Completadas
 
 _Sin ítems todavía._

@@ -10,6 +10,14 @@ _Sin ítems en esta corrida._
 
 ## Alta
 
+### TD-RF007 — El estado académico `'libre'` no lo reconoce ningún componente de estilos de Carrera
+
+- **Tipo:** Funcional (RF)
+- **Archivos afectados:** `src/shared/types/index.ts:5` (`SubjectStatus`), `src/features/career/lib/utils.ts` (`CAREER_STATUS_CFG`), `src/features/career/components/MapTab.tsx:180-201` (`getStatusStyle`), `src/features/career/components/GridTab.tsx:174`, `src/features/career/components/ElectivesTab.tsx:51`, `src/features/career/components/SubjectDetailModal.tsx:96,108`, `src/features/subjects/components/SubjectModal.tsx:192`, `src/features/subjects/components/GradesModal.tsx:119`
+- **Descripción:** `SubjectModal.tsx:192` y `GradesModal.tsx:119` permiten elegir `status='libre'` desde sus `<select>`, pero `SubjectStatus` (`shared/types/index.ts:5`) no incluye `'libre'` en su unión de tipos, y `CAREER_STATUS_CFG` tampoco tiene esa key. Todo componente que hace `CAREER_STATUS_CFG[cs] || CAREER_STATUS_CFG.pendiente` (`GridTab.tsx:174`, `ElectivesTab.tsx:51`, `SubjectDetailModal.tsx:96,108`) muestra "Pendiente" para una materia libre. En `MapTab.tsx`, el `switch` de `getStatusStyle` no tiene caso para `'libre'` y cae en el `default`, mostrando la etiqueta **"DISPONIBLE"**. Detectado en auditoría 2026-08-11.
+- **Riesgo:** Es la misma clase de riesgo que TD-RF001 pero para un estado que ni siquiera existe en el vocabulario tipado de la app. En `MapTab` específicamente, mostrar "Disponible" para una materia que perdió la regularidad puede llevar a un estudiante a asumir que no necesita volver a cursarla.
+- **Recomendación:** Agregar `'libre'` a `SubjectStatus` (`shared/types/index.ts`) y a `CAREER_STATUS_CFG` (`career/lib/utils.ts`, reusando el color de `ACTIVE_STATUS.libre` en `subjects/lib/constants.ts:41` para consistencia visual), y agregar el caso `'libre'` al `switch` de `getStatusStyle` en `MapTab.tsx`.
+
 ### TD-RF001 — El mapa de correlativas (`MapTab`) etiqueta materias bloqueadas como "Disponible"
 
 - **Tipo:** Funcional (RF)
@@ -71,10 +79,10 @@ _Sin ítems en esta corrida._
 ### TD-RNF003 — Llamadas a Supabase sin manejo de error visible al usuario
 
 - **Tipo:** No funcional (RNF)
-- **Archivos afectados:** `src/shared/hooks/useDataSync.ts:20-47`, `src/shared/context/AuthProvider.tsx:17-28`, `src/pages/Settings.tsx:39`
-- **Descripción:** `useDataSync` dispara ocho queries en paralelo con `Promise.all` y nunca revisa el campo `error` de ninguna respuesta individual; si una falla, sus datos quedan `undefined` y se tratan silenciosamente como "sin datos" (todos los destructurados usan `|| []`/`|| undefined` de respaldo). `AuthProvider.tsx:17-21` hace lo mismo con el fetch de perfil. `Settings.tsx:39` (`handleThemeChange`) tampoco revisa el resultado del `update`. Detectado en auditoría 2026-08-11.
-- **Riesgo:** Si Supabase devuelve un error (RLS, red, etc.), la app no lo distingue de "el usuario no tiene datos todavía" — no hay estado de error visible, así que un fallo real se percibe como una carrera vacía o un cambio de tema que no se guardó, sin ninguna pista de qué pasó.
-- **Recomendación:** Revisar el campo `error` de cada respuesta en `useDataSync` y exponer un estado de error en el store (o al menos un `console.error` + toast) en vez de tratar todo fallo como "sin datos"; aplicar el mismo patrón en `AuthProvider` y `handleThemeChange`.
+- **Archivos afectados:** `src/shared/hooks/useDataSync.ts:20-47`, `src/shared/context/AuthProvider.tsx:17-28`, `src/pages/Settings.tsx:39`, `src/pages/Auth.tsx:39-44`
+- **Descripción:** `useDataSync` dispara ocho queries en paralelo con `Promise.all` y nunca revisa el campo `error` de ninguna respuesta individual; si una falla, sus datos quedan `undefined` y se tratan silenciosamente como "sin datos" (todos los destructurados usan `|| []`/`|| undefined` de respaldo). `AuthProvider.tsx:17-21` hace lo mismo con el fetch de perfil. `Settings.tsx:39` (`handleThemeChange`) tampoco revisa el resultado del `update`. Detectado en auditoría 2026-08-11. **Ampliado en la corrida del mismo día:** `Auth.tsx:39-44` tiene el mismo problema en el flujo de registro — el `.update({ plan_id: planId })` posterior a `signUp`/`signInWithPassword` no destructura ni revisa `error`; si falla, el usuario queda logueado con un perfil sin `plan_id`, y `useDataSync.ts:18` cae silenciosamente al fallback `'2016'` sin importar qué plan haya elegido en el registro.
+- **Riesgo:** Si Supabase devuelve un error (RLS, red, etc.), la app no lo distingue de "el usuario no tiene datos todavía" — no hay estado de error visible, así que un fallo real se percibe como una carrera vacía, un cambio de tema que no se guardó, o un plan de estudio equivocado, sin ninguna pista de qué pasó.
+- **Recomendación:** Revisar el campo `error` de cada respuesta en `useDataSync` y exponer un estado de error en el store (o al menos un `console.error` + toast) en vez de tratar todo fallo como "sin datos"; aplicar el mismo patrón en `AuthProvider`, `handleThemeChange` y el `update` de `plan_id` en `Auth.tsx`.
 
 ### TD-RNF004 — Tipado débil concentrado en la capa de sincronización con Supabase
 
@@ -83,6 +91,22 @@ _Sin ítems en esta corrida._
 - **Descripción:** Todos los `.map()` que transforman filas de Supabase a los tipos del dominio (`Task`, `Note`, `Subject`, `Seminar`, `Elective`) tipan el parámetro como `any` (`t: any`, `n: any`, `g: any`, `p: any`, `a: any`, `gr: any`, `s: any`, `e: any`), sin ningún tipo intermedio para las filas de Supabase. Es el único punto del repo que mapea los ocho `SELECT *` a los tipos de dominio. En todo el repo hay 27 usos de `any`/`as any`, concentrados sobre todo acá. Detectado en auditoría 2026-08-11.
 - **Riesgo:** Es el punto de entrada de todos los datos remotos a la app; un cambio de nombre de columna en Supabase (p. ej. `g.correlatives?.toCurse`, línea 99, un nombre de campo poco convencional) no se detecta en compilación, solo en runtime cuando el dato ya está mal mapeado.
 - **Recomendación:** Definir tipos de fila (`SupabaseActiveSubjectRow`, `SupabaseTaskRow`, etc.) o generar tipos desde el schema de Supabase (`supabase gen types typescript`), y tipar los parámetros de los `.map()` con esos tipos en vez de `any`.
+
+### TD-RNF005 — Escrituras multi-paso a Supabase sin atomicidad ante un fallo a mitad de camino
+
+- **Tipo:** No funcional (RNF)
+- **Archivos afectados:** `src/features/subjects/components/GradesModal.tsx:34-90` (`handleSave`), `src/pages/Settings.tsx:123-179` (`handleFileChange`), `src/pages/Settings.tsx:236-279` (`handleInputCode`)
+- **Descripción:** `GradesModal.handleSave` encadena `saveActiveSubject` → `syncGrades` → `updateSubjectProgress` → un loop de `saveTask`/`deleteTask`, cuatro-más escrituras a tablas distintas sin transacción ni rollback. `Settings.tsx` repite el patrón en el import de backup (`handleFileChange`) y en "Ingresar Código" de horario compartido (`handleInputCode`): un `for` que llama a varias funciones de escritura por cada ítem, una por una. Detectado en auditoría 2026-08-11.
+- **Riesgo:** A diferencia de TD-RNF003, acá el fallo sí se le muestra al usuario (`alert`), pero no cuán parcial quedó el guardado — un corte de red a mitad de la secuencia deja algunas tablas actualizadas y otras no, y reintentar puede duplicar lo que ya se había guardado (ej. una tarea de evaluación repetida).
+- **Recomendación:** Para `GradesModal.handleSave`, evaluar mover los cuatro pasos a una función de Postgres (`RPC`) que los agrupe en una transacción del lado del servidor. Para los imports masivos, acumular los fallos por ítem y mostrar al usuario un resumen de qué se guardó y qué no, en vez de abortar el loop en el primer error sin indicar hasta dónde llegó.
+
+### TD-RNF006 — Accesibilidad: botones icon-only sin nombre accesible y elementos clickeables no operables por teclado
+
+- **Tipo:** No funcional (RNF)
+- **Archivos afectados:** botón de cerrar (`className="btn-icon"`) en `SeminarModal.tsx`, `SubjectDetailModal.tsx`, `PlanSimulationModal.tsx`, `GradePromptModal.tsx`, `TaskModal.tsx`, `SubjectModal.tsx`, `GradesModal.tsx`, `NoteModal.tsx`; `src/shared/components/layout/Sidebar.tsx:133`; `src/features/career/components/GridTab.tsx:136`
+- **Descripción:** Los 8 modales de la app cierran con un `<button className="btn-icon">` que solo contiene el ícono `<X>` — sin `aria-label` ni texto accesible. `Sidebar.tsx:133` (logout) y `GridTab.tsx:136` (colapsar/expandir año) usan `<div onClick={...}>` para una acción interactiva, sin `role="button"`, `tabIndex` ni manejador de teclado. Detectado en auditoría 2026-08-11.
+- **Riesgo:** Un usuario con lector de pantalla no puede identificar qué hace el botón de cerrar de ningún modal (8 puntos de entrada con el mismo problema); un usuario que navega solo con teclado no puede cerrar sesión ni colapsar un año del plan de carrera sin mouse.
+- **Recomendación:** Agregar `aria-label="Cerrar"` a los 8 botones `btn-icon` de cierre; cambiar los `<div onClick>` de `Sidebar.tsx:133` y `GridTab.tsx:136` por `<button>`, o agregarles `role="button"`, `tabIndex={0}` y un `onKeyDown` que dispare la acción en Enter/Espacio.
 
 ## Baja
 
