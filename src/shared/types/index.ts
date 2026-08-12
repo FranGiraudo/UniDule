@@ -2,7 +2,7 @@ import type { THEMES } from '../lib/themes';
 
 export type ThemeType = keyof typeof THEMES;
 
-export type SubjectStatus = 'pendiente' | 'aprobada' | 'promocionado' | 'regular' | 'cursando';
+export type SubjectStatus = 'pendiente' | 'aprobada' | 'promocionado' | 'regular' | 'cursando' | 'libre';
 
 export interface Grade {
   id: string;

@@ -1,6 +1,6 @@
 # Deuda Técnica — UniDule
 
-**Última actualización:** 2026-08-11 (auditoría src/docs/audits/2026-08-11.md)
+**Última actualización:** 2026-08-12 (auditoría src/docs/audits/2026-08-12.md)
 
 ---
 
@@ -9,14 +9,6 @@
 _Sin ítems en esta corrida._
 
 ## Alta
-
-### TD-RF007 — El estado académico `'libre'` no lo reconoce ningún componente de estilos de Carrera
-
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/shared/types/index.ts:5` (`SubjectStatus`), `src/features/career/lib/utils.ts` (`CAREER_STATUS_CFG`), `src/features/career/components/MapTab.tsx:180-201` (`getStatusStyle`), `src/features/career/components/GridTab.tsx:174`, `src/features/career/components/ElectivesTab.tsx:51`, `src/features/career/components/SubjectDetailModal.tsx:96,108`, `src/features/subjects/components/SubjectModal.tsx:192`, `src/features/subjects/components/GradesModal.tsx:119`
-- **Descripción:** `SubjectModal.tsx:192` y `GradesModal.tsx:119` permiten elegir `status='libre'` desde sus `<select>`, pero `SubjectStatus` (`shared/types/index.ts:5`) no incluye `'libre'` en su unión de tipos, y `CAREER_STATUS_CFG` tampoco tiene esa key. Todo componente que hace `CAREER_STATUS_CFG[cs] || CAREER_STATUS_CFG.pendiente` (`GridTab.tsx:174`, `ElectivesTab.tsx:51`, `SubjectDetailModal.tsx:96,108`) muestra "Pendiente" para una materia libre. En `MapTab.tsx`, el `switch` de `getStatusStyle` no tiene caso para `'libre'` y cae en el `default`, mostrando la etiqueta **"DISPONIBLE"**. Detectado en auditoría 2026-08-11.
-- **Riesgo:** Es la misma clase de riesgo que TD-RF001 pero para un estado que ni siquiera existe en el vocabulario tipado de la app. En `MapTab` específicamente, mostrar "Disponible" para una materia que perdió la regularidad puede llevar a un estudiante a asumir que no necesita volver a cursarla.
-- **Recomendación:** Agregar `'libre'` a `SubjectStatus` (`shared/types/index.ts`) y a `CAREER_STATUS_CFG` (`career/lib/utils.ts`, reusando el color de `ACTIVE_STATUS.libre` en `subjects/lib/constants.ts:41` para consistencia visual), y agregar el caso `'libre'` al `switch` de `getStatusStyle` en `MapTab.tsx`.
 
 ### TD-RF001 — El mapa de correlativas (`MapTab`) etiqueta materias bloqueadas como "Disponible"
 
@@ -41,6 +33,14 @@ _Sin ítems en esta corrida._
 - **Descripción:** `parseMd` aplica reemplazos regex (`**bold**`, `` `code` ``, listas) directamente sobre el contenido crudo de la nota, sin escapar `<`, `>` ni `&` antes de convertir a HTML. El resultado se inyecta con `dangerouslySetInnerHTML` en la tarjeta de la nota. Detectado en auditoría 2026-08-11.
 - **Riesgo:** Cualquier texto con HTML/JS embebido pegado en una nota se renderiza literalmente — al menos self-XSS explotable por contenido pegado sin querer, y deja la puerta abierta a un problema mayor si en el futuro las notas se comparten entre usuarios (como ya ocurre con los horarios, ver TD-RNF001).
 - **Recomendación:** Escapar `<`, `>`, `&`, `"` del contenido crudo antes de aplicar los reemplazos de `parseMd`, o cambiar el enfoque a un parser de markdown que sanitice por diseño (ej. `marked` + `DOMPurify`) en vez de regex manual.
+
+### TD-RNF007 — Re-renders innecesarios en MapTab y StatsTab por fallback a array vacío en cada render
+
+- **Tipo:** No funcional (RNF)
+- **Archivos afectados:** `src/features/career/components/MapTab.tsx:17`, `src/features/career/components/StatsTab.tsx:8`
+- **Descripción:** La declaración `const subjects = career?.subjects || [];` crea una nueva referencia de array en memoria en cada ciclo de renderizado de React. Esto hace que los hooks `useMemo` dependientes de `subjects` evalúen que hubo un cambio en sus dependencias, invalidando sus cálculos internos. Detectado por ESLint en auditoría 2026-08-12.
+- **Riesgo:** Deterioro de performance. En componentes con alta interacción y gráficos complejos como `MapTab`, recalcular los datos y el layout SVG en cada render (ej: en onMouseMove u otros eventos) penaliza severamente el rendimiento y provoca retrasos (lag) perceptibles en la UI.
+- **Recomendación:** Definir una constante inmutable `const EMPTY_SUBJECTS: Subject[] = [];` fuera del componente para actuar como fallback de `career?.subjects || EMPTY_SUBJECTS`, o memoizar el array de subjects directamente si la referencia no puede ser estática.
 
 ## Media
 
@@ -120,3 +120,10 @@ _Sin ítems en esta corrida._
 - **Detectado en:** auditoría 2026-08-11 (`src/docs/audits/2026-08-11.md`).
 - **Resuelto en:** 2026-08-11.
 - **Fix:** Se agregó `escapeHtml` (`src/shared/lib/utils.ts`) y se aplicó a todo el contenido dinámico interpolado en `exportPDF` (`src/pages/Schedule.tsx`) antes de pasarlo a `win.document.write(...)`: título/materia/tipo de tareas pendientes, nombre/color/horario/aula/tipo de cada bloque de clase y nombre/color de las materias activas. Además, `handleInputCode` (`src/pages/Settings.tsx`) ahora valida el shape completo del código pegado (`sanitizeSharePayload`/`sanitizeShareScheduleEvent`) — día dentro de una lista permitida, horarios con formato `HH:MM`, y todo texto (`professor`, `room`, `type`, `name`, `id`) saneado (sin `<`/`>`, longitud acotada) — antes de persistirlo vía `saveActiveSubject`.
+
+### TD-RF007 — El estado académico `'libre'` no lo reconoce ningún componente de estilos de Carrera
+
+- **Tipo:** Funcional (RF)
+- **Detectado en:** auditoría 2026-08-11
+- **Resuelto en:** 2026-08-12
+- **Fix:** Se agregó `'libre'` a la unión `SubjectStatus` en `index.ts`, se configuró en `CAREER_STATUS_CFG` (`utils.ts`) y se añadió el caso `libre` en el `getStatusStyle` de `MapTab.tsx` respetando los estilos esperados de la app.
