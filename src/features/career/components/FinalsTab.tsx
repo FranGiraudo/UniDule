@@ -67,9 +67,12 @@ export function FinalsTab({ onSelectSubject }: { onSelectSubject: (id: string) =
   });
 
   filteredSubs.sort((a, b) => {
-    // We don't have expDate in V2 yet, so we assume 9999
-    if (sort === 'exp-asc') return 0;
-    if (sort === 'exp-desc') return 0;
+    if (sort === 'exp-asc' || sort === 'exp-desc') {
+      const dateA = a.expDate ? new Date(a.expDate).getTime() : Infinity;
+      const dateB = b.expDate ? new Date(b.expDate).getTime() : Infinity;
+      if (dateA === dateB) return a.name.localeCompare(b.name);
+      return sort === 'exp-asc' ? dateA - dateB : dateB - dateA;
+    }
     if (sort === 'name-asc') return a.name.localeCompare(b.name);
     if (sort === 'year-asc') return a.year - b.year || (a.period || 0) - (b.period || 0);
     return 0;
@@ -171,9 +174,8 @@ export function FinalsTab({ onSelectSubject }: { onSelectSubject: (id: string) =
               .filter((dep) => !dep || dep.status !== 'aprobada');
             const canRendir = missingToPass.length === 0;
 
-            // Assumed fields for V2 until added to types
-            const expDate = (s as any).expDate;
-            const regDate = (s as any).regDate;
+            const expDate = s.expDate;
+            const regDate = s.regDate;
 
             const daysLeft = getDaysToExpiration(expDate);
             let badgeBg = 'rgba(74,222,128,.15)',
