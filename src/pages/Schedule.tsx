@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../shared/store/useStore';
-import { todayDay, nowMin, t2m, m2t, t2y, dur } from '../shared/lib/utils';
+import { todayDay, nowMin, t2m, m2t, t2y, dur, escapeHtml } from '../shared/lib/utils';
 import type { Subject, ScheduleEvent } from '../shared/types';
 
 const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -91,9 +91,9 @@ export function Schedule() {
       .map((t) => {
         const sub = subjects.find((s) => s.id === t.subjectId);
         return `<tr>
-        <td>${t.title}</td>
-        <td>${sub ? sub.name : '—'}</td>
-        <td>${t.type}</td>
+        <td>${escapeHtml(t.title)}</td>
+        <td>${escapeHtml(sub ? sub.name : '—')}</td>
+        <td>${escapeHtml(t.type)}</td>
         <td>${t.dueDate ? new Date(t.dueDate + 'T12:00:00').toLocaleDateString('es-AR') : '—'}</td>
       </tr>`;
       })
@@ -103,18 +103,19 @@ export function Schedule() {
       const classes = byDay[day];
       const cells = classes.length
         ? classes
-            .map(
-              (c) => `
-            <div style="background:${c.subColor}18;border-left:3px solid ${c.subColor};border-radius:6px;padding:7px 9px;margin-bottom:6px;">
-              <div style="font-weight:700;font-size:12px;color:${c.subColor};">${c.subName}</div>
-              <div style="font-size:11px;color:#555;margin-top:3px;">${c.startTime}–${c.endTime}</div>
-              <div style="font-size:10px;color:#777;">${c.type} · ${c.room}</div>
-            </div>`,
-            )
+            .map((c) => {
+              const subColor = escapeHtml(c.subColor);
+              return `
+            <div style="background:${subColor}18;border-left:3px solid ${subColor};border-radius:6px;padding:7px 9px;margin-bottom:6px;">
+              <div style="font-weight:700;font-size:12px;color:${subColor};">${escapeHtml(c.subName)}</div>
+              <div style="font-size:11px;color:#555;margin-top:3px;">${escapeHtml(c.startTime)}–${escapeHtml(c.endTime)}</div>
+              <div style="font-size:10px;color:#777;">${escapeHtml(c.type)} · ${escapeHtml(c.room)}</div>
+            </div>`;
+            })
             .join('')
         : `<div style="color:#bbb;font-size:11px;text-align:center;padding:16px 0;">Libre</div>`;
       return `<td style="vertical-align:top;padding:6px;border-right:1px solid #eee;min-width:110px;">
-        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#555;margin-bottom:8px;">${day}</div>
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#555;margin-bottom:8px;">${escapeHtml(day)}</div>
         ${cells}
       </td>`;
     }).join('');
@@ -167,7 +168,12 @@ export function Schedule() {
 
       <div class="section-title">Materias Activas</div>
       <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;">
-        ${activeSubjects.map((s) => `<div style="background:${s.color}18; color:${s.color}; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:700;">${s.name}</div>`).join('')}
+        ${activeSubjects
+          .map((s) => {
+            const color = escapeHtml(s.color);
+            return `<div style="background:${color}18; color:${color}; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:700;">${escapeHtml(s.name)}</div>`;
+          })
+          .join('')}
       </div>
 
       <div class="section-title">Horario Semanal</div>

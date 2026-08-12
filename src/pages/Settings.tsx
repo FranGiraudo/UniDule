@@ -20,6 +20,78 @@ interface ScheduleSharePayload {
   }>;
 }
 
+const SHARE_TEXT_MAX_LEN = 80;
+const SHARE_VALID_DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+const SHARE_TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+/** Strips angle brackets and clamps length on untrusted text pasted via a "Compartir Horario" code. */
+function sanitizeShareText(value: unknown, maxLen = SHARE_TEXT_MAX_LEN): string {
+  if (typeof value !== 'string') return '';
+  return value.replace(/[<>]/g, '').trim().slice(0, maxLen);
+}
+
+/** Validates and sanitizes a single schedule block from a pasted share code; returns null if the shape is untrusted/malformed. */
+function sanitizeShareScheduleEvent(ev: unknown): ScheduleEvent | null {
+  if (!ev || typeof ev !== 'object') return null;
+  const e = ev as Record<string, unknown>;
+  let day: string | number;
+  if (typeof e.day === 'string' && SHARE_VALID_DAYS.includes(e.day)) {
+    day = e.day;
+  } else if (
+    typeof e.day === 'number' &&
+    Number.isInteger(e.day) &&
+    e.day >= 0 &&
+    e.day <= 6
+  ) {
+    day = e.day;
+  } else {
+    return null;
+  }
+  if (typeof e.startTime !== 'string' || !SHARE_TIME_RE.test(e.startTime)) return null;
+  if (typeof e.endTime !== 'string' || !SHARE_TIME_RE.test(e.endTime)) return null;
+  if (typeof e.type !== 'string' || e.type.trim().length === 0) return null;
+
+  return {
+    id: sanitizeShareText(e.id, 60) || crypto.randomUUID(),
+    subject_id: sanitizeShareText(e.subject_id, 60),
+    type: sanitizeShareText(e.type, 40),
+    day,
+    startTime: e.startTime,
+    endTime: e.endTime,
+    room: e.room !== undefined ? sanitizeShareText(e.room) : undefined,
+    name: e.name !== undefined ? sanitizeShareText(e.name) : undefined,
+  };
+}
+
+/** Validates the decoded "Compartir Horario" payload shape and sanitizes every string field before it's trusted. */
+function sanitizeSharePayload(decoded: unknown): ScheduleSharePayload['data'] | null {
+  if (!decoded || typeof decoded !== 'object') return null;
+  const d = decoded as Record<string, unknown>;
+  if (d.type !== 'unidule-schedule' || !Array.isArray(d.data)) return null;
+
+  const sanitized: ScheduleSharePayload['data'] = [];
+  for (const entry of d.data) {
+    if (!entry || typeof entry !== 'object') continue;
+    const e = entry as Record<string, unknown>;
+    if (typeof e.code !== 'string' || typeof e.name !== 'string' || !Array.isArray(e.schedules))
+      continue;
+
+    const schedules = e.schedules
+      .map(sanitizeShareScheduleEvent)
+      .filter((s): s is ScheduleEvent => s !== null);
+    if (schedules.length === 0) continue;
+
+    sanitized.push({
+      code: sanitizeShareText(e.code, 60),
+      name: sanitizeShareText(e.name),
+      professor: e.professor !== undefined ? sanitizeShareText(e.professor) : undefined,
+      room: e.room !== undefined ? sanitizeShareText(e.room) : undefined,
+      schedules,
+    });
+  }
+  return sanitized;
+}
+
 export function Settings() {
   const { session, profile, theme, setTheme, career, tasks } = useStore();
   const [showSim, setShowSim] = useState(false);
@@ -165,14 +237,14 @@ export function Settings() {
     const code = prompt('Pegá el código de horario que te pasaron:');
     if (!code) return;
     try {
-      const decoded: ScheduleSharePayload = JSON.parse(decodeURIComponent(atob(code)));
-      if (decoded.type !== 'unidule-schedule' || !Array.isArray(decoded.data))
-        throw new Error('Invalid');
+      const decoded: unknown = JSON.parse(decodeURIComponent(atob(code)));
+      const data = sanitizeSharePayload(decoded);
+      if (!data) throw new Error('Invalid');
 
       const allSubjects = useStore.getState().career?.subjects || [];
       let added = 0,
         skipped = 0;
-      for (const extSub of decoded.data) {
+      for (const extSub of data) {
         const local = allSubjects.find(
           (s) =>
             s.id === extSub.code ||

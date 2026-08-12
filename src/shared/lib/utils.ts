@@ -39,3 +39,16 @@ export function urgColor(d: number | null): string {
   if (d <= 14) return '#fbbf24';
   return '#34d399';
 }
+
+const HTML_ESCAPES: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+};
+
+/** Escapes HTML-significant characters so untrusted strings are safe to interpolate into raw HTML (e.g. document.write). */
+export function escapeHtml(value: unknown): string {
+  return String(value ?? '').replace(/[&<>"']/g, (c) => HTML_ESCAPES[c]);
+}
