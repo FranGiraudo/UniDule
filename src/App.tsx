@@ -16,7 +16,7 @@ import { Schedule } from './pages/Schedule';
 import { Settings } from './pages/Settings';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const session = useStore(state => state.session);
+  const session = useStore((state) => state.session);
   if (!session) return <Navigate to="/login" replace />;
   return <>{children}</>;
 }
@@ -28,8 +28,15 @@ export default function App() {
         <ThemeProvider>
           <Routes>
             <Route path="/login" element={<Auth />} />
-            
-            <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <MainLayout />
+                </ProtectedRoute>
+              }
+            >
               <Route index element={<Dashboard />} />
               <Route path="career" element={<Career />} />
               <Route path="subjects" element={<Subjects />} />

@@ -1,6 +1,10 @@
 export function Topbar() {
-
-  const today = new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const today = new Date().toLocaleDateString('es-AR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
   const formattedDate = today.charAt(0).toUpperCase() + today.slice(1);
 
   return (

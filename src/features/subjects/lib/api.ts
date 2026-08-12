@@ -7,7 +7,7 @@ function updateSubjectInCareer(id: string, patch: Record<string, unknown>) {
   if (!career) return;
   useStore.getState().setCareer({
     ...career,
-    subjects: career.subjects.map(s => (s.id === id ? { ...s, ...patch } : s)),
+    subjects: career.subjects.map((s) => (s.id === id ? { ...s, ...patch } : s)),
   });
 }
 
@@ -72,7 +72,11 @@ export async function deleteActiveSubject(id: string) {
 
   await supabase.from('user_tasks').delete().eq('subject_id', id).eq('user_id', uid);
   await supabase.from('user_grades').delete().eq('active_subject_id', id).eq('user_id', uid);
-  const { error } = await supabase.from('user_active_subjects').delete().eq('id', id).eq('user_id', uid);
+  const { error } = await supabase
+    .from('user_active_subjects')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', uid);
   if (error) {
     console.error('Error deleting active subject:', error);
     throw error;
@@ -90,7 +94,7 @@ export async function deleteActiveSubject(id: string) {
     room: '',
     schedules: [],
   });
-  useStore.getState().setTasks(useStore.getState().tasks.filter(t => t.subjectId !== id));
+  useStore.getState().setTasks(useStore.getState().tasks.filter((t) => t.subjectId !== id));
 }
 
 export async function syncGrades(activeSubjectId: string, grades: Grade[]) {
@@ -104,7 +108,7 @@ export async function syncGrades(activeSubjectId: string, grades: Grade[]) {
     .eq('active_subject_id', activeSubjectId)
     .eq('user_id', uid);
   const existingIds = new Set((existing || []).map((g: any) => g.id));
-  const incomingIds = new Set(grades.map(g => g.id));
+  const incomingIds = new Set(grades.map((g) => g.id));
 
   for (const id of existingIds) {
     if (!incomingIds.has(id)) {
@@ -113,7 +117,7 @@ export async function syncGrades(activeSubjectId: string, grades: Grade[]) {
   }
 
   if (grades.length > 0) {
-    const toUpsert = grades.map(g => ({
+    const toUpsert = grades.map((g) => ({
       id: g.id,
       user_id: uid,
       active_subject_id: activeSubjectId,
@@ -153,17 +157,23 @@ export async function saveNote(note: Note) {
   }
 
   const notes = useStore.getState().notes;
-  const exists = notes.find(n => n.id === note.id);
-  useStore.getState().setNotes(exists ? notes.map(n => (n.id === note.id ? note : n)) : [...notes, note]);
+  const exists = notes.find((n) => n.id === note.id);
+  useStore
+    .getState()
+    .setNotes(exists ? notes.map((n) => (n.id === note.id ? note : n)) : [...notes, note]);
 }
 
 export async function deleteNote(id: string) {
   const session = useStore.getState().session;
   if (!session) throw new Error('No session');
-  const { error } = await supabase.from('user_notes').delete().eq('id', id).eq('user_id', session.user.id);
+  const { error } = await supabase
+    .from('user_notes')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', session.user.id);
   if (error) {
     console.error('Error deleting note:', error);
     throw error;
   }
-  useStore.getState().setNotes(useStore.getState().notes.filter(n => n.id !== id));
+  useStore.getState().setNotes(useStore.getState().notes.filter((n) => n.id !== id));
 }
