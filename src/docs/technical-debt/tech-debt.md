@@ -10,14 +10,6 @@ _Sin ítems en esta corrida._
 
 ## Alta
 
-### TD-RF001 — El mapa de correlativas (`MapTab`) etiqueta materias bloqueadas como "Disponible"
-
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/features/career/components/MapTab.tsx:180-201,254`
-- **Descripción:** `getStatusStyle` solo distingue `aprobada`, `regular` y `cursando`; cualquier otro estado —incluidas materias con correlativas sin cumplir— cae en el mismo `default` y muestra la etiqueta `'DISPONIBLE'`. A diferencia de `GridTab.tsx:172-180` y `FinalsTab.tsx`, nunca llama a `getComputedStatus` para diferenciar `disponible` de `bloqueada`. El color de leyenda `V.nodeFillDisp` (línea 254) tampoco se usa en ningún nodo real (el `default` pinta con `V.nodeFill`), así que no hay ni siquiera contraste visual entre ambos estados. Detectado en auditoría 2026-08-11.
-- **Riesgo:** El mapa es la vista pensada para planificar qué cursar; decirle a un estudiante que una materia bloqueada está "Disponible" puede llevarlo a intentar anotarse en algo que no cumple correlativas, y contradice lo que la misma app muestra en `GridTab`/`FinalsTab` para la misma materia.
-- **Recomendación:** Reemplazar el `switch (s.status)` de `getStatusStyle` por la misma lógica de `getComputedStatus(s, subjects)` que ya usan `GridTab` y `FinalsTab`, agregando una rama explícita para `bloqueada` que use `V.nodeFillBloq` (ya definido pero sin uso) en vez de reutilizar el color de disponible.
-
 ### TD-RF002 — `PlanSimulationModal` es contenido 100% hardcodeado, no una simulación real
 
 - **Tipo:** Funcional (RF)
@@ -127,3 +119,10 @@ _Sin ítems en esta corrida._
 - **Detectado en:** auditoría 2026-08-11
 - **Resuelto en:** 2026-08-12
 - **Fix:** Se agregó `'libre'` a la unión `SubjectStatus` en `index.ts`, se configuró en `CAREER_STATUS_CFG` (`utils.ts`) y se añadió el caso `libre` en el `getStatusStyle` de `MapTab.tsx` respetando los estilos esperados de la app.
+
+### TD-RF001 — El mapa de correlativas (`MapTab`) etiqueta materias bloqueadas como "Disponible"
+
+- **Tipo:** Funcional (RF)
+- **Detectado en:** auditoría 2026-08-11
+- **Resuelto en:** 2026-08-12
+- **Fix:** Se reemplazó el `switch (s.status)` en `getStatusStyle` de `MapTab.tsx` por `getComputedStatus(s, subjects)`. Se agregaron los casos específicos para `bloqueada` usando `V.nodeFillBloq` y para `disponible` usando `V.nodeFillDisp`, unificando la lógica con el resto de las vistas.
