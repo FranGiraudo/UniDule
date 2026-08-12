@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../store/useStore';
 import type { Session } from '@supabase/supabase-js';
@@ -9,6 +9,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setTheme = useStore((state) => state.setTheme);
   const [loading, setLoading] = useState(true);
 
+  const handleSession = useCallback(
+    async (session: Session | null) => {
+      setSession(session);
+      if (session) {
+        // Fetch profile
+        const { data } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (data) {
+          setProfile(data);
+          if (data.theme) {
+            setTheme(data.theme);
+          }
+        }
+      } else {
+        setProfile(null);
+      }
+      setLoading(false);
+    },
+    [setSession, setProfile, setTheme],
+  );
+
   useEffect(() => {
     // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -16,34 +41,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     // Listen to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       handleSession(session);
     });
 
     return () => subscription.unsubscribe();
-  }, []);
-
-  const handleSession = async (session: Session | null) => {
-    setSession(session);
-    if (session) {
-      // Fetch profile
-      const { data } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-        
-      if (data) {
-        setProfile(data);
-        if (data.theme) {
-          setTheme(data.theme);
-        }
-      }
-    } else {
-      setProfile(null);
-    }
-    setLoading(false);
-  };
+  }, [handleSession]);
 
   if (loading) {
     return <div className="loading-screen">Cargando UniDule...</div>;

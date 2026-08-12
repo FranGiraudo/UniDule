@@ -1,4 +1,6 @@
-export type ThemeType = 'light' | 'dark' | 'retro' | 'keychron_ps1';
+import type { THEMES } from '../lib/themes';
+
+export type ThemeType = keyof typeof THEMES;
 
 export type SubjectStatus = 'pendiente' | 'aprobada' | 'promocionado' | 'regular' | 'cursando';
 

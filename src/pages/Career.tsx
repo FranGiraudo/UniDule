@@ -11,27 +11,35 @@ import { SubjectDetailModal } from '../features/career/components/SubjectDetailM
 export function Career() {
   const [activeTab, setActiveTab] = useState('grid');
   const [selectedSubjectId, setSelectedSubjectId] = useState<string | null>(null);
-  const profile = useStore(state => state.profile);
+  const profile = useStore((state) => state.profile);
 
   return (
     <div className="view-content fade-in" style={{ animation: 'fadeUp 0.3s ease' }}>
       <div style={{ padding: '0 0 1rem' }}>
-        <div className="view-title" style={{ marginBottom: '0.25rem' }}>Plan de Carrera</div>
+        <div className="view-title" style={{ marginBottom: '0.25rem' }}>
+          Plan de Carrera
+        </div>
         <div className="view-sub">{profile?.career || 'Ingeniería en Informática — UTN'}</div>
       </div>
-      
+
       <div className="career-tab-bar">
-        {['grid', 'finals', 'stats', 'seminars', 'electives', 'map'].map(tab => (
-          <button 
+        {['grid', 'finals', 'stats', 'seminars', 'electives', 'map'].map((tab) => (
+          <button
             key={tab}
-            className={`career-tab ${activeTab === tab ? 'active' : ''}`} 
+            className={`career-tab ${activeTab === tab ? 'active' : ''}`}
             onClick={() => setActiveTab(tab)}
           >
-            {tab === 'grid' ? 'Plan' :
-             tab === 'finals' ? 'Finales' :
-             tab === 'stats' ? 'Estadísticas' :
-             tab === 'seminars' ? 'Seminarios' :
-             tab === 'electives' ? 'Electivas' : 'Mapa'}
+            {tab === 'grid'
+              ? 'Plan'
+              : tab === 'finals'
+                ? 'Finales'
+                : tab === 'stats'
+                  ? 'Estadísticas'
+                  : tab === 'seminars'
+                    ? 'Seminarios'
+                    : tab === 'electives'
+                      ? 'Electivas'
+                      : 'Mapa'}
           </button>
         ))}
       </div>
@@ -46,9 +54,10 @@ export function Career() {
       </div>
 
       {selectedSubjectId && (
-        <SubjectDetailModal 
-          subjectId={selectedSubjectId} 
-          onClose={() => setSelectedSubjectId(null)} 
+        <SubjectDetailModal
+          key={selectedSubjectId}
+          subjectId={selectedSubjectId}
+          onClose={() => setSelectedSubjectId(null)}
         />
       )}
     </div>

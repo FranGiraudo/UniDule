@@ -11,7 +11,13 @@ import { saveTask } from '../features/tasks/lib/api';
 interface ScheduleSharePayload {
   type: 'unidule-schedule';
   v: 1;
-  data: Array<{ code: string; name: string; professor?: string; room?: string; schedules: ScheduleEvent[] }>;
+  data: Array<{
+    code: string;
+    name: string;
+    professor?: string;
+    room?: string;
+    schedules: ScheduleEvent[];
+  }>;
 }
 
 export function Settings() {
@@ -20,7 +26,7 @@ export function Settings() {
   const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const trackedSubjects = (career?.subjects || []).filter(s => s.activeId);
+  const trackedSubjects = (career?.subjects || []).filter((s) => s.activeId);
 
   const showToast = (text: string, type: 'success' | 'error' = 'success') => {
     setToast({ text, type });
@@ -30,10 +36,7 @@ export function Settings() {
   const handleThemeChange = async (newTheme: ThemeType) => {
     setTheme(newTheme);
     if (session && profile) {
-      await supabase
-        .from('user_profiles')
-        .update({ theme: newTheme })
-        .eq('id', session.user.id);
+      await supabase.from('user_profiles').update({ theme: newTheme }).eq('id', session.user.id);
     }
   };
 
@@ -57,7 +60,12 @@ export function Settings() {
         const tasksIn = Array.isArray(parsed.tasks) ? parsed.tasks : [];
         if (!subjectsIn.length && !tasksIn.length) throw new Error('empty');
 
-        if (!confirm(`Se cargarán ${subjectsIn.length} materia(s) y ${tasksIn.length} tarea(s). Esto sobrescribirá tus datos actuales para esas materias/tareas.`)) return;
+        if (
+          !confirm(
+            `Se cargarán ${subjectsIn.length} materia(s) y ${tasksIn.length} tarea(s). Esto sobrescribirá tus datos actuales para esas materias/tareas.`,
+          )
+        )
+          return;
 
         for (const s of subjectsIn) {
           await saveActiveSubject({
@@ -90,7 +98,7 @@ export function Settings() {
           });
         }
         showToast('Datos importados correctamente.');
-      } catch (err) {
+      } catch {
         showToast('El archivo no es un backup válido.', 'error');
       }
     };
@@ -102,10 +110,19 @@ export function Settings() {
     const dataToExport = {
       version: 1,
       exportedAt: new Date().toISOString(),
-      subjects: trackedSubjects.map(s => ({
-        code: s.id, name: s.name, color: s.color, professor: s.professor, room: s.room, email: s.email,
-        maxAbsences: s.maxAbsences, absences: s.absences, status: s.status, allowsPromotion: s.allowsPromotion,
-        schedules: s.schedules, grades: s.grades,
+      subjects: trackedSubjects.map((s) => ({
+        code: s.id,
+        name: s.name,
+        color: s.color,
+        professor: s.professor,
+        room: s.room,
+        email: s.email,
+        maxAbsences: s.maxAbsences,
+        absences: s.absences,
+        status: s.status,
+        allowsPromotion: s.allowsPromotion,
+        schedules: s.schedules,
+        grades: s.grades,
       })),
       tasks,
     };
@@ -122,8 +139,14 @@ export function Settings() {
 
   const handleGenerateCode = async () => {
     const scheds = trackedSubjects
-      .filter(s => s.schedules && s.schedules.length > 0)
-      .map(s => ({ code: s.id, name: s.name, professor: s.professor, room: s.room, schedules: s.schedules! }));
+      .filter((s) => s.schedules && s.schedules.length > 0)
+      .map((s) => ({
+        code: s.id,
+        name: s.name,
+        professor: s.professor,
+        room: s.room,
+        schedules: s.schedules!,
+      }));
     if (scheds.length === 0) {
       showToast('No tenés horarios cargados para compartir.', 'error');
       return;
@@ -133,7 +156,7 @@ export function Settings() {
       const code = btoa(encodeURIComponent(JSON.stringify(payload)));
       await navigator.clipboard.writeText(code);
       showToast('¡Horario copiado! Pasáselo a un compañero.');
-    } catch (e) {
+    } catch {
       showToast('Error generando el código.', 'error');
     }
   };
@@ -143,13 +166,23 @@ export function Settings() {
     if (!code) return;
     try {
       const decoded: ScheduleSharePayload = JSON.parse(decodeURIComponent(atob(code)));
-      if (decoded.type !== 'unidule-schedule' || !Array.isArray(decoded.data)) throw new Error('Invalid');
+      if (decoded.type !== 'unidule-schedule' || !Array.isArray(decoded.data))
+        throw new Error('Invalid');
 
       const allSubjects = useStore.getState().career?.subjects || [];
-      let added = 0, skipped = 0;
+      let added = 0,
+        skipped = 0;
       for (const extSub of decoded.data) {
-        const local = allSubjects.find(s => s.id === extSub.code || s.code === extSub.code || s.name.toLowerCase() === extSub.name.toLowerCase());
-        if (!local) { skipped++; continue; }
+        const local = allSubjects.find(
+          (s) =>
+            s.id === extSub.code ||
+            s.code === extSub.code ||
+            s.name.toLowerCase() === extSub.name.toLowerCase(),
+        );
+        if (!local) {
+          skipped++;
+          continue;
+        }
         await saveActiveSubject({
           id: local.id,
           name: local.name,
@@ -165,14 +198,19 @@ export function Settings() {
         });
         added++;
       }
-      showToast(`Se importaron los horarios de ${added} materia(s).${skipped ? ` ${skipped} no se encontraron en tu plan.` : ''}`);
-    } catch (e) {
+      showToast(
+        `Se importaron los horarios de ${added} materia(s).${skipped ? ` ${skipped} no se encontraron en tu plan.` : ''}`,
+      );
+    } catch {
       showToast('Código inválido. Asegurate de copiarlo completo.', 'error');
     }
   };
 
   return (
-    <div className="view-content fade-in" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div
+      className="view-content fade-in"
+      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+    >
       <header className="view-header">
         <div>
           <h2 className="view-title">Configuración & Perfil</h2>
@@ -180,23 +218,72 @@ export function Settings() {
         </div>
       </header>
 
-      <div style={{ maxWidth: '700px', margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingBottom: '3rem' }}>
-        
+      <div
+        style={{
+          maxWidth: '700px',
+          margin: '0 auto',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1.5rem',
+          paddingBottom: '3rem',
+        }}
+      >
         {/* PERFIL */}
         <div className="card" style={{ padding: '1.5rem', borderRadius: '12px' }}>
-          <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h3
+            style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
             <User size={20} style={{ color: 'var(--primary)' }} /> Perfil
           </h3>
           <div className="form-grid" style={{ gridTemplateColumns: '1fr', gap: '1rem' }}>
             <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text2)', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block' }}>Nombre</label>
-              <div className="f-input" style={{ padding: '0.75rem', background: 'var(--bg)', borderRadius: '8px', color: 'var(--text)' }}>
+              <label
+                style={{
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  color: 'var(--text2)',
+                  textTransform: 'uppercase',
+                  marginBottom: '0.25rem',
+                  display: 'block',
+                }}
+              >
+                Nombre
+              </label>
+              <div
+                className="f-input"
+                style={{
+                  padding: '0.75rem',
+                  background: 'var(--bg)',
+                  borderRadius: '8px',
+                  color: 'var(--text)',
+                }}
+              >
                 {profile?.name || 'Estudiante'}
               </div>
             </div>
             <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text2)', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block' }}>Carrera</label>
-              <div className="f-input" style={{ padding: '0.75rem', background: 'var(--bg)', borderRadius: '8px', color: 'var(--text)' }}>
+              <label
+                style={{
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  color: 'var(--text2)',
+                  textTransform: 'uppercase',
+                  marginBottom: '0.25rem',
+                  display: 'block',
+                }}
+              >
+                Carrera
+              </label>
+              <div
+                className="f-input"
+                style={{
+                  padding: '0.75rem',
+                  background: 'var(--bg)',
+                  borderRadius: '8px',
+                  color: 'var(--text)',
+                }}
+              >
                 {profile?.career || 'Ingeniería en Informática — IUA'}
               </div>
             </div>
@@ -205,92 +292,180 @@ export function Settings() {
 
         {/* PLAN DE ESTUDIO */}
         <div className="card" style={{ padding: '1.5rem', borderRadius: '12px' }}>
-          <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h3
+            style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
             <BookOpen size={20} style={{ color: 'var(--primary)' }} /> Plan de Estudio
           </h3>
-          
-          <div className="card" style={{ background: 'color-mix(in srgb, var(--primary) 10%, transparent)', padding: '1rem', marginBottom: '1.25rem', borderColor: 'color-mix(in srgb, var(--primary) 20%, transparent)' }}>
-            <div style={{ fontWeight: 800, color: 'var(--primary)', marginBottom: '0.25rem' }}>Plan {profile?.plan_id || '2016'}</div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text2)' }}>Este es tu plan de estudios activo actualmente.</div>
+
+          <div
+            className="card"
+            style={{
+              background: 'color-mix(in srgb, var(--primary) 10%, transparent)',
+              padding: '1rem',
+              marginBottom: '1.25rem',
+              borderColor: 'color-mix(in srgb, var(--primary) 20%, transparent)',
+            }}
+          >
+            <div style={{ fontWeight: 800, color: 'var(--primary)', marginBottom: '0.25rem' }}>
+              Plan {profile?.plan_id || '2016'}
+            </div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text2)' }}>
+              Este es tu plan de estudios activo actualmente.
+            </div>
           </div>
 
           <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
             <div style={{ fontWeight: 700, marginBottom: '0.25rem' }}>Simular Cambio de Plan</div>
             <p style={{ fontSize: '0.85rem', color: 'var(--text2)', marginBottom: '1rem' }}>
-              Comprueba qué materias te tomarían como equivalencias si decidís pasarte al nuevo Plan 2026.
+              Comprueba qué materias te tomarían como equivalencias si decidís pasarte al nuevo Plan
+              2026.
             </p>
-            <button className="btn btn-ghost" onClick={() => setShowSim(true)}>Simular Cambio</button>
+            <button className="btn btn-ghost" onClick={() => setShowSim(true)}>
+              Simular Cambio
+            </button>
           </div>
         </div>
 
         {/* APARIENCIA */}
         <div className="card" style={{ padding: '1.5rem', borderRadius: '12px' }}>
-          <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--primary)' }}><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/></svg>
+          <h3
+            style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ color: 'var(--primary)' }}
+            >
+              <path d="M12 2v4" />
+              <path d="M12 18v4" />
+              <path d="M4.93 4.93l2.83 2.83" />
+              <path d="M16.24 16.24l2.83 2.83" />
+              <path d="M2 12h4" />
+              <path d="M18 12h4" />
+              <path d="M4.93 19.07l2.83-2.83" />
+              <path d="M16.24 7.76l2.83-2.83" />
+            </svg>
             Apariencia (Tema)
           </h3>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text2)', marginBottom: '1rem' }}>El tema cambiará instantáneamente y se guardará en tu cuenta.</p>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text2)', marginBottom: '1rem' }}>
+            El tema cambiará instantáneamente y se guardará en tu cuenta.
+          </p>
           <select
             value={theme}
             onChange={(e) => handleThemeChange(e.target.value as ThemeType)}
             className="f-input"
-            style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: 'var(--bg)', color: 'var(--text)', outline: 'none' }}
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              borderRadius: '8px',
+              background: 'var(--bg)',
+              color: 'var(--text)',
+              outline: 'none',
+            }}
           >
             {Object.entries(THEMES).map(([key, t]) => (
-              <option key={key} value={key}>{t.name}</option>
+              <option key={key} value={key}>
+                {t.name}
+              </option>
             ))}
           </select>
         </div>
 
         {/* COMPARTIR */}
         <div className="card" style={{ padding: '1.5rem', borderRadius: '12px' }}>
-          <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h3
+            style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
             <Share2 size={20} style={{ color: 'var(--primary)' }} /> Compartir Horario
           </h3>
           <p style={{ fontSize: '0.85rem', color: 'var(--text2)', marginBottom: '1rem' }}>
-            Compartí tu grilla de horarios con compañeros, o pegá un código que te hayan pasado para no cargar todo a mano.
+            Compartí tu grilla de horarios con compañeros, o pegá un código que te hayan pasado para
+            no cargar todo a mano.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <button className="btn btn-primary" onClick={handleGenerateCode}>Generar Código</button>
-            <button className="btn btn-ghost" onClick={handleInputCode}>Ingresar Código</button>
+            <button className="btn btn-primary" onClick={handleGenerateCode}>
+              Generar Código
+            </button>
+            <button className="btn btn-ghost" onClick={handleInputCode}>
+              Ingresar Código
+            </button>
           </div>
         </div>
 
         {/* DATOS Y CUENTA */}
         <div className="card" style={{ padding: '1.5rem', borderRadius: '12px' }}>
-          <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h3
+            style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
             <Database size={20} style={{ color: 'var(--primary)' }} /> Datos y Respaldo
           </h3>
           <p style={{ fontSize: '0.85rem', color: 'var(--text2)', marginBottom: '1rem' }}>
             Sincronización en la nube activa.
           </p>
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>
-            <button className="btn btn-ghost" onClick={handleExportData}>Exportar mis datos (JSON)</button>
-            <input type="file" accept=".json" style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileChange} />
+            <button className="btn btn-ghost" onClick={handleExportData}>
+              Exportar mis datos (JSON)
+            </button>
+            <input
+              type="file"
+              accept=".json"
+              style={{ display: 'none' }}
+              ref={fileInputRef}
+              onChange={handleFileChange}
+            />
             <button className="btn btn-ghost" onClick={handleImportClick}>
               <Upload size={16} style={{ marginRight: '6px' }} /> Importar desde JSON
             </button>
           </div>
-          
-          <h3 style={{ margin: '0 0 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
+
+          <h3
+            style={{
+              margin: '0 0 1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              borderTop: '1px solid var(--border)',
+              paddingTop: '1.5rem',
+            }}
+          >
             <Shield size={20} style={{ color: 'var(--primary)' }} /> Cuenta
           </h3>
-          <button className="btn btn-ghost" style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' }} onClick={handleLogout}>
+          <button
+            className="btn btn-ghost"
+            style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' }}
+            onClick={handleLogout}
+          >
             <LogOut size={16} /> Cerrar Sesión
           </button>
         </div>
-
       </div>
 
       {toast && (
-        <div style={{
-          position: 'fixed', bottom: '2rem', left: '50%', transform: 'translateX(-50%)',
-          background: toast.type === 'error' ? '#ef4444' : 'var(--primary)',
-          color: toast.type === 'error' ? '#fff' : 'var(--bg)',
-          padding: '0.75rem 1.25rem', borderRadius: '8px', fontSize: '0.875rem', fontWeight: 600,
-          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-          zIndex: 9999, animation: 'fadeUp 0.3s ease'
-        }}>
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '2rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: toast.type === 'error' ? '#ef4444' : 'var(--primary)',
+            color: toast.type === 'error' ? '#fff' : 'var(--bg)',
+            padding: '0.75rem 1.25rem',
+            borderRadius: '8px',
+            fontSize: '0.875rem',
+            fontWeight: 600,
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            zIndex: 9999,
+            animation: 'fadeUp 0.3s ease',
+          }}
+        >
           {toast.text}
         </div>
       )}

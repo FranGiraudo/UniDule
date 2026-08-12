@@ -4,11 +4,11 @@ import { useStore } from '../store/useStore';
 import type { Subject, Task, Career, Seminar, Elective, Note } from '../types';
 
 export function useDataSync() {
-  const session = useStore(state => state.session);
-  const setCareer = useStore(state => state.setCareer);
-  const setTasks = useStore(state => state.setTasks);
-  const setNotes = useStore(state => state.setNotes);
-  const profile = useStore(state => state.profile);
+  const session = useStore((state) => state.session);
+  const setCareer = useStore((state) => state.setCareer);
+  const setTasks = useStore((state) => state.setTasks);
+  const setNotes = useStore((state) => state.setNotes);
+  const profile = useStore((state) => state.profile);
 
   useEffect(() => {
     if (!session || !profile) return;
@@ -25,16 +25,25 @@ export function useDataSync() {
         { data: progressData },
         { data: seminarsData },
         { data: electivesData },
-        { data: notesData }
+        { data: notesData },
       ] = await Promise.all([
         supabase.from('user_active_subjects').select('*').eq('user_id', uid),
         supabase.from('user_tasks').select('*').eq('user_id', uid),
         supabase.from('user_grades').select('*').eq('user_id', uid),
-        supabase.from('global_subjects').select('*').eq('plan_id', planId).order('year').order('semester'),
+        supabase
+          .from('global_subjects')
+          .select('*')
+          .eq('plan_id', planId)
+          .order('year')
+          .order('semester'),
         supabase.from('user_progress').select('*').eq('user_id', uid),
         supabase.from('user_seminars').select('*').eq('user_id', uid),
         supabase.from('global_electives').select('*').eq('plan_id', planId),
-        supabase.from('user_notes').select('*').eq('user_id', uid).order('note_date', { ascending: false })
+        supabase
+          .from('user_notes')
+          .select('*')
+          .eq('user_id', uid)
+          .order('note_date', { ascending: false }),
       ]);
 
       // Map Tasks
@@ -47,7 +56,7 @@ export function useDataSync() {
           dueDate: t.due_date,
           notes: t.notes || '',
           gradeId: t.grade_id,
-          done: t.done
+          done: t.done,
         }));
         setTasks(mappedTasks);
       }
@@ -58,7 +67,7 @@ export function useDataSync() {
         subject_id: n.subject_id,
         title: n.title,
         content: n.content || '',
-        note_date: n.note_date
+        note_date: n.note_date,
       }));
       setNotes(mappedNotes);
 
@@ -66,15 +75,19 @@ export function useDataSync() {
       if (globalSubsData) {
         const subjects: Subject[] = globalSubsData.map((g: any) => {
           const prog = (progressData || []).find((p: any) => p.global_id === g.code);
-          const active = (activeSubsData || []).find((a: any) => a.code === g.code || a.id === g.code);
+          const active = (activeSubsData || []).find(
+            (a: any) => a.code === g.code || a.id === g.code,
+          );
           const grades = active
-            ? (gradesData || []).filter((gr: any) => gr.active_subject_id === active.id).map((gr: any) => ({
-                id: gr.id,
-                type: gr.title,
-                score: gr.grade === null || gr.grade === undefined ? '' : gr.grade,
-                date: gr.date,
-                weight: gr.weight
-              }))
+            ? (gradesData || [])
+                .filter((gr: any) => gr.active_subject_id === active.id)
+                .map((gr: any) => ({
+                  id: gr.id,
+                  type: gr.title,
+                  score: gr.grade === null || gr.grade === undefined ? '' : gr.grade,
+                  date: gr.date,
+                  weight: gr.weight,
+                }))
             : undefined;
 
           return {
@@ -101,7 +114,7 @@ export function useDataSync() {
             absences: active?.absences ?? 0,
             maxAbsences: active?.max_absences ?? 6,
             allowsPromotion: !!active?.allows_promotion,
-            grades
+            grades,
           };
         });
 
@@ -113,11 +126,13 @@ export function useDataSync() {
           hours: s.hours,
           status: s.status,
           date: s.date,
-          notes: s.notes
+          notes: s.notes,
         }));
 
         const electives: Elective[] = (electivesData || []).map((e: any) => {
-          const prog = (progressData || []).find((p: any) => p.global_id === e.code && p.type === 'elective');
+          const prog = (progressData || []).find(
+            (p: any) => p.global_id === e.code && p.type === 'elective',
+          );
           return {
             id: e.code,
             code: e.code,
@@ -136,7 +151,7 @@ export function useDataSync() {
           name: profile?.career || 'Ingeniería',
           subjects,
           seminars,
-          electives
+          electives,
         };
 
         setCareer(career);
@@ -144,5 +159,5 @@ export function useDataSync() {
     }
 
     loadData();
-  }, [session, profile, setCareer, setTasks]);
+  }, [session, profile, setCareer, setTasks, setNotes]);
 }
