@@ -1,6 +1,6 @@
 # Deuda Técnica — UniDule
 
-**Última actualización:** 2026-08-12 (auditoría src/docs/audits/2026-08-12.md)
+**Última actualización:** 2026-08-12 (auditorías `src/docs/audits/2026-08-12.md`; incluye fixes de `TD-RF001` y parcial de `TD-RF007` aportados por otra sesión sobre la misma rama)
 
 ---
 
@@ -20,17 +20,9 @@
 
 - **Tipo:** Funcional (RF)
 - **Archivos afectados:** `src/shared/types/index.ts:5` (`SubjectStatus`), `src/features/career/lib/utils.ts` (`CAREER_STATUS_CFG`), `src/features/career/components/MapTab.tsx:180-201` (`getStatusStyle`), `src/features/career/components/GridTab.tsx:174`, `src/features/career/components/ElectivesTab.tsx:51`, `src/features/career/components/SubjectDetailModal.tsx:96,108,177-182` (clamp + `<select>` de estado), `src/features/subjects/components/SubjectModal.tsx:192`, `src/features/subjects/components/GradesModal.tsx:119`
-- **Descripción:** `SubjectModal.tsx:192` y `GradesModal.tsx:119` permiten elegir `status='libre'` desde sus `<select>`, pero `SubjectStatus` (`shared/types/index.ts:5`) no incluye `'libre'` en su unión de tipos, y `CAREER_STATUS_CFG` tampoco tiene esa key — todo componente que hace `CAREER_STATUS_CFG[cs] || CAREER_STATUS_CFG.pendiente` cae al fallback y muestra "Pendiente". En `MapTab.tsx`, el `switch` de `getStatusStyle` no tiene caso para `'libre'` y cae en el `default`, mostrando la etiqueta **"DISPONIBLE"**. **Ampliado en auditoría 2026-08-12:** el mismo bug de raíz afecta también a `'promocionado'` — es un valor válido de `SubjectStatus` y seleccionable desde `SubjectModal.tsx:191` y `GradesModal.tsx:118`, pero `CAREER_STATUS_CFG` tampoco tiene esa key, `MapTab.getStatusStyle` tampoco tiene ese caso (cae igual a `'DISPONIBLE'`), y `GridTab`/`ElectivesTab`/`SubjectDetailModal` caen al mismo fallback `'Pendiente'`. Además, el propio `<select>` de `SubjectDetailModal.tsx:177-182` no ofrece ni `'libre'` ni `'promocionado'` como opciones — si una materia ya tiene uno de esos estados (seteado desde la feature `subjects`), al abrir el modal de Carrera el `<select>` queda con una selección vacía/inconsistente.
-- **Riesgo:** en `MapTab` específicamente, mostrar "Disponible" para una materia que perdió la regularidad o que ya fue promocionada puede llevar a un estudiante a asumir que no necesita volver a cursarla, o a no darse cuenta de que ya la aprobó. El `<select>` sin opción correspondiente en `SubjectDetailModal` puede además llevar a resetear el estado real de la materia al guardar sin que el usuario lo note.
-- **Recomendación:** agregar `'libre'` y `'promocionado'` a `SubjectStatus` (`shared/types/index.ts`) y a `CAREER_STATUS_CFG` (`career/lib/utils.ts`, reusando el color de `ACTIVE_STATUS` en `subjects/lib/constants.ts` para consistencia visual), agregar ambos casos al `switch` de `getStatusStyle` en `MapTab.tsx`, y sumar las `<option>` faltantes al `<select>` de `SubjectDetailModal.tsx`.
-
-### TD-RF001 — El mapa de correlativas (`MapTab`) etiqueta materias bloqueadas como "Disponible"
-
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/features/career/components/MapTab.tsx:180-201,254`
-- **Descripción:** `getStatusStyle` solo distingue `aprobada`, `regular` y `cursando`; cualquier otro estado —incluidas materias con correlativas sin cumplir— cae en el mismo `default` y muestra la etiqueta `'DISPONIBLE'`. A diferencia de `GridTab.tsx:172-180` y `FinalsTab.tsx`, nunca llama a `getComputedStatus` para diferenciar `disponible` de `bloqueada`. El color de leyenda `V.nodeFillDisp` (línea 254) tampoco se usa en ningún nodo real (el `default` pinta con `V.nodeFill`), así que no hay ni siquiera contraste visual entre ambos estados. Detectado en auditoría 2026-08-11, confirmado sin cambios en 2026-08-12.
-- **Riesgo:** el mapa es la vista pensada para planificar qué cursar; decirle a un estudiante que una materia bloqueada está "Disponible" puede llevarlo a intentar anotarse en algo que no cumple correlativas, y contradice lo que la misma app muestra en `GridTab`/`FinalsTab` para la misma materia.
-- **Recomendación:** reemplazar el `switch (s.status)` de `getStatusStyle` por la misma lógica de `getComputedStatus(s, subjects)` que ya usan `GridTab` y `FinalsTab`, agregando una rama explícita para `bloqueada` que use `V.nodeFillBloq` (ya definido pero sin uso) en vez de reutilizar el color de disponible.
+- **Descripción:** `SubjectModal.tsx:192` y `GradesModal.tsx:119` permiten elegir `status='libre'` desde sus `<select>`, pero `SubjectStatus` (`shared/types/index.ts:5`) no incluía `'libre'` en su unión de tipos, y `CAREER_STATUS_CFG` tampoco tenía esa key — todo componente que hace `CAREER_STATUS_CFG[cs] || CAREER_STATUS_CFG.pendiente` caía al fallback y mostraba "Pendiente". En `MapTab.tsx`, el `switch` de `getStatusStyle` no tenía caso para `'libre'` y caía en el `default`, mostrando la etiqueta **"DISPONIBLE"**. **Parcialmente resuelto el 2026-08-12** (commit `8d1f063` de otra sesión sobre esta misma rama): se agregó `'libre'` a `SubjectStatus`, a `CAREER_STATUS_CFG` y al `switch` de `MapTab.getStatusStyle` — ese caso puntual ya funciona en los tres archivos. **Sigue sin resolver:** el mismo bug de raíz afecta también a `'promocionado'` — es un valor válido de `SubjectStatus` y seleccionable desde `SubjectModal.tsx:191` y `GradesModal.tsx:118`, pero `CAREER_STATUS_CFG` no tiene esa key, `MapTab.getStatusStyle` no tiene ese caso (cae a `'DISPONIBLE'`), y `GridTab`/`ElectivesTab`/`SubjectDetailModal` caen al fallback `'Pendiente'`. Además, el propio `<select>` de `SubjectDetailModal.tsx:177-182` sigue sin ofrecer ni `'libre'` ni `'promocionado'` como opciones — si una materia ya tiene uno de esos estados, al abrir el modal de Carrera el `<select>` queda con una selección vacía/inconsistente, independientemente del fix ya aplicado.
+- **Riesgo:** en `MapTab` específicamente, mostrar "Disponible" para una materia que ya fue promocionada puede llevar a un estudiante a no darse cuenta de que ya la aprobó. El `<select>` sin opción correspondiente en `SubjectDetailModal` puede además llevar a resetear el estado real de la materia al guardar sin que el usuario lo note.
+- **Recomendación:** replicar el mismo patrón ya aplicado para `'libre'` con `'promocionado'` (agregar a `SubjectStatus`, a `CAREER_STATUS_CFG` y al `switch` de `MapTab.tsx`), y sumar las `<option>` faltantes (`'libre'` y `'promocionado'`) al `<select>` de `SubjectDetailModal.tsx`.
 
 ### TD-RF002 — `PlanSimulationModal` es contenido 100% hardcodeado, no una simulación real
 
@@ -55,6 +47,14 @@
 - **Descripción:** `parseMd` aplica reemplazos regex (`**bold**`, `` `code` ``, listas) directamente sobre el contenido crudo de la nota, sin escapar `<`, `>` ni `&` antes de convertir a HTML. El resultado se inyecta con `dangerouslySetInnerHTML` en la tarjeta de la nota. Detectado en auditoría 2026-08-11, confirmado sin cambios en 2026-08-12 (verificado desde dos ángulos distintos: feature `subjects` y página `Subjects.tsx`).
 - **Riesgo:** cualquier texto con HTML/JS embebido pegado en una nota se renderiza literalmente — al menos self-XSS explotable por contenido pegado sin querer, y deja la puerta abierta a un problema mayor si en el futuro las notas se comparten entre usuarios (como ya ocurría con los horarios antes del fix de TD-RNF001). Nota adicional: la sesión de Supabase se persiste con la configuración por defecto del SDK (`localStorage`, sin `httpOnly`), así que un XSS explotado por esta vía también podría exponer el token de sesión del usuario, no solo el contenido de la página.
 - **Recomendación:** escapar `<`, `>`, `&`, `"` del contenido crudo antes de aplicar los reemplazos de `parseMd` (reusando `escapeHtml` de `shared/lib/utils.ts`, ya usado para el mismo propósito en `Schedule.tsx`), o cambiar el enfoque a un parser de markdown que sanitice por diseño (ej. `marked` + `DOMPurify`) en vez de regex manual.
+
+### TD-RNF007 — Re-renders innecesarios en `MapTab` y `StatsTab` por fallback a array vacío en cada render
+
+- **Tipo:** No funcional (RNF)
+- **Archivos afectados:** `src/features/career/components/MapTab.tsx:17`, `src/features/career/components/StatsTab.tsx:8`
+- **Descripción:** la declaración `const subjects = career?.subjects || [];` crea una nueva referencia de array en memoria en cada ciclo de renderizado de React. Esto hace que los hooks `useMemo` dependientes de `subjects` evalúen que hubo un cambio en sus dependencias, invalidando sus cálculos internos. Detectado en auditoría 2026-08-12 (sesión paralela sobre esta misma rama).
+- **Riesgo:** deterioro de performance. En componentes con alta interacción y gráficos complejos como `MapTab`, recalcular los datos y el layout SVG en cada render penaliza el rendimiento y provoca retrasos perceptibles en la UI.
+- **Recomendación:** definir una constante inmutable `const EMPTY_SUBJECTS: Subject[] = [];` fuera del componente para actuar como fallback de `career?.subjects || EMPTY_SUBJECTS`, o memoizar el array de subjects directamente si la referencia no puede ser estática.
 
 ## Media
 
@@ -87,7 +87,7 @@
 - **Tipo:** Funcional (RF)
 - **Archivos afectados:** `src/shared/components/layout/Sidebar.tsx:49`, `src/features/career/components/StatsTab.tsx:22,206`, `src/pages/Auth.tsx:13,268-270`, `src/pages/Career.tsx:22`, `src/pages/Settings.tsx:359,383`
 - **Descripción:** `Auth.tsx` ofrece tres planes de estudio distintos al registrarse, incluido "Plan 2000 (Abogacía UNC)". Sin embargo, `Sidebar.tsx:49` muestra siempre `"IUA · 2do Sem 2026"` como subtítulo fijo, y `StatsTab.tsx` calcula el "Título Intermedio" filtrando `subjects.filter(s => s.year <= 3)` (línea 22) y lo etiqueta siempre `"Analista de Sistemas Informáticos"` (línea 206), sin importar el `plan_id` real del usuario. **Ampliado en auditoría 2026-08-12:** el nombre de institución de respaldo también es inconsistente entre pantallas — `Career.tsx:22` usa el fallback `'Ingeniería en Informática — UTN'` mientras `Settings.tsx:359` usa `'Ingeniería en Informática — IUA'` para el mismo dato (`profile?.career` nulo). El plan por defecto también difiere: `Auth.tsx:13` asigna `planId = '2026'` al registrarse, mientras `Settings.tsx:383` muestra `Plan {profile?.plan_id || '2016'}` como fallback si `plan_id` llegara nulo.
-- **Riesgo:** un usuario del plan de Abogacía UNC ve branding y estadísticas de una carrera de informática que no cursa; el umbral `year <= 3` es una regla de negocio del plan de Ingeniería sin sentido para otro plan. Los fallbacks inconsistentes de institución/plan agravan el problema mostrando datos distintos según qué pantalla mire el usuario.
+- **Riesgo:** un usuario del plan de Abogacía UNC ve branding y estadísticas de una carrera de informática que no cursa; el umbral `year <= 3` es una regla de negocio del plan de Ingeniería sin sentido para otro plan. Los fallbacks inconsistentes de institución/plan agravan el problema mostrando datos distintos según qué pantalla mire el usuario. Este fallback silencioso a `'2016'` es además la causa raíz confirmada de un bug reportado por un usuario (ver `TD-RNF003`): con `plan_id` nulo en el perfil, `useDataSync` cargaba sistemáticamente el catálogo del plan 2016 y las notas de materias de otro plan aparecían como "Materia desconocida".
 - **Recomendación:** mover estos literales a configuración por `plan_id` (nombre de carrera, institución, título intermedio, año de corte si aplica) en un único lugar (`shared/lib/constants.ts` o similar) del que lean todas las páginas/componentes, en vez de hardcodearlos y duplicarlos con valores distintos; para planes sin título intermedio, ocultar esa tarjeta en `StatsTab`.
 
 ### TD-RF010 — Tareas auto-generadas desde evaluaciones usan tipos que `TaskModal` no reconoce
@@ -138,14 +138,6 @@
 - **Riesgo:** un usuario con lector de pantalla no puede identificar qué hace el botón de cerrar de ningún modal, ni varios botones de acción de las páginas principales; un usuario que navega solo con teclado no puede cerrar sesión, colapsar un año del plan de carrera, seleccionar una materia desde el mapa de correlativas, ni borrar un horario/evaluación sin mouse.
 - **Recomendación:** agregar `aria-label="Cerrar"` a los 8 botones `btn-icon` de cierre y `aria-label` a los botones de acción que hoy solo tienen `title`; cambiar los `<div onClick>` (`Sidebar.tsx:133`, `GridTab.tsx:136`, `SubjectModal.tsx:280`, `GradesModal.tsx:210`) por `<button>`, o agregarles `role="button"`, `tabIndex={0}` y un `onKeyDown` que dispare la acción en Enter/Espacio; para los nodos SVG de `MapTab.tsx`, agregar el mismo soporte de teclado o, como alternativa más simple, señalizar explícitamente `GridTab` como el camino accesible equivalente.
 
-### TD-RNF007 — Lógica de "correlativas aprobadas para rendir final" duplicada entre `GridTab` y `FinalsTab`
-
-- **Tipo:** No funcional (RNF)
-- **Archivos afectados:** `src/features/career/components/GridTab.tsx:176-180` (`canFinal`), `src/features/career/components/FinalsTab.tsx:59-62,169-172` (`missingToPass`/`canRendir`)
-- **Descripción:** cada componente reimplementa, de forma independiente, la misma regla de negocio — "todas las correlativas de la materia están en estado `aprobada`" — sin reusar un helper común de `career/lib/utils.ts`. Detectado en auditoría 2026-08-12.
-- **Riesgo:** un cambio futuro en la regla de correlatividad (por ejemplo, permitir rendir con correlativas regularizadas en vez de aprobadas) requiere tocar dos implementaciones independientes, con riesgo real de que queden desincronizadas.
-- **Recomendación:** extraer un helper `canSitFinal(subject, allSubjects)` a `career/lib/utils.ts` y usarlo desde ambos componentes.
-
 ### TD-RNF010 — Import de backup confía en el JSON sin validar shape, a diferencia del import de horario compartido
 
 - **Tipo:** No funcional (RNF)
@@ -161,6 +153,14 @@
 - **Descripción:** el único archivo de test del repo (`utils.test.ts`) cubre solo `t2m`/`m2t`, `formatDate`, `daysUntil` y `urgColor` — 4 de las 7 funciones exportadas en `utils.ts`. Faltan tests para `todayDay`, `nowMin`, `t2y`, `dur`, y notablemente **`escapeHtml`**, la función que sostiene el fix de seguridad de TD-RNF001 (XSS en exportación PDF y horarios compartidos), no tiene ningún test que impida una regresión silenciosa. `src/test/` solo tiene `setup.ts` (configuración de Vitest). No hay ningún test para `useStore.ts`, `useDataSync.ts`, `AuthProvider.tsx`, `ThemeProvider.tsx`, el routing de `App.tsx`, ni ningún componente de página o feature. Detectado en auditoría 2026-08-12.
 - **Riesgo:** sin test de regresión sobre `escapeHtml`, un refactor futuro de esa función (o de su forma de uso) podría reabrir silenciosamente el vector de XSS que ya se cerró en TD-RNF001, sin que ningún CI lo detecte. La ausencia total de tests sobre `useDataSync`/`AuthProvider`/routing tampoco da ninguna red de seguridad para los hallazgos de esta misma auditoría (TD-RF014, TD-RNF003) que tocan justamente esos archivos.
 - **Recomendación:** priorizar un test de regresión para `escapeHtml` (casos con `<script>`, atributos `on*`, comillas) y uno para el guard de `ProtectedRoute` en `App.tsx`; a partir de ahí, ampliar cobertura de forma incremental sobre `useDataSync`/`AuthProvider` en paralelo a que se resuelvan TD-RF014/TD-RNF003.
+
+### TD-RNF013 — Lógica de "correlativas aprobadas para rendir final" duplicada entre `GridTab` y `FinalsTab`
+
+- **Tipo:** No funcional (RNF)
+- **Archivos afectados:** `src/features/career/components/GridTab.tsx:176-180` (`canFinal`), `src/features/career/components/FinalsTab.tsx:59-62,169-172` (`missingToPass`/`canRendir`)
+- **Descripción:** cada componente reimplementa, de forma independiente, la misma regla de negocio — "todas las correlativas de la materia están en estado `aprobada`" — sin reusar un helper común de `career/lib/utils.ts`. Detectado en auditoría 2026-08-12.
+- **Riesgo:** un cambio futuro en la regla de correlatividad (por ejemplo, permitir rendir con correlativas regularizadas en vez de aprobadas) requiere tocar dos implementaciones independientes, con riesgo real de que queden desincronizadas.
+- **Recomendación:** extraer un helper `canSitFinal(subject, allSubjects)` a `career/lib/utils.ts` y usarlo desde ambos componentes.
 
 ## Baja
 
@@ -221,3 +221,10 @@
 - **Resuelto en:** 2026-08-11.
 - **Confirmado que sigue resuelto en:** auditoría 2026-08-12 (`src/docs/audits/2026-08-12.md`) — se verificó que `escapeHtml` (`shared/lib/utils.ts`) sigue aplicado a las 9 interpolaciones dinámicas de `exportPDF` en `Schedule.tsx`, y que `sanitizeSharePayload`/`sanitizeShareScheduleEvent` (`Settings.tsx`) siguen validando el shape completo de un código de horario compartido antes de persistirlo. Sin regresión.
 - **Fix:** se agregó `escapeHtml` (`src/shared/lib/utils.ts`) y se aplicó a todo el contenido dinámico interpolado en `exportPDF` (`src/pages/Schedule.tsx`) antes de pasarlo a `win.document.write(...)`: título/materia/tipo de tareas pendientes, nombre/color/horario/aula/tipo de cada bloque de clase y nombre/color de las materias activas. Además, `handleInputCode` (`src/pages/Settings.tsx`) ahora valida el shape completo del código pegado (`sanitizeSharePayload`/`sanitizeShareScheduleEvent`) — día dentro de una lista permitida, horarios con formato `HH:MM`, y todo texto (`professor`, `room`, `type`, `name`, `id`) saneado (sin `<`/`>`, longitud acotada) — antes de persistirlo vía `saveActiveSubject`.
+
+### TD-RF001 — El mapa de correlativas (`MapTab`) etiqueta materias bloqueadas como "Disponible"
+
+- **Tipo:** Funcional (RF)
+- **Detectado en:** auditoría 2026-08-11.
+- **Resuelto en:** 2026-08-12 (commit `3781937`, otra sesión sobre esta misma rama; verificado en esta auditoría).
+- **Fix:** se reemplazó el `switch (s.status)` en `getStatusStyle` de `MapTab.tsx` por `getComputedStatus(s, subjects)`. Se agregaron los casos específicos para `bloqueada` (usando `V.nodeFillBloq`) y `disponible` (usando `V.nodeFillDisp`), unificando la lógica con `GridTab`/`FinalsTab`. Verificado: coincide con la recomendación original del hallazgo.

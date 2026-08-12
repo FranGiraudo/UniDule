@@ -32,6 +32,12 @@ export const CAREER_STATUS_CFG: Record<
     border: 'rgba(74,222,128,.3)',
     label: 'Aprobada',
   },
+  libre: {
+    bg: 'rgba(239,68,68,.15)',
+    color: '#f87171',
+    border: 'rgba(239,68,68,.3)',
+    label: 'Libre',
+  },
   regular: {
     bg: 'rgba(167,139,250,.15)',
     color: '#a78bfa',
