@@ -37,10 +37,11 @@ export function Auth() {
         if (signInError) throw signInError;
 
         if (signInData.session) {
-          await supabase
+          const { error: profileError } = await supabase
             .from('user_profiles')
             .update({ plan_id: planId })
             .eq('id', signInData.session.user.id);
+          if (profileError) throw profileError;
         }
       }
     } catch (error: any) {
