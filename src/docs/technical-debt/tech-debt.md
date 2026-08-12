@@ -24,13 +24,6 @@
 - **Riesgo:** en `MapTab` específicamente, mostrar "Disponible" para una materia que ya fue promocionada puede llevar a un estudiante a no darse cuenta de que ya la aprobó. El `<select>` sin opción correspondiente en `SubjectDetailModal` puede además llevar a resetear el estado real de la materia al guardar sin que el usuario lo note.
 - **Recomendación:** replicar el mismo patrón ya aplicado para `'libre'` con `'promocionado'` (agregar a `SubjectStatus`, a `CAREER_STATUS_CFG` y al `switch` de `MapTab.tsx`), y sumar las `<option>` faltantes (`'libre'` y `'promocionado'`) al `<select>` de `SubjectDetailModal.tsx`.
 
-### TD-RF002 — `PlanSimulationModal` es contenido 100% hardcodeado, no una simulación real
-
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/features/career/components/PlanSimulationModal.tsx:1-245`, `src/pages/Settings.tsx:318-327,473`
-- **Descripción:** el propio comentario del código lo admite (línea 4): *"Hardcoded for the prompt's provided text... In a real scenario, this would be computed by comparing user progress with plan_id 2026 subjects' equivalent_ids"*. Las listas `riskSubjects` y `appliedEquivalences` son literales fijos que no leen `career`, `profile` ni ningún estado del usuario. Detectado en auditoría 2026-08-11, confirmado sin cambios en 2026-08-12 (el archivo creció a 245 líneas pero el contenido sigue siendo estático).
-- **Riesgo:** el botón "Simular Cambio" en Settings promete "comprobar qué materias te tomarían como equivalencias" según el progreso propio del usuario, pero todos ven exactamente el mismo listado, sin relación con su carrera real — una feature que aparenta funcionar pero engaña.
-- **Recomendación:** o bien implementar el cálculo real comparando `career.subjects`/`electives` del usuario contra las equivalencias del plan destino (tabla de equivalencias en Supabase), o quitar la feature/marcarla explícitamente como "Próximamente" hasta que exista esa tabla.
 
 ### TD-RF011 — `GradesModal` borra silenciosamente tareas ya completadas al quitar una nota vinculada
 
@@ -198,6 +191,13 @@
 - **Recomendación:** centralizar en una única constante en `shared/lib/` (o `shared/types/`) de la que las tres ubicaciones importen, ajustando cada uso al subconjunto de días que necesite.
 
 ## Resueltos
+
+### TD-RF002 — `PlanSimulationModal` es contenido 100% hardcodeado, no una simulación real
+
+- **Tipo:** Funcional (RF)
+- **Detectado en:** auditoría 2026-08-11
+- **Resuelto en:** 2026-08-12
+- **Fix:** Se implementó el cálculo real comparando el progreso del usuario contra la tabla de equivalencias (`equivalencies.ts`), procesando materias en riesgo, directas e integradoras dinámicamente en `PlanSimulationModal.tsx`.
 
 ### TD-RF003 — El ordenamiento de finales por vencimiento no hace nada
 
