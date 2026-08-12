@@ -2,6 +2,10 @@
 
 Project-specific instructions for Claude Code in this repo.
 
-## Git commits
+## Gobernanza del proyecto
 
-Follow the Conventional Commits rules defined in [AGENTS.md](./AGENTS.md) (shared with Antigravity and other agents working in this repo). Don't duplicate those rules here — read that file before creating a commit.
+Toda la gobernanza de este proyecto — arquitectura, prioridades, reglas generales, manejo de Supabase, convenciones de commits y ramas, protocolos de seguridad, gestión de documentación y deuda técnica, cobertura de testing, flujo QA y el reporte final obligatorio — vive en [AGENTS.md](./AGENTS.md) (compartido con Antigravity y cualquier otro agente compatible con AGENTS.md). Leé ese archivo completo antes de hacer cualquier cambio en este repo; no dupliques esas reglas acá.
+
+## Skills
+
+- `audit` (`.claude/skills/audit/`) — auditoría de código y consolidación de deuda técnica en `src/docs/technical-debt/tech-debt.md`. Ver AGENTS.md § "Gestión de Deuda Técnica".
