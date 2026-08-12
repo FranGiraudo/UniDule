@@ -58,21 +58,6 @@
 
 ## Media
 
-### TD-RF003 — El ordenamiento de finales por vencimiento no hace nada
-
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/features/career/components/FinalsTab.tsx:69-76,174-177`
-- **Descripción:** el `<select>` de orden ofrece "Vencimiento más próximo" y "Vencimiento más lejano" (`exp-asc`/`exp-desc`), pero el comparador hace `return 0` en ambos casos, dejando la lista sin ordenar. El comentario en línea 70 (*"We don't have expDate in V2 yet"*) está desactualizado: el mismo archivo usa `expDate` unas líneas más abajo (175, 178) para calcular `daysLeft` y pintar los badges de vencimiento — el campo ya existe en `Subject.expDate` (`shared/types/index.ts:25`). Detectado en auditoría 2026-08-11, confirmado sin cambios en 2026-08-12; se confirma además que los `(s as any).expDate`/`(s as any).regDate` de las líneas 175-176 son casts innecesarios (el tipo ya tiene esos campos) que la corrección debería eliminar de paso, usando el helper `getDaysToExpiration` (ya importado) en vez del cast.
-- **Riesgo:** es una opción de UI visible que no hace lo que dice.
-- **Recomendación:** implementar el comparador real usando `getDaysToExpiration`/`expDate` (`a.expDate` vs `b.expDate`, con `null` al final) y quitar los casts `as any` ya innecesarios.
-
-### TD-RF004 — "Próximas Entregas" del Dashboard no ordena por fecha
-
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/pages/Dashboard.tsx:477-480`
-- **Descripción:** `tasks.filter((t) => !t.done).slice(0, 5).map(renderTask)` recorta las primeras 5 tareas pendientes en el orden en que llegan del store, sin ordenar por `dueDate`. `src/pages/Tasks.tsx:73-79` sí implementa el ordenamiento correcto (no hechas primero, luego por fecha ascendente) para la misma data. Detectado en auditoría 2026-08-11, confirmado sin cambios en 2026-08-12.
-- **Riesgo:** una tarea que vence en 60 días puede desplazar del widget a otra que vence mañana, justo en el panel pensado para avisar qué es urgente.
-- **Recomendación:** ordenar por `dueDate` ascendente (con `null` al final, igual que en `Tasks.tsx`) antes de aplicar `.slice(0, 5)`.
 
 ### TD-RF005 — Validación de notas inconsistente entre modales
 
@@ -213,6 +198,21 @@
 - **Recomendación:** centralizar en una única constante en `shared/lib/` (o `shared/types/`) de la que las tres ubicaciones importen, ajustando cada uso al subconjunto de días que necesite.
 
 ## Resueltos
+
+### TD-RF003 — El ordenamiento de finales por vencimiento no hace nada
+
+- **Tipo:** Funcional (RF)
+- **Detectado en:** auditoría 2026-08-11
+- **Resuelto en:** 2026-08-12
+- **Fix:** Se implementó el ordenamiento correcto usando `expDate` (descendente y ascendente) en `FinalsTab.tsx` y se removieron los casts de TypeScript desactualizados.
+
+### TD-RF004 — "Próximas Entregas" del Dashboard no ordena por fecha
+
+- **Tipo:** Funcional (RF)
+- **Detectado en:** auditoría 2026-08-11
+- **Resuelto en:** 2026-08-12
+- **Fix:** Se agregó `.sort` comparando `dueDate` ascendente (poniendo `null` al final) antes del `.slice(0, 5)` para asegurar que se muestren las tareas genuinamente más urgentes en el Dashboard.
+
 
 ### TD-RNF001 — Robo de sesión entre usuarios vía "Compartir Horario" + exportación PDF sin sanitizar
 
