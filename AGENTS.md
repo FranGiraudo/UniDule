@@ -9,7 +9,7 @@ UniDule es una aplicación de gestión académica personal (materias, tareas, ca
 ## Antes de cualquier cambio
 
 1. Analizar la arquitectura existente (`src/features/<name>/{components,lib}`, `src/pages`, `src/shared`).
-2. Revisar los archivos de `.claude/` y `.agent/` (skills disponibles, configuración) para no reinventar algo que ya existe como skill.
+2. Revisar los archivos de `.claude/`, `.agent/` y `.agents/` (skills disponibles, configuración) para no reinventar algo que ya existe como skill. `audit` e `improve` usan la convención legacy `.agent/`; `graphify` se instaló con la convención actual de Antigravity, `.agents/` (ambas siguen siendo válidas — Antigravity mantiene compatibilidad retroactiva con `.agent/`).
 3. Comprender el flujo completo afectado (UI → hook/store → `lib/api.ts` → Supabase) antes de tocar una sola capa.
 4. Evitar cambios innecesarios — no tocar código fuera del alcance pedido.
 
@@ -175,6 +175,7 @@ src/docs/
 ├── audits/          # Auditorías de código y calidad (ver skill `audit`)
 ├── architecture/    # Reportes de arquitectura
 ├── implementations/ # Documentación de features/implementaciones relevantes
+├── improvements/    # Mejoras propuestas y sus planes por etapas (MEJ-xxx, ver skill `improve`)
 ├── security/        # Reportes de seguridad (RLS, auth, hallazgos)
 ├── testing/         # Estrategias y evolución de cobertura
 ├── reports/         # Reportes de progreso por tarea
@@ -229,6 +230,33 @@ UniDule usa la skill `audit` (`.claude/skills/audit/` y `.agent/skills/audit/`) 
    - Recomendación.
 
 Ver `.claude/skills/audit/SKILL.md` para el criterio completo de clasificación RF/RNF y el formato exacto.
+
+## Gestión de Mejoras Propuestas
+
+UniDule usa la skill `improve` (`.claude/skills/improve/` y `.agent/skills/improve/`) para proponer mejoras que no son deuda técnica — código que funciona pero podría ser mejor en arquitectura, performance, developer experience, testing estratégico, seguridad proactiva o producto/UX — y también sugerencias de funcionalidad nueva: capacidades que UniDule todavía no tiene pero que encajan con su dominio (gestión académica) y con lo que el código o el modelo de datos ya anticipan (ej. una columna de Supabase sin usar, un campo del tipo de dominio sin consumir). A diferencia de `audit`, cada mejora o funcionalidad se documenta en un archivo propio bajo `src/docs/improvements/` con una planificación por etapas explícita y verificable, no solo una recomendación corta. `improve` solo planifica — nunca modifica código.
+
+Se ejecuta solo a pedido explícito del usuario, nunca como parte de una tarea puntual sin relación (ver "Scope Control"). Cada ítem se identifica como `MEJ-xxx`, secuencia correlativa única que nunca se reutiliza. El índice general vive en `src/docs/improvements/mejoras.md`; el plan detallado de cada mejora, en `src/docs/improvements/MEJ-xxx-<slug>.md`.
+
+Ver `.claude/skills/improve/SKILL.md` para el criterio completo de categorización y el formato exacto de los planes.
+
+### Ejecución de mejoras planificadas
+
+Una vez que una mejora tiene su plan por etapas, se implementa con la skill `planific` (`.claude/skills/planific/` y `.agent/skills/planific/`) — a diferencia de `improve`, esta skill sí modifica código. Recorre el plan etapa por etapa, corre la verificación de cada una (`tsc -b`, `lint`, `test:run`, y los pasos de QA manual que el plan describa, confirmados por el usuario) y crea una rama de Git dedicada para las etapas que el plan marcó como punto de confirmación obligatoria o que tocan más de 3 archivos — mismos criterios de riesgo/tamaño que ya definen § "Protocolo antes de implementar funcionalidades grandes" y § "Protocolo de seguridad antes de cambios riesgosos" de este documento. Las etapas chicas y sin riesgo se aplican directo sobre la rama general de la mejora (la "Rama sugerida" del plan). Al terminar todas las etapas, sigue el mismo cierre que cualquier tarea de código: reporte en `src/docs/reports/` y el bloque `REPORTE_INICIO`/`REPORTE_FIN` de § "Reporte Final Obligatorio".
+
+Ver `.claude/skills/planific/SKILL.md` para el flujo completo de ejecución, resolución de rama por etapa, y manejo de corridas parciales/reanudación.
+
+## Grafo de Conocimiento (graphify)
+
+UniDule usa `graphify` (`.claude/skills/graphify/` y `.agents/skills/graphify/`) para mantener un grafo de conocimiento del código en `graphify-out/` (nodos, comunidades, relaciones entre archivos). Reglas:
+
+1. Antes de leer archivos a ciegas o hacer `grep` exploratorio para responder preguntas sobre arquitectura o relaciones entre archivos, si existe `graphify-out/graph.json` correr `graphify query "<pregunta>"` (o `graphify path "A" "B"` / `graphify explain "<concepto>"`) en vez de recorrer el código manualmente.
+2. El grafo se regenera solo:
+   - Un hook `post-commit`/`post-checkout` en `.git/hooks/` reconstruye la parte AST del grafo automáticamente después de cada commit/checkout (sin costo de LLM).
+   - Un hook `PreToolUse` en `.claude/settings.json` (Claude Code) y una regla `always_on` en `.agents/rules/graphify.md` (Antigravity) recuerdan consultar el grafo antes de leer archivos sueltos.
+3. Tras cambios de código dentro de una misma sesión, correr `graphify update .` para refrescar el grafo sin esperar al commit.
+4. `graphify-out/` no debe versionarse a mano — es un artefacto regenerable; agregarlo a `.gitignore` si el equipo no quiere trackear el output binario/HTML.
+
+Ver `.claude/skills/graphify/SKILL.md` para el pipeline completo (`/graphify`, `/graphify query`, `/graphify path`, `/graphify explain`).
 
 ## Cobertura de Testing
 

@@ -20,6 +20,9 @@ dist-ssr
 # Test coverage
 coverage
 
+# graphify: grafo de conocimiento regenerable (graphify update . / graphify extract .)
+graphify-out/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
