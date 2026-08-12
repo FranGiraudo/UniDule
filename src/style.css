@@ -128,7 +128,7 @@ body {
   padding: 0.625rem 0.4375rem;
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
+  gap: 0.375rem;
   overflow: hidden;
 }
 .nav-section {
@@ -153,6 +153,7 @@ body {
   overflow: hidden;
   border: 1px solid transparent;
   user-select: none;
+  text-decoration: none;
 }
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.05);
@@ -918,6 +919,7 @@ body {
   flex: 1;
   user-select: none;
   min-width: 0;
+  text-decoration: none;
 }
 .bnav-item:active {
   transform: scale(0.92);
@@ -1853,12 +1855,12 @@ input[type='time']::-webkit-calendar-picker-indicator {
    KEYCHRON / PS1 THEME OVERRIDES
    Activo cuando <body> tiene class theme-kps1
 ══════════════════════════════════════════════ */
-.theme-kps1 * {
+.theme-3d * {
   font-family: 'IBM Plex Mono', monospace;
 }
 
 /* Botones estilo keycap físico */
-.theme-kps1 .btn {
+.theme-3d .btn {
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -1871,40 +1873,61 @@ input[type='time']::-webkit-calendar-picker-indicator {
   transition:
     transform 0.07s,
     box-shadow 0.07s;
+  margin-bottom: 3px;
 }
-.theme-kps1 .btn:active {
+.theme-3d .btn:active {
   transform: translateY(2px);
   box-shadow:
     0 1px 0 rgba(0, 0, 0, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  margin-bottom: 3px;
 }
-.theme-kps1 .btn-primary {
-  background: #cc2929 !important;
-  border-color: #8b1a1a !important;
-  color: #f5f0e8 !important;
+.theme-3d .btn-primary {
+  background: var(--primary) !important;
+  border-color: var(--border) !important;
+  color: var(--bg) !important;
   box-shadow:
-    0 3px 0 #6b0e0e,
+    0 3px 0 rgba(0,0,0,0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
-.theme-kps1 .btn-ghost {
-  background: #d0cbba !important;
-  border: 1.5px solid #9a9080 !important;
-  color: #1a1208 !important;
+.theme-3d .nav-item {
+  border-radius: 4px !important;
+  border: 1.5px solid transparent;
+  margin-bottom: 2px;
+}
+.theme-3d .nav-item.active {
+  background: var(--card2) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
   box-shadow:
-    0 3px 0 #7a7060,
+    0 2px 0 rgba(0,0,0,0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
-.theme-kps1 .btn-secondary {
-  background: #1a6fcc !important;
-  border-color: #0f4a8a !important;
-  color: #f5f0e8 !important;
+
+.theme-3d .btn-icon {
+  border-radius: 4px !important;
+  border: 1.5px solid var(--border) !important;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  transform: translateY(0);
+  background: var(--card2);
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.theme-3d .btn-icon:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+.theme-3d .btn-secondary {
+  background: var(--text2) !important;
+  border-color: var(--border) !important;
+  color: var(--bg) !important;
   box-shadow:
-    0 3px 0 #0a3060,
+    0 3px 0 rgba(0,0,0,0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 /* Nav items como teclas */
-.theme-kps1 .nav-item {
+.theme-3d .nav-item {
   border-radius: 4px !important;
   font-size: 0.72rem;
   font-weight: 600;
@@ -1917,26 +1940,26 @@ input[type='time']::-webkit-calendar-picker-indicator {
     box-shadow 0.07s,
     background 0.15s;
 }
-.theme-kps1 .nav-item:hover {
+.theme-3d .nav-item:hover {
   transform: translateY(1px);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.22);
 }
-.theme-kps1 .nav-item.active {
+.theme-3d .nav-item.active {
   transform: translateY(1px);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.18);
 }
-.theme-kps1 #sidebar {
-  border-right: 2px solid #9a9080 !important;
+.theme-3d #sidebar {
+  border-right: 2px solid var(--border) !important;
 }
-.theme-kps1 .s-footer {
-  border-top: 2px solid #9a9080 !important;
+.theme-3d .s-footer {
+  border-top: 2px solid var(--border) !important;
 }
 
 /* Topbar */
-.theme-kps1 #topbar {
-  border-bottom: 2px solid #9a9080 !important;
+.theme-3d #topbar {
+  border-bottom: 2px solid var(--border) !important;
 }
-.theme-kps1 #topbar-title {
+.theme-3d #topbar-title {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1944,55 +1967,55 @@ input[type='time']::-webkit-calendar-picker-indicator {
 }
 
 /* Inputs */
-.theme-kps1 .f-input,
-.theme-kps1 input,
-.theme-kps1 select,
-.theme-kps1 textarea {
+.theme-3d .f-input,
+.theme-3d input,
+.theme-3d select,
+.theme-3d textarea {
   font-family: 'IBM Plex Mono', monospace !important;
   border-radius: 4px !important;
-  border: 1.5px solid #9a9080 !important;
+  border: 1.5px solid var(--border) !important;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Modales */
-.theme-kps1 .modal-box {
+.theme-3d .modal-box {
   border-radius: 6px !important;
-  border: 2px solid #9a9080 !important;
+  border: 2px solid var(--border) !important;
 }
-.theme-kps1 .modal-title {
+.theme-3d .modal-title {
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-.theme-kps1 .m-header {
-  border-bottom: 2px solid #9a9080 !important;
+.theme-3d .m-header {
+  border-bottom: 2px solid var(--border) !important;
 }
-.theme-kps1 .m-footer {
-  border-top: 2px solid #9a9080 !important;
+.theme-3d .m-footer {
+  border-top: 2px solid var(--border) !important;
 }
 
 /* Stat cards con efecto keycap */
-.theme-kps1 .stat-card {
+.theme-3d .stat-card {
   border-radius: 5px !important;
-  border: 1.5px solid #9a9080 !important;
+  border: 1.5px solid var(--border) !important;
   box-shadow:
     0 3px 0 rgba(0, 0, 0, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 /* Sección títulos */
-.theme-kps1 .view-title,
-.theme-kps1 .section-title,
-.theme-kps1 .section-title-sm {
+.theme-3d .view-title,
+.theme-3d .section-title,
+.theme-3d .section-title-sm {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-weight: 800;
 }
 
 /* Canvas del mapa */
-.theme-kps1 .cm-canvas {
-  background: #d8d5ce !important;
-  border: 2px solid #b2afa6 !important;
+.theme-3d .cm-canvas {
+  background: var(--bg) !important;
+  border: 2px solid var(--border) !important;
   box-shadow:
     inset 0 2px 6px rgba(0, 0, 0, 0.08),
     0 2px 10px rgba(0, 0, 0, 0.1) !important;
@@ -2030,19 +2053,19 @@ input[type='time']::-webkit-calendar-picker-indicator {
 ══════════════════════════════════════════════ */
 
 /* Grid wrapper: pergamino limpio */
-.theme-kps1 .sched-wrap {
+.theme-3d .sched-wrap {
   background: var(--card) !important;
   border: 2px solid var(--border) !important;
   border-radius: 6px !important;
 }
 
 /* Columna de hoy */
-.theme-kps1 #sched-container > div > div:last-child > div[style*='border-left'] {
+.theme-3d #sched-container > div > div:last-child > div[style*='border-left'] {
   background: rgba(204, 41, 41, 0.04) !important;
 }
 
 /* Bloques de clase — keycap físico */
-.theme-kps1 .class-block {
+.theme-3d .class-block {
   border-radius: 3px !important;
   border-left-width: 4px !important;
   border-top: none !important;
@@ -2055,7 +2078,7 @@ input[type='time']::-webkit-calendar-picker-indicator {
     box-shadow 0.07s,
     filter 0.1s !important;
 }
-.theme-kps1 .class-block:hover {
+.theme-3d .class-block:hover {
   filter: brightness(1.06) !important;
   transform: translateY(1px) !important;
   box-shadow:
@@ -2064,26 +2087,26 @@ input[type='time']::-webkit-calendar-picker-indicator {
 }
 
 /* Texto dentro de los bloques */
-.theme-kps1 .cb-name {
+.theme-3d .cb-name {
   font-family: 'IBM Plex Mono', monospace !important;
   font-size: 0.62rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.01em !important;
   text-transform: uppercase !important;
 }
-.theme-kps1 .cb-type {
+.theme-3d .cb-type {
   font-family: 'IBM Plex Mono', monospace !important;
   font-size: 0.55rem !important;
   letter-spacing: 0.05em !important;
   text-transform: uppercase !important;
 }
-.theme-kps1 .cb-room {
+.theme-3d .cb-room {
   font-family: 'IBM Plex Mono', monospace !important;
   font-size: 0.5rem !important;
 }
 
 /* Headers de días — como leyendas de tecla */
-.theme-kps1 #sched-container [style*='font-weight:700;text-transform:uppercase'] {
+.theme-3d #sched-container [style*='font-weight:700;text-transform:uppercase'] {
   font-family: 'IBM Plex Mono', monospace !important;
   font-size: 0.6rem !important;
   letter-spacing: 0.12em !important;
@@ -2091,24 +2114,24 @@ input[type='time']::-webkit-calendar-picker-indicator {
 }
 
 /* Línea del tiempo actual — estilo scanline */
-.theme-kps1 .now-line {
-  background: #cc2929 !important;
+.theme-3d .now-line {
+  background: var(--primary) !important;
   height: 2px !important;
   opacity: 0.8;
 }
-.theme-kps1 .now-dot {
-  background: #cc2929 !important;
-  box-shadow: 0 0 4px #cc2929 !important;
+.theme-3d .now-dot {
+  background: var(--primary) !important;
+  box-shadow: 0 0 4px var(--primary) !important;
 }
 
 /* Labels de hora */
-.theme-kps1 [style*='font-size:10px'][style*='color:var(--text2)'] {
+.theme-3d [style*='font-size:10px'][style*='color:var(--text2)'] {
   font-family: 'IBM Plex Mono', monospace !important;
   letter-spacing: 0.04em !important;
 }
 
 /* Mobile day tabs */
-.theme-kps1 .day-tab {
+.theme-3d .day-tab {
   border-radius: 4px !important;
   box-shadow:
     0 2px 0 rgba(0, 0, 0, 0.2),
@@ -2118,17 +2141,17 @@ input[type='time']::-webkit-calendar-picker-indicator {
     transform 0.07s,
     box-shadow 0.07s !important;
 }
-.theme-kps1 .day-tab:hover {
+.theme-3d .day-tab:hover {
   transform: translateY(1px);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
 }
-.theme-kps1 .day-tab.active {
+.theme-3d .day-tab.active {
   transform: translateY(1px);
   box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.18);
 }
 
 /* Mobile class cards */
-.theme-kps1 .mobile-class-card {
+.theme-3d .mobile-class-card {
   border-radius: 4px !important;
   border-left-width: 4px !important;
   box-shadow:
@@ -2137,7 +2160,7 @@ input[type='time']::-webkit-calendar-picker-indicator {
 }
 
 /* Popup de clase */
-.theme-kps1 #class-popup-box {
+.theme-3d #class-popup-box {
   font-family: 'IBM Plex Mono', monospace !important;
   border-radius: 5px !important;
   border: 2px solid var(--border) !important;
