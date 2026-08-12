@@ -476,6 +476,11 @@ export function Dashboard() {
             >
               {tasks
                 .filter((t) => !t.done)
+                .sort((a, b) => {
+                  if (!a.dueDate) return 1;
+                  if (!b.dueDate) return -1;
+                  return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+                })
                 .slice(0, 5)
                 .map(renderTask)}
               {tasks.filter((t) => !t.done).length === 0 && (
