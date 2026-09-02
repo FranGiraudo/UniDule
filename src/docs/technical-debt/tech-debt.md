@@ -6,23 +6,11 @@
 
 ## Crítica
 
-### TD-RF009 — Editar una materia desde `SubjectModal` resetea las inasistencias a 0 silenciosamente
 
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/features/subjects/components/SubjectModal.tsx:75-93` (`handleSave`), `src/features/subjects/lib/api.ts:42` (`saveActiveSubject`, `absences: sub.absences ?? 0`)
-- **Descripción:** el payload que arma `handleSave` en `SubjectModal` para `saveActiveSubject` no incluye la propiedad `absences`. Como `saveActiveSubject` defaultea a `absences: sub.absences ?? 0` cuando el campo no llega, cada vez que se edita una materia activa desde este modal (cambiar profesor, aula, email, máximo de inasistencias, estado, o agregar/editar un horario) el contador de inasistencias actuales se sobrescribe a 0 tanto en Supabase (`user_active_subjects`) como en el store local, sin ningún aviso. `GradesModal.tsx:45`, la otra vía de edición de la misma materia, sí reenvía `absences: subject.absences` correctamente — es la única de las dos rutas que lo hace bien. Detectado en auditoría 2026-08-12.
-- **Riesgo:** pérdida de datos reales del usuario en un flujo de uso muy frecuente — cualquier edición de una materia que se está cursando pisa las inasistencias ya registradas. El usuario no tiene forma de notar el reseteo hasta que revisa el contador y ya perdió el historial acumulado.
-- **Recomendación:** agregar `absences: subject?.absences` al payload de `SubjectModal.handleSave`. Adicionalmente, hacer que `saveActiveSubject` preserve el valor existente (vía upsert parcial o lectura previa) en vez de defaultear silenciosamente a 0 cuando el campo no llega, para que esta clase de omisión no pueda repetirse en otro punto de la app.
 
 ## Alta
 
-### TD-RF007 — Los estados `'libre'` y `'promocionado'` no los reconoce de forma consistente ningún componente de estilos de Carrera
 
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/shared/types/index.ts:5` (`SubjectStatus`), `src/features/career/lib/utils.ts` (`CAREER_STATUS_CFG`), `src/features/career/components/MapTab.tsx:180-201` (`getStatusStyle`), `src/features/career/components/GridTab.tsx:174`, `src/features/career/components/ElectivesTab.tsx:51`, `src/features/career/components/SubjectDetailModal.tsx:96,108,177-182` (clamp + `<select>` de estado), `src/features/subjects/components/SubjectModal.tsx:192`, `src/features/subjects/components/GradesModal.tsx:119`
-- **Descripción:** `SubjectModal.tsx:192` y `GradesModal.tsx:119` permiten elegir `status='libre'` desde sus `<select>`, pero `SubjectStatus` (`shared/types/index.ts:5`) no incluía `'libre'` en su unión de tipos, y `CAREER_STATUS_CFG` tampoco tenía esa key — todo componente que hace `CAREER_STATUS_CFG[cs] || CAREER_STATUS_CFG.pendiente` caía al fallback y mostraba "Pendiente". En `MapTab.tsx`, el `switch` de `getStatusStyle` no tenía caso para `'libre'` y caía en el `default`, mostrando la etiqueta **"DISPONIBLE"**. **Parcialmente resuelto el 2026-08-12** (commit `8d1f063` de otra sesión sobre esta misma rama): se agregó `'libre'` a `SubjectStatus`, a `CAREER_STATUS_CFG` y al `switch` de `MapTab.getStatusStyle` — ese caso puntual ya funciona en los tres archivos. **Sigue sin resolver:** el mismo bug de raíz afecta también a `'promocionado'` — es un valor válido de `SubjectStatus` y seleccionable desde `SubjectModal.tsx:191` y `GradesModal.tsx:118`, pero `CAREER_STATUS_CFG` no tiene esa key, `MapTab.getStatusStyle` no tiene ese caso (cae a `'DISPONIBLE'`), y `GridTab`/`ElectivesTab`/`SubjectDetailModal` caen al fallback `'Pendiente'`. Además, el propio `<select>` de `SubjectDetailModal.tsx:177-182` sigue sin ofrecer ni `'libre'` ni `'promocionado'` como opciones — si una materia ya tiene uno de esos estados, al abrir el modal de Carrera el `<select>` queda con una selección vacía/inconsistente, independientemente del fix ya aplicado.
-- **Riesgo:** en `MapTab` específicamente, mostrar "Disponible" para una materia que ya fue promocionada puede llevar a un estudiante a no darse cuenta de que ya la aprobó. El `<select>` sin opción correspondiente en `SubjectDetailModal` puede además llevar a resetear el estado real de la materia al guardar sin que el usuario lo note.
-- **Recomendación:** replicar el mismo patrón ya aplicado para `'libre'` con `'promocionado'` (agregar a `SubjectStatus`, a `CAREER_STATUS_CFG` y al `switch` de `MapTab.tsx`), y sumar las `<option>` faltantes (`'libre'` y `'promocionado'`) al `<select>` de `SubjectDetailModal.tsx`.
 
 
 ### TD-RF011 — `GradesModal` borra silenciosamente tareas ya completadas al quitar una nota vinculada
@@ -191,6 +179,13 @@
 - **Recomendación:** centralizar en una única constante en `shared/lib/` (o `shared/types/`) de la que las tres ubicaciones importen, ajustando cada uso al subconjunto de días que necesite.
 
 ## Resueltos
+
+### TD-RF009 — Editar una materia desde `SubjectModal` resetea las inasistencias a 0 silenciosamente
+
+- **Tipo:** Funcional (RF)
+- **Detectado en:** auditoría 2026-08-12
+- **Resuelto en:** 2026-09-01
+- **Fix:** Se agregó `absences` al payload de `SubjectModal.tsx` al llamar a `saveActiveSubject`, y se actualizó `api.ts` para buscar el valor existente en Supabase mediante una consulta extra en caso de que `sub.absences` venga `undefined`, previniendo así un reseteo silencioso.
 
 ### TD-RF002 — `PlanSimulationModal` es contenido 100% hardcodeado, no una simulación real
 
