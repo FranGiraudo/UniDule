@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { X, Plus, Save } from 'lucide-react';
+import { parseGrade } from '../../../shared/lib/utils';
 import type { Grade, Subject } from '../../../shared/types';
 import { useStore } from '../../../shared/store/useStore';
 import { saveActiveSubject, syncGrades } from '../lib/api';
 import { updateSubjectProgress } from '../../career/lib/api';
 import { saveTask, deleteTask } from '../../tasks/lib/api';
-import { GRADE_TYPES, EXAM_TYPES } from '../lib/constants';
+import { GRADE_TYPES } from '../lib/constants';
 
 interface Props {
   subject: Subject;
@@ -26,7 +27,7 @@ export function GradesModal({ subject, onClose }: Props) {
     setGrades(
       grades.map((g, idx) =>
         idx === i
-          ? { ...g, [field]: field === 'score' ? (value === '' ? '' : parseFloat(value)) : value }
+          ? { ...g, [field]: field === 'score' ? (value === '' ? '' : parseGrade(value) ?? '') : value }
           : g,
       ),
     );
@@ -65,7 +66,7 @@ export function GradesModal({ subject, onClose }: Props) {
           await saveTask({
             id: crypto.randomUUID(),
             title: `${g.type} — ${subject.name}`,
-            type: EXAM_TYPES.has(g.type) ? g.type : 'Tarea',
+            type: g.type.startsWith('Parcial') || g.type === 'Recuperatorio' ? 'Parcial' : g.type === 'Final' ? 'Final' : g.type === 'TP' ? 'Trabajo Práctico' : g.type === 'Lab' ? 'Laboratorio' : 'Tarea',
             subjectId: subject.id,
             gradeId: g.id,
             dueDate: g.date || null,

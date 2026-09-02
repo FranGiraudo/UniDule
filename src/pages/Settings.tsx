@@ -7,6 +7,7 @@ import { useState, useRef } from 'react';
 import { PlanSimulationModal } from '../features/career/components/PlanSimulationModal';
 import { saveActiveSubject, syncGrades } from '../features/subjects/lib/api';
 import { saveTask } from '../features/tasks/lib/api';
+import { getCareerConfig } from '../shared/lib/careerConfig';
 
 interface ScheduleSharePayload {
   type: 'unidule-schedule';
@@ -94,6 +95,7 @@ function sanitizeSharePayload(decoded: unknown): ScheduleSharePayload['data'] | 
 
 export function Settings() {
   const { session, profile, theme, setTheme, career, tasks } = useStore();
+  const careerCfg = getCareerConfig(profile?.plan_id);
   const [showSim, setShowSim] = useState(false);
   const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -356,7 +358,7 @@ export function Settings() {
                   color: 'var(--text)',
                 }}
               >
-                {profile?.career || 'Ingeniería en Informática — IUA'}
+                {profile?.career || careerCfg.institution}
               </div>
             </div>
           </div>
@@ -371,7 +373,7 @@ export function Settings() {
           </h3>
 
           <div
-            className="card"
+            className="notice-box"
             style={{
               background: 'color-mix(in srgb, var(--primary) 10%, transparent)',
               padding: '1rem',
@@ -380,7 +382,7 @@ export function Settings() {
             }}
           >
             <div style={{ fontWeight: 800, color: 'var(--primary)', marginBottom: '0.25rem' }}>
-              Plan {profile?.plan_id || '2016'}
+              Plan {careerCfg.id}
             </div>
             <div style={{ fontSize: '0.85rem', color: 'var(--text2)' }}>
               Este es tu plan de estudios activo actualmente.

@@ -17,30 +17,6 @@
 ## Media
 
 
-### TD-RF005 — Validación de notas inconsistente entre modales
-
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/features/subjects/components/GradesModal.tsx:25-32,189-191`, `src/features/career/components/SubjectDetailModal.tsx:60-63`, `src/features/tasks/components/GradePromptModal.tsx:30-37`
-- **Descripción:** `GradePromptModal` valida explícitamente el rango 0-10 antes de guardar. `SubjectDetailModal` clampea la nota final con `Math.min(10, Math.max(0, gv))` pero solo cuando `status === 'aprobada'`, y permite guardar con nota vacía (`finalGrade = null`) sin bloquear el guardado. `GradesModal` (editor de evaluaciones parciales) no aplica ningún clamp ni validación al `score`, solo la restricción visual `min`/`max` del `<input type="number">`, que no impide escribir un valor fuera de rango. Detectado en auditoría 2026-08-11, confirmado sin cambios en 2026-08-12.
-- **Riesgo:** el mismo dato (nota 0-10) tiene tres reglas de validación distintas según qué modal se use, facilitando notas de parcial fuera de rango o materias "Aprobadas" sin nota final.
-- **Recomendación:** extraer una función compartida `clampGrade`/`validateGrade` en `shared/lib/` y usarla en los tres modales; en `SubjectDetailModal`, bloquear el guardado si `status === 'aprobada'` y la nota quedó vacía.
-
-### TD-RF006 — Contenido hardcodeado para un solo plan de carrera, pese a que la app soporta varios
-
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/shared/components/layout/Sidebar.tsx:49`, `src/features/career/components/StatsTab.tsx:22,206`, `src/pages/Auth.tsx:13,268-270`, `src/pages/Career.tsx:22`, `src/pages/Settings.tsx:359,383`
-- **Descripción:** `Auth.tsx` ofrece tres planes de estudio distintos al registrarse, incluido "Plan 2000 (Abogacía UNC)". Sin embargo, `Sidebar.tsx:49` muestra siempre `"IUA · 2do Sem 2026"` como subtítulo fijo, y `StatsTab.tsx` calcula el "Título Intermedio" filtrando `subjects.filter(s => s.year <= 3)` (línea 22) y lo etiqueta siempre `"Analista de Sistemas Informáticos"` (línea 206), sin importar el `plan_id` real del usuario. **Ampliado en auditoría 2026-08-12:** el nombre de institución de respaldo también es inconsistente entre pantallas — `Career.tsx:22` usa el fallback `'Ingeniería en Informática — UTN'` mientras `Settings.tsx:359` usa `'Ingeniería en Informática — IUA'` para el mismo dato (`profile?.career` nulo). El plan por defecto también difiere: `Auth.tsx:13` asigna `planId = '2026'` al registrarse, mientras `Settings.tsx:383` muestra `Plan {profile?.plan_id || '2016'}` como fallback si `plan_id` llegara nulo.
-- **Riesgo:** un usuario del plan de Abogacía UNC ve branding y estadísticas de una carrera de informática que no cursa; el umbral `year <= 3` es una regla de negocio del plan de Ingeniería sin sentido para otro plan. Los fallbacks inconsistentes de institución/plan agravan el problema mostrando datos distintos según qué pantalla mire el usuario. Este fallback silencioso a `'2016'` es además la causa raíz confirmada de un bug reportado por un usuario (ver `TD-RNF003`): con `plan_id` nulo en el perfil, `useDataSync` cargaba sistemáticamente el catálogo del plan 2016 y las notas de materias de otro plan aparecían como "Materia desconocida".
-- **Recomendación:** mover estos literales a configuración por `plan_id` (nombre de carrera, institución, título intermedio, año de corte si aplica) en un único lugar (`shared/lib/constants.ts` o similar) del que lean todas las páginas/componentes, en vez de hardcodearlos y duplicarlos con valores distintos; para planes sin título intermedio, ocultar esa tarjeta en `StatsTab`.
-
-### TD-RF010 — Tareas auto-generadas desde evaluaciones usan tipos que `TaskModal` no reconoce
-
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/features/subjects/components/GradesModal.tsx:68`, `src/features/tasks/lib/constants.ts:1-9` (`TASK_TYPES`), `src/features/tasks/components/TaskModal.tsx:76-82`, `src/pages/Tasks.tsx:204-205`
-- **Descripción:** `GradesModal.handleSave` crea tareas con `type: EXAM_TYPES.has(g.type) ? g.type : 'Tarea'`, generando `task.type` como `'Parcial 1'`, `'Parcial 2'`, `'Parcial 3'` o `'Recuperatorio'`. Ninguno de esos valores existe en `TASK_TYPES` (que solo tiene `'Parcial'` genérico). Al abrir esa tarea en `TaskModal.tsx`, el `<select value={type}>` no tiene ninguna `<option>` que matchee, quedando con la selección en blanco. Efecto secundario: `TYPE_BG`/`TYPE_FG` en `Tasks.tsx:204-205` caen al color gris por defecto para esos tipos. Detectado en auditoría 2026-08-12.
-- **Riesgo:** cualquier tarea auto-generada desde una evaluación de nota (el flujo más común de creación de tareas de examen) muestra un `<select>` en blanco al editarla, y pierde su color distintivo en el listado.
-- **Recomendación:** agregar las variantes de examen a `TASK_TYPES`, o separar `type` (categoría visible en `TaskModal`) de un campo `examType`/`gradeType` propio para no mezclar ambos vocabularios.
-
 ### TD-RF014 — `useDataSync` no cancela cargas superadas, riesgo de pisar el store con datos de una carga vieja
 
 - **Tipo:** Funcional (RF)
@@ -156,6 +132,15 @@
 - **Recomendación:** centralizar en una única constante en `shared/lib/` (o `shared/types/`) de la que las tres ubicaciones importen, ajustando cada uso al subconjunto de días que necesite.
 
 ## Resueltos
+
+### TD-RF005 — Validación de notas inconsistente entre modales (Resuelto)
+- **Implementación:** Se creó una función centralizada `parseGrade` en `src/shared/lib/utils.ts` que convierte el string y clampea el valor numérico al rango de 0-10. Se la aplicó en `GradePromptModal`, `GradesModal` (evaluaciones parciales) y `SubjectDetailModal` (nota final). Además se agregó lógica en `SubjectDetailModal` para impedir guardar en estado "Aprobada" sin una nota final válida.
+
+### TD-RF006 — Contenido hardcodeado para un solo plan de carrera, pese a que la app soporta varios (Resuelto)
+- **Implementación:** Se introdujo `src/shared/lib/careerConfig.ts` con la constante `CAREER_PLANS`. Se reemplazaron todos los strings estáticos en `Auth.tsx`, `Sidebar.tsx`, `Career.tsx`, `StatsTab.tsx` y `Settings.tsx` para leer dinámicamente el nombre de la institución, plan y reglas del título intermedio de acuerdo al `profile.plan_id`. 
+
+### TD-RF010 — Tareas auto-generadas desde evaluaciones usan tipos que `TaskModal` no reconoce (Resuelto)
+- **Implementación:** Se modificó la creación automática de tareas en `GradesModal.tsx:68` para que mapee los valores de `g.type` ('Parcial 1', 'Final', etc.) a las categorías base existentes en `TASK_TYPES` ('Parcial', 'Final', 'Trabajo Práctico', 'Tarea'), logrando que el modal de tareas los reconozca e indexe de forma correcta.
 
 ### TD-RF011 — `GradesModal` borra silenciosamente tareas ya completadas al quitar una nota vinculada
 

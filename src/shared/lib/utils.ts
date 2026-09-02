@@ -52,3 +52,10 @@ const HTML_ESCAPES: Record<string, string> = {
 export function escapeHtml(value: unknown): string {
   return String(value ?? '').replace(/[&<>"']/g, (c) => HTML_ESCAPES[c]);
 }
+
+export function parseGrade(val: string | number | null | undefined): number | null {
+  if (val === null || val === undefined || val === '') return null;
+  const num = typeof val === 'string' ? parseFloat(val.replace(',', '.')) : val;
+  if (isNaN(num)) return null;
+  return Math.min(10, Math.max(0, num));
+}

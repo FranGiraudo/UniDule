@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Map, Calendar, LogOut, Settings, CheckSquare } from 'lucide-react';
+import { LayoutDashboard, Map, Calendar, LogOut, Settings, ListTodo } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { useStore } from '../../store/useStore';
+import { getCareerConfig } from '../../lib/careerConfig';
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
+  const { profile } = useStore();
+  const careerCfg = getCareerConfig(profile?.plan_id);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -46,7 +50,7 @@ export function Sidebar() {
         </div>
         <div className="s-logo-text">
           <h1>UniDule</h1>
-          <p>IUA · 2do Sem 2026</p>
+          <p>{careerCfg.shortInstitution} · {careerCfg.defaultSemester}</p>
         </div>
       </div>
 
@@ -91,7 +95,7 @@ export function Sidebar() {
 
         <NavLink to="/tasks" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <div className="nav-icon">
-            <CheckSquare size={18} />
+            <ListTodo size={18} />
           </div>
           <div className="nav-label">Tareas</div>
         </NavLink>

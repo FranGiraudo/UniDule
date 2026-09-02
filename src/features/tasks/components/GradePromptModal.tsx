@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
+import { parseGrade } from '../../../shared/lib/utils';
 import type { Task } from '../../../shared/types';
 import { useStore } from '../../../shared/store/useStore';
 import { syncGrades } from '../../subjects/lib/api';
+import { saveTask } from '../lib/api';
 
 interface Props {
   task: Task;
@@ -10,13 +12,11 @@ interface Props {
 }
 
 export function GradePromptModal({ task, onClose }: Props) {
-  const career = useStore((state) => state.career);
+  const { career } = useStore();
   const subject = career?.subjects.find((s) => s.id === task.subjectId);
   const grade = subject?.grades?.find((g) => g.id === task.gradeId);
 
-  const [score, setScore] = useState(
-    grade && grade.score !== '' && grade.score !== null ? String(grade.score) : '',
-  );
+  const [score, setScore] = useState(grade?.score?.toString() || '');
   const [saving, setSaving] = useState(false);
 
   const v = parseFloat(score);
@@ -28,20 +28,18 @@ export function GradePromptModal({ task, onClose }: Props) {
       return;
     }
     const raw = score.trim();
-    if (raw !== '') {
-      const num = parseFloat(raw);
-      if (isNaN(num) || num < 0 || num > 10) {
-        alert('Nota inválida. Ingresá un número entre 0 y 10.');
-        return;
-      }
+    const newScore = raw === '' ? '' : parseGrade(raw);
+    if (raw !== '' && newScore === null) {
+      alert('Nota inválida. Ingresá un número válido.');
+      return;
     }
     setSaving(true);
     try {
-      const newScore: number | '' = raw === '' ? '' : parseFloat(raw);
       const newGrades = subject.grades!.map((g) =>
-        g.id === grade.id ? { ...g, score: newScore } : g,
+        g.id === grade.id ? { ...g, score: newScore as any } : g,
       );
       await syncGrades(subject.id, newGrades);
+      await saveTask({ ...task, done: true });
       onClose();
     } catch (e: any) {
       alert('Error al guardar la nota: ' + (e?.message || e));

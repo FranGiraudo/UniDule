@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { Eye, EyeOff, GraduationCap } from 'lucide-react';
 import { supabase } from '../shared/lib/supabase';
 import { useStore } from '../shared/store/useStore';
+import { CAREER_PLANS, DEFAULT_PLAN_ID } from '../shared/lib/careerConfig';
 
 export function Auth() {
   const session = useStore((state) => state.session);
@@ -10,7 +11,7 @@ export function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [planId, setPlanId] = useState('2026');
+  const [planId, setPlanId] = useState(DEFAULT_PLAN_ID);
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ text: string; isError: boolean } | null>(null);
 
@@ -266,9 +267,11 @@ export function Auth() {
                 value={planId}
                 onChange={(e) => setPlanId(e.target.value)}
               >
-                <option value="2026">Plan 2026 (Ing. Informática IUA)</option>
-                <option value="2016">Plan 2016 (Ing. Informática IUA)</option>
-                <option value="unc-derecho">Plan 2000 (Abogacía UNC)</option>
+                {Object.values(CAREER_PLANS).map((plan) => (
+                  <option key={plan.id} value={plan.id}>
+                    Plan {plan.id} ({plan.institution})
+                  </option>
+                ))}
               </select>
             </div>
           )}

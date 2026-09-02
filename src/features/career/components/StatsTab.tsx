@@ -2,6 +2,7 @@ import { useStore } from '../../../shared/store/useStore';
 import { getComputedStatus } from '../lib/utils';
 import { useMemo } from 'react';
 import type { Subject } from '../../../shared/types';
+import { getCareerConfig } from '../../../shared/lib/careerConfig';
 import './stats.css'; // We'll create this to store the animations and complex styles
 
 const EMPTY_SUBJECTS: Subject[] = [];
@@ -9,6 +10,8 @@ const EMPTY_SUBJECTS: Subject[] = [];
 export function StatsTab() {
   const { career, profile } = useStore();
   const subjects = career?.subjects || EMPTY_SUBJECTS;
+
+  const careerCfg = getCareerConfig(profile?.plan_id);
 
   const stats = useMemo(() => {
     const total = subjects.length;
@@ -22,7 +25,8 @@ export function StatsTab() {
     const pctActual = total ? Math.round((aprobadas / total) * 100) : 0;
     const pctProy = total ? Math.round(((aprobadas + regulares) / total) * 100) : 0;
 
-    const analistaSubs = subjects.filter((s) => s.year <= 3);
+    const maxYear = careerCfg.intermediateTitle?.maxYear || 0;
+    const analistaSubs = maxYear > 0 ? subjects.filter((s) => s.year <= maxYear) : [];
     const anTotal = analistaSubs.length;
     const anAprob = analistaSubs.filter((s) => s.status === 'aprobada').length;
     const anReg = analistaSubs.filter((s) => s.status === 'regular').length;
@@ -92,7 +96,7 @@ export function StatsTab() {
       R,
       C,
     };
-  }, [subjects, profile?.theme]);
+  }, [subjects, profile?.theme, careerCfg.intermediateTitle?.maxYear]);
 
   const { R, C } = stats;
 
@@ -199,14 +203,15 @@ export function StatsTab() {
       </div>
 
       {/* Título Intermedio */}
-      <div className="premium-card premium-ring-col">
-        <div
-          className="ring-title-badge"
-          style={{ background: 'rgba(96,165,250,0.15)', color: '#60a5fa' }}
-        >
-          Título Intermedio
-        </div>
-        <div className="ring-title">Analista de Sistemas Informáticos</div>
+      {careerCfg.intermediateTitle && (
+        <div className="premium-card premium-ring-col">
+          <div
+            className="ring-title-badge"
+            style={{ background: 'rgba(96,165,250,0.15)', color: '#60a5fa' }}
+          >
+            Título Intermedio
+          </div>
+          <div className="ring-title">{careerCfg.intermediateTitle.name}</div>
 
         <svg
           width="180"
@@ -295,8 +300,9 @@ export function StatsTab() {
             </span>
             <span className="ring-stat-lbl">Total Requeridas</span>
           </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Mini Grid */}
       <div className="mini-stats-grid">

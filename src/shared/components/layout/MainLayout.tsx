@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from 'react-router-dom';
-import { LayoutDashboard, Map, Calendar, Settings, CheckSquare } from 'lucide-react';
+import { LayoutDashboard, Map, Calendar, Settings, ListTodo } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { useDataSync } from '../../hooks/useDataSync';
 
@@ -60,7 +60,7 @@ export function MainLayout() {
         </NavLink>
         <NavLink to="/tasks" className={({ isActive }) => `bnav-item ${isActive ? 'active' : ''}`}>
           <div className="bnav-icon">
-            <CheckSquare size={18} />
+            <ListTodo size={18} />
           </div>
           <div className="bnav-label">Tareas</div>
         </NavLink>

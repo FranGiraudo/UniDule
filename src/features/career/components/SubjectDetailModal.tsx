@@ -3,6 +3,7 @@ import { useStore } from '../../../shared/store/useStore';
 import { getComputedStatus, CAREER_STATUS_CFG } from '../lib/utils';
 import { updateSubjectProgress } from '../lib/api';
 import { X, Save } from 'lucide-react';
+import { parseGrade } from '../../../shared/lib/utils';
 
 interface Props {
   subjectId: string;
@@ -58,8 +59,12 @@ export function SubjectDetailModal({ subjectId, onClose }: Props) {
       let finalExp = null;
 
       if (status === 'aprobada') {
-        const gv = parseFloat(grade);
-        finalGrade = isNaN(gv) ? null : Math.min(10, Math.max(0, gv));
+        finalGrade = parseGrade(grade);
+        if (finalGrade === null) {
+          alert('Debes ingresar una nota final válida (0-10) para aprobar.');
+          setLoading(false);
+          return;
+        }
       }
 
       if (status === 'regular' || status === 'aprobada') {

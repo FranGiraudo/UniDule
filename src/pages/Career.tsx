@@ -8,10 +8,14 @@ import { ElectivesTab } from '../features/career/components/ElectivesTab';
 import { MapTab } from '../features/career/components/MapTab';
 import { SubjectDetailModal } from '../features/career/components/SubjectDetailModal';
 
+import { getCareerConfig } from '../shared/lib/careerConfig';
+
 export function Career() {
+  const { profile } = useStore();
   const [activeTab, setActiveTab] = useState('grid');
   const [selectedSubjectId, setSelectedSubjectId] = useState<string | null>(null);
-  const profile = useStore((state) => state.profile);
+
+  const careerCfg = getCareerConfig(profile?.plan_id);
 
   return (
     <div className="view-content fade-in" style={{ animation: 'fadeUp 0.3s ease' }}>
@@ -19,7 +23,7 @@ export function Career() {
         <div className="view-title" style={{ marginBottom: '0.25rem' }}>
           Plan de Carrera
         </div>
-        <div className="view-sub">{profile?.career || 'Ingeniería en Informática — UTN'}</div>
+        <div className="view-sub">{profile?.career || careerCfg.institution}</div>
       </div>
 
       <div className="career-tab-bar">
