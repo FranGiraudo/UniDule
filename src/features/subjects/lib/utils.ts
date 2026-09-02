@@ -1,6 +1,9 @@
+import { escapeHtml } from '../../../shared/lib/utils';
+
 export function parseMd(md?: string | null): string {
   if (!md) return '';
-  const html = md
+  const escaped = escapeHtml(md);
+  const html = escaped
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(
