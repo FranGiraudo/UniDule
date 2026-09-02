@@ -29,6 +29,12 @@ export async function saveActiveSubject(sub: ActiveSubjectInput) {
   const session = useStore.getState().session;
   if (!session) throw new Error('No session');
 
+  let currentAbsences = sub.absences;
+  if (currentAbsences === undefined) {
+    const { data } = await supabase.from('user_active_subjects').select('absences').eq('id', sub.id).single();
+    currentAbsences = data?.absences ?? 0;
+  }
+
   const payload = {
     id: sub.id,
     user_id: session.user.id,
@@ -39,7 +45,7 @@ export async function saveActiveSubject(sub: ActiveSubjectInput) {
     room: sub.room || '',
     email: sub.email || '',
     max_absences: sub.maxAbsences ?? 6,
-    absences: sub.absences ?? 0,
+    absences: currentAbsences,
     status: sub.status || 'cursando',
     allows_promotion: sub.allowsPromotion || false,
     schedule: sub.schedules || [],

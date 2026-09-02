@@ -81,6 +81,7 @@ export function SubjectModal({ subject, onClose }: Props) {
         email: email.trim(),
         maxAbsences,
         status,
+        absences: subject?.absences ?? 0,
         allowsPromotion: subject?.allowsPromotion,
         schedules: slots.map((s) => ({
           id: s.id,
@@ -188,8 +189,6 @@ export function SubjectModal({ subject, onClose }: Props) {
                 <option value="cursando">Cursando</option>
                 <option value="regular">Regular</option>
                 <option value="aprobada">Aprobada</option>
-                <option value="promocionado">Promocionada</option>
-                <option value="libre">Libre</option>
               </select>
             </div>
           </div>
