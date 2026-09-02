@@ -13,29 +13,6 @@
 
 
 
-### TD-RF011 — `GradesModal` borra silenciosamente tareas ya completadas al quitar una nota vinculada
-
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/features/subjects/components/GradesModal.tsx:79-82`
-- **Descripción:** el loop de limpieza de `handleSave` recorre `tasks` (la lista global de todas las materias, vía `useStore`) y borra cualquier tarea cuyo `gradeId` ya no esté entre las notas actuales — incluidas tareas con `done: true`. Si el usuario borra una fila de evaluación con `rmGrade` (incluso por error), la tarea vinculada desaparece sin confirmación ni aviso, aunque represente una entrega ya completada. Detectado en auditoría 2026-08-12.
-- **Riesgo:** pérdida silenciosa de contenido creado por el usuario (una tarea ya marcada como hecha) como efecto secundario de una acción que no advierte esa consecuencia.
-- **Recomendación:** pedir confirmación explícita antes de borrar tareas vinculadas a una nota eliminada, o preservar la tarea y solo desvincular su `gradeId` en vez de borrarla.
-
-### TD-RNF002 — Notas de usuario renderizadas con `dangerouslySetInnerHTML` sin sanitizar
-
-- **Tipo:** No funcional (RNF)
-- **Archivos afectados:** `src/features/subjects/lib/utils.ts:1-12` (`parseMd`), `src/pages/Subjects.tsx:405`
-- **Descripción:** `parseMd` aplica reemplazos regex (`**bold**`, `` `code` ``, listas) directamente sobre el contenido crudo de la nota, sin escapar `<`, `>` ni `&` antes de convertir a HTML. El resultado se inyecta con `dangerouslySetInnerHTML` en la tarjeta de la nota. Detectado en auditoría 2026-08-11, confirmado sin cambios en 2026-08-12 (verificado desde dos ángulos distintos: feature `subjects` y página `Subjects.tsx`).
-- **Riesgo:** cualquier texto con HTML/JS embebido pegado en una nota se renderiza literalmente — al menos self-XSS explotable por contenido pegado sin querer, y deja la puerta abierta a un problema mayor si en el futuro las notas se comparten entre usuarios (como ya ocurría con los horarios antes del fix de TD-RNF001). Nota adicional: la sesión de Supabase se persiste con la configuración por defecto del SDK (`localStorage`, sin `httpOnly`), así que un XSS explotado por esta vía también podría exponer el token de sesión del usuario, no solo el contenido de la página.
-- **Recomendación:** escapar `<`, `>`, `&`, `"` del contenido crudo antes de aplicar los reemplazos de `parseMd` (reusando `escapeHtml` de `shared/lib/utils.ts`, ya usado para el mismo propósito en `Schedule.tsx`), o cambiar el enfoque a un parser de markdown que sanitice por diseño (ej. `marked` + `DOMPurify`) en vez de regex manual.
-
-### TD-RNF007 — Re-renders innecesarios en `MapTab` y `StatsTab` por fallback a array vacío en cada render
-
-- **Tipo:** No funcional (RNF)
-- **Archivos afectados:** `src/features/career/components/MapTab.tsx:17`, `src/features/career/components/StatsTab.tsx:8`
-- **Descripción:** la declaración `const subjects = career?.subjects || [];` crea una nueva referencia de array en memoria en cada ciclo de renderizado de React. Esto hace que los hooks `useMemo` dependientes de `subjects` evalúen que hubo un cambio en sus dependencias, invalidando sus cálculos internos. Detectado en auditoría 2026-08-12 (sesión paralela sobre esta misma rama).
-- **Riesgo:** deterioro de performance. En componentes con alta interacción y gráficos complejos como `MapTab`, recalcular los datos y el layout SVG en cada render penaliza el rendimiento y provoca retrasos perceptibles en la UI.
-- **Recomendación:** definir una constante inmutable `const EMPTY_SUBJECTS: Subject[] = [];` fuera del componente para actuar como fallback de `career?.subjects || EMPTY_SUBJECTS`, o memoizar el array de subjects directamente si la referencia no puede ser estática.
 
 ## Media
 
@@ -179,6 +156,27 @@
 - **Recomendación:** centralizar en una única constante en `shared/lib/` (o `shared/types/`) de la que las tres ubicaciones importen, ajustando cada uso al subconjunto de días que necesite.
 
 ## Resueltos
+
+### TD-RF011 — `GradesModal` borra silenciosamente tareas ya completadas al quitar una nota vinculada
+
+- **Tipo:** Funcional (RF)
+- **Detectado en:** auditoría 2026-08-12
+- **Resuelto en:** 2026-09-01
+- **Fix:** Ahora, si la tarea vinculada a la nota ya está marcada como `done: true`, solo se desvincula su `gradeId` y se preserva, evitando perder entregas ya hechas accidentalmente. Si no estaba completada, se sigue eliminando como tarea pendiente huérfana.
+
+### TD-RNF002 — Notas de usuario renderizadas con `dangerouslySetInnerHTML` sin sanitizar
+
+- **Tipo:** No funcional (RNF)
+- **Detectado en:** auditoría 2026-08-11
+- **Resuelto en:** 2026-09-01
+- **Fix:** Se importó y usó `escapeHtml` desde `shared/lib/utils.ts` en `parseMd` para sanitizar la nota escapando los caracteres peligrosos (`<`, `>`, `&`, `"`) antes de aplicar los regex que inyectan el HTML de markdown.
+
+### TD-RNF007 — Re-renders innecesarios en `MapTab` y `StatsTab` por fallback a array vacío en cada render
+
+- **Tipo:** No funcional (RNF)
+- **Detectado en:** auditoría 2026-08-12
+- **Resuelto en:** 2026-09-01
+- **Fix:** Se extrajo `const EMPTY_SUBJECTS: Subject[] = [];` fuera del cuerpo de los componentes para asegurar que el array fallback de `career?.subjects` tenga la misma referencia estable en cada ciclo.
 
 ### TD-RF009 — Editar una materia desde `SubjectModal` resetea las inasistencias a 0 silenciosamente
 
