@@ -1,11 +1,14 @@
 import { useStore } from '../../../shared/store/useStore';
 import { getComputedStatus } from '../lib/utils';
 import { useMemo } from 'react';
+import type { Subject } from '../../../shared/types';
 import './stats.css'; // We'll create this to store the animations and complex styles
+
+const EMPTY_SUBJECTS: Subject[] = [];
 
 export function StatsTab() {
   const { career, profile } = useStore();
-  const subjects = career?.subjects || [];
+  const subjects = career?.subjects || EMPTY_SUBJECTS;
 
   const stats = useMemo(() => {
     const total = subjects.length;

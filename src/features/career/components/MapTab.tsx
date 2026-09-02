@@ -12,9 +12,11 @@ interface NodePos {
   w: number;
 }
 
+const EMPTY_SUBJECTS: Subject[] = [];
+
 export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => void }) {
   const { career, theme } = useStore();
-  const subjects = career?.subjects || [];
+  const subjects = career?.subjects || EMPTY_SUBJECTS;
 
   const [transform, setTransform] = useState({ x: 0, y: 0, s: 0.72 });
   const [hoverId, setHoverId] = useState<string | null>(null);
