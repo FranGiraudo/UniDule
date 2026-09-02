@@ -115,8 +115,6 @@ export function GradesModal({ subject, onClose }: Props) {
                 <option value="cursando">Cursando</option>
                 <option value="regular">Regular</option>
                 <option value="aprobada">Aprobada</option>
-                <option value="promocionado">Promocionada</option>
-                <option value="libre">Libre</option>
               </select>
             </div>
             <label

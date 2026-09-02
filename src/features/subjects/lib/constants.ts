@@ -38,9 +38,6 @@ export const ACTIVE_STATUS: Record<string, { label: string; color: string; bg: s
   regular: { label: 'Regular', color: '#60a5fa', bg: 'rgba(59,130,246,.12)' },
   aprobado: { label: 'Aprobada', color: '#4ade80', bg: 'rgba(34,197,94,.12)' },
   aprobada: { label: 'Aprobada', color: '#4ade80', bg: 'rgba(34,197,94,.12)' },
-  libre: { label: 'Libre', color: '#f87171', bg: 'rgba(239,68,68,.12)' },
-  promocionado: { label: 'Promocionada', color: '#fbbf24', bg: 'rgba(245,158,11,.12)' },
-  promocionada: { label: 'Promocionada', color: '#fbbf24', bg: 'rgba(245,158,11,.12)' },
   pendiente: { label: 'Pendiente', color: 'var(--text2)', bg: 'rgba(255,255,255,.05)' },
 };
 

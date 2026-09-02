@@ -195,13 +195,7 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
           text: V.textLight,
           label: 'CURSANDO',
         };
-      case 'libre':
-        return {
-          bg: V.gradeBad,
-          stroke: isPS1 ? '#5A1A1A' : '#6A1A1A',
-          text: V.textLight,
-          label: 'LIBRE',
-        };
+
       case 'bloqueada':
         return {
           bg: V.nodeFillBloq,
