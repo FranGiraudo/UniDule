@@ -78,7 +78,13 @@ export function GradesModal({ subject, onClose }: Props) {
       }
       const keepIds = new Set(grades.map((g) => g.id));
       for (const t of tasks) {
-        if (t.gradeId && !keepIds.has(t.gradeId)) await deleteTask(t.id);
+        if (t.gradeId && !keepIds.has(t.gradeId)) {
+          if (t.done) {
+            await saveTask({ ...t, gradeId: undefined });
+          } else {
+            await deleteTask(t.id);
+          }
+        }
       }
 
       onClose();
