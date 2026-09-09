@@ -2180,3 +2180,15 @@ input[type='time']::-webkit-calendar-picker-indicator {
   font-weight: 800;
   z-index: 9999;
 }
+
+/* DND Mode (MEJ-013) */
+body.dnd-active #sidebar,
+body.dnd-active #bottom-nav,
+body.dnd-active .view-header {
+  display: none !important;
+  opacity: 0;
+  pointer-events: none;
+}
+body.dnd-active {
+  background: var(--bg);
+}
