@@ -122,7 +122,7 @@ export async function syncGrades(activeSubjectId: string, grades: Grade[]) {
       user_id: uid,
       active_subject_id: activeSubjectId,
       title: g.type,
-      grade: g.score !== '' && g.score !== null ? g.score : null,
+      grade: g.score !== '' && g.score !== null ? g.score : -1,
       date: g.date || null,
       weight: g.weight ?? null,
     }));

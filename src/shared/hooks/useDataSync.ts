@@ -118,7 +118,7 @@ export function useDataSync() {
                 .map((gr: any) => ({
                   id: gr.id,
                   type: gr.title,
-                  score: gr.grade === null || gr.grade === undefined ? '' : gr.grade,
+                  score: gr.grade === null || gr.grade === undefined || gr.grade === -1 ? '' : gr.grade,
                   date: gr.date,
                   weight: gr.weight,
                 }))
