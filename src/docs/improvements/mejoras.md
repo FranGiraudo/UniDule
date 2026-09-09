@@ -221,3 +221,12 @@ _Sin ítems todavía._
 ## Descartadas
 
 _Sin ítems todavía._
+
+### MEJ-024 — Sección de Finales (Gestión Completa)
+
+- **Categoría:** Nueva Funcionalidad
+- **Impacto:** Alto
+- **Esfuerzo:** Alto
+- **Estado:** Propuesta
+- **Resumen:** Crear una sección dedicada para gestionar materias regulares que requieren rendir Final. Debe permitir visualizar materias disponibles para final, cargar fechas de mesas de exámenes, registrar intentos restantes, mostrar un countdown específico, y permitir vincular sesiones de estudio (Pomodoro) directamente a la preparación de ese final.
+- **Plan:** `src/docs/improvements/MEJ-024-seccion-finales.md`
