@@ -102,7 +102,7 @@
 - **Categoría:** Nueva Funcionalidad
 - **Impacto:** Alto
 - **Esfuerzo:** Medio
-- **Estado:** Propuesta
+- **Estado:** Completada
 - **Resumen:** Migrar la vista de horarios (Schedule) a un calendario con fechas reales, permitiendo navegar entre semanas pasadas y futuras, y agregando un toggle para vista mensual.
 - **Plan:** `src/docs/improvements/MEJ-011-agenda-fechas-reales.md`
 
