@@ -59,8 +59,14 @@ export function GradesModal({ subject, onClose }: Props) {
 
       // Keep a pending task in sync for every ungraded evaluation
       for (const g of grades) {
-        if (g.score !== '' && g.score !== null) continue;
         const existing = tasks.find((t) => t.gradeId === g.id);
+        if (g.score !== '' && g.score !== null) {
+          if (existing && !existing.done) {
+            await saveTask({ ...existing, done: true });
+          }
+          continue;
+        }
+        
         if (!existing) {
           await saveTask({
             id: crypto.randomUUID(),
@@ -78,7 +84,9 @@ export function GradesModal({ subject, onClose }: Props) {
       }
       const keepIds = new Set(grades.map((g) => g.id));
       for (const t of tasks) {
-        if (t.gradeId && !keepIds.has(t.gradeId)) await deleteTask(t.id);
+        if (t.subjectId === subject.id && t.gradeId && !keepIds.has(t.gradeId)) {
+          await deleteTask(t.id);
+        }
       }
 
       onClose();
