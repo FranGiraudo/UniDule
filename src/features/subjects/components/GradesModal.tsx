@@ -57,15 +57,10 @@ export function GradesModal({ subject, onClose }: Props) {
         subject.expDate ?? null,
       );
 
-      // Keep a pending task in sync for every ungraded evaluation
+      // Keep a task in sync for every evaluation
       for (const g of grades) {
         const existing = tasks.find((t) => t.gradeId === g.id);
-        if (g.score !== '' && g.score !== null) {
-          if (existing && !existing.done) {
-            await saveTask({ ...existing, done: true });
-          }
-          continue;
-        }
+        const hasScore = g.score !== '' && g.score !== null;
         
         if (!existing) {
           await saveTask({
@@ -76,10 +71,19 @@ export function GradesModal({ subject, onClose }: Props) {
             gradeId: g.id,
             dueDate: g.date || null,
             notes: '',
-            done: false,
+            done: hasScore,
           });
-        } else if (existing.dueDate !== (g.date || null)) {
-          await saveTask({ ...existing, dueDate: g.date || null });
+        } else {
+          const needsScoreUpdate = hasScore && !existing.done;
+          const needsDateUpdate = existing.dueDate !== (g.date || null);
+          
+          if (needsScoreUpdate || needsDateUpdate) {
+            await saveTask({
+              ...existing,
+              done: hasScore ? true : existing.done,
+              dueDate: g.date || null,
+            });
+          }
         }
       }
       const keepIds = new Set(grades.map((g) => g.id));
