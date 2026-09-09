@@ -378,10 +378,11 @@ export function Schedule() {
             <button
               onClick={() => setViewMode('week')}
               style={{
-                padding: '4px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 600, border: 'none',
-                background: viewMode === 'week' ? 'var(--bg3)' : 'transparent',
-                color: viewMode === 'week' ? 'var(--text)' : 'var(--text2)',
-                cursor: 'pointer'
+                padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 700, border: 'none',
+                background: viewMode === 'week' ? 'var(--text)' : 'transparent',
+                color: viewMode === 'week' ? 'var(--bg)' : 'var(--text2)',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
               }}
             >
               Semana
@@ -389,10 +390,11 @@ export function Schedule() {
             <button
               onClick={() => setViewMode('month')}
               style={{
-                padding: '4px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 600, border: 'none',
-                background: viewMode === 'month' ? 'var(--bg3)' : 'transparent',
-                color: viewMode === 'month' ? 'var(--text)' : 'var(--text2)',
-                cursor: 'pointer'
+                padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 700, border: 'none',
+                background: viewMode === 'month' ? 'var(--text)' : 'transparent',
+                color: viewMode === 'month' ? 'var(--bg)' : 'var(--text2)',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
               }}
             >
               Mes

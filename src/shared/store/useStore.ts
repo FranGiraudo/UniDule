@@ -13,15 +13,24 @@ interface AppState {
   eventCompletions: any[];
   studySessions: any[];
   theme: ThemeType;
+  settings: {
+    pomodoroTime: number;
+    shortBreakTime: number;
+    longBreakTime: number;
+    ambientSound: string;
+    dndMode: boolean;
+  };
   pomodoro: {
     timeLeft: number;
     isRunning: boolean;
     mode: 'pomodoro' | 'shortBreak' | 'longBreak';
     subjectId?: string;
     taskId?: string;
+    examId?: string;
   };
 
   // Actions
+  setSettings: (settings: Partial<AppState['settings']>) => void;
   setSession: (session: Session | null) => void;
   setProfile: (profile: SupabaseProfile | null) => void;
   setCareer: (career: Career | null) => void;
@@ -46,8 +55,16 @@ export const useStore = create<AppState>((set) => ({
   eventCompletions: [],
   studySessions: [],
   theme: 'keychron_ps1',
+  settings: {
+    pomodoroTime: 25,
+    shortBreakTime: 5,
+    longBreakTime: 15,
+    ambientSound: 'none',
+    dndMode: false,
+  },
   pomodoro: { timeLeft: 25 * 60, isRunning: false, mode: 'pomodoro' },
 
+  setSettings: (newSettings) => set((state) => ({ settings: { ...state.settings, ...newSettings } })),
   setSession: (session) => set({ session }),
   setProfile: (profile) => set({ profile }),
   setCareer: (career) => set({ career }),
