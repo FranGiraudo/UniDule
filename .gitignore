@@ -33,3 +33,6 @@ graphify-out/
 *.njsproj
 *.sln
 *.sw?
+
+# Antigravity Context
+.antigravity_context.md

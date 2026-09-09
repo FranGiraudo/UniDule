@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../shared/store/useStore';
 import { todayDay, nowMin, t2m, m2t, t2y, dur, escapeHtml } from '../shared/lib/utils';
-import type { Subject, ScheduleEvent } from '../shared/types';
 
-const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-const DSHORT = ['LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
+const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+const DSHORT = ['LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
 const GRID_START = '08:00';
 const GRID_END = '23:30';
 const PPM = 1.2;
@@ -33,7 +32,7 @@ export function Schedule() {
   const tm = t2m(GRID_END) - gs;
 
   const getBlocksForDay = (day: string) => {
-    const blocks: { s: Subject; sc: ScheduleEvent }[] = [];
+    const blocks: { s: any; sc: any }[] = [];
     subjects.forEach((s) => {
       s.schedules
         ?.filter((sc) => sc.day === day)
@@ -41,10 +40,40 @@ export function Schedule() {
           blocks.push({ s, sc });
         });
     });
+
+    const dayIndex = DAYS.indexOf(day) + 1;
+    const userEvents = useStore.getState().userEvents;
+    
+    userEvents.forEach((e) => {
+      let shouldShow = false;
+      if (e.isRecurring) {
+        if (e.dayOfWeek === dayIndex) shouldShow = true;
+      } else if (e.date) {
+        const parts = e.date.split('-');
+        if (parts.length === 3) {
+          const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+          let jsDay = d.getDay();
+          let myDay = jsDay === 0 ? 7 : jsDay;
+          if (myDay === dayIndex) shouldShow = true;
+        }
+      }
+
+      if (shouldShow) {
+        blocks.push({
+          s: { name: e.title, color: e.color || '#a855f7', room: '' },
+          sc: { 
+            startTime: e.startTime, 
+            endTime: e.endTime, 
+            type: e.category.charAt(0).toUpperCase() + e.category.slice(1) 
+          }
+        });
+      }
+    });
+
     return blocks.sort((a, b) => t2m(a.sc.startTime) - t2m(b.sc.startTime));
   };
 
-  const assignCols = (blocks: { s: Subject; sc: ScheduleEvent }[]) => {
+  const assignCols = (blocks: { s: any; sc: any }[]) => {
     const cols: number[] = [];
     return blocks
       .map((b) => {
@@ -408,7 +437,7 @@ export function Schedule() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             {/* DESKTOP HEADERS */}
-            <div style={{ display: 'flex', borderBottom: '1px solid var(--border)' }}>
+            <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', paddingRight: '6px' }}>
               <div style={{ minWidth: '54px', flexShrink: 0 }}></div>
               <div style={{ flex: 1, display: 'flex' }}>
                 {DAYS.map((d, i) => (

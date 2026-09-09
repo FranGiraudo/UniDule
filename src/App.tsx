@@ -12,6 +12,9 @@ import { Dashboard } from './pages/Dashboard';
 import { Career } from './pages/Career';
 import { Subjects } from './pages/Subjects';
 import { Tasks } from './pages/Tasks';
+import { Events } from './pages/Events';
+import { Study } from './pages/Study';
+import { Stats } from './pages/Stats';
 import { Schedule } from './pages/Schedule';
 import { Settings } from './pages/Settings';
 
@@ -41,6 +44,9 @@ export default function App() {
               <Route path="career" element={<Career />} />
               <Route path="subjects" element={<Subjects />} />
               <Route path="tasks" element={<Tasks />} />
+              <Route path="events" element={<Events />} />
+              <Route path="study" element={<Study />} />
+              <Route path="stats" element={<Stats />} />
               <Route path="schedule" element={<Schedule />} />
               <Route path="settings" element={<Settings />} />
             </Route>

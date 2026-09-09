@@ -112,3 +112,17 @@ export interface SupabaseProfile {
   theme: ThemeType;
   plan_id: string | null;
 }
+
+export type EventCategory = 'estudio' | 'trabajo' | 'gimnasio' | 'otro';
+
+export interface UserEvent {
+  id: string;
+  title: string;
+  category: EventCategory;
+  startTime: string;
+  endTime: string;
+  isRecurring: boolean;
+  date?: string | null;
+  dayOfWeek?: number | null;
+  color?: string | null;
+}

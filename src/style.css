@@ -25,6 +25,9 @@
   margin: 0;
   padding: 0;
 }
+a {
+  text-decoration: none;
+}
 html {
   scroll-behavior: smooth;
   font-size: 16px;
@@ -1315,6 +1318,10 @@ input[type='number'] {
   /* Bottom nav visible */
   #bottom-nav {
     display: flex;
+    overflow-x: auto;
+  }
+  #bottom-nav::-webkit-scrollbar {
+    display: none;
   }
 
   /* Main shrinks to full width; extra padding for bottom nav */

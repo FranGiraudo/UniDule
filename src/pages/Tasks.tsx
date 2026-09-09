@@ -8,6 +8,7 @@ import { EXAM_TYPES } from '../features/subjects/lib/constants';
 import { daysUntil, urgColor, formatDate } from '../shared/lib/utils';
 import { TaskModal } from '../features/tasks/components/TaskModal';
 import { GradePromptModal } from '../features/tasks/components/GradePromptModal';
+import { ConfirmModal } from '../shared/components/ui/ConfirmModal';
 import type { Task } from '../shared/types';
 
 type Filter = 'all' | 'pending' | 'done' | `type-${string}`;
@@ -20,6 +21,7 @@ export function Tasks() {
   const [filter, setFilter] = useState<Filter>('all');
   const [editingTask, setEditingTask] = useState<Task | null | undefined>(undefined);
   const [gradeTask, setGradeTask] = useState<Task | null>(null);
+  const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
 
   const ensureGradeForTask = async (t: Task) => {
     const subject = useStore.getState().career?.subjects.find((s) => s.id === t.subjectId);
@@ -56,9 +58,9 @@ export function Tasks() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('¿Eliminar tarea?')) return;
     try {
       await deleteTask(id);
+      setDeletingTaskId(null);
     } catch (e: any) {
       alert('Error al eliminar: ' + (e?.message || e));
     }
@@ -292,7 +294,7 @@ export function Tasks() {
                     className="btn-xs"
                     title="Eliminar"
                     style={{ color: '#f87171' }}
-                    onClick={() => handleDelete(t.id)}
+                    onClick={() => setDeletingTaskId(t.id)}
                   >
                     <Trash2 size={14} />
                   </button>
@@ -307,6 +309,15 @@ export function Tasks() {
         <TaskModal task={editingTask || undefined} onClose={() => setEditingTask(undefined)} />
       )}
       {gradeTask && <GradePromptModal task={gradeTask} onClose={() => setGradeTask(null)} />}
+      
+      {deletingTaskId && (
+        <ConfirmModal 
+          title="Eliminar tarea"
+          message="¿Estás seguro de que deseas eliminar esta tarea? Esta acción no se puede deshacer."
+          onConfirm={() => handleDelete(deletingTaskId)}
+          onCancel={() => setDeletingTaskId(null)}
+        />
+      )}
     </div>
   );
 }

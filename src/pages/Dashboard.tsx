@@ -1,19 +1,34 @@
 import { useEffect, useState } from 'react';
-import { Book, CheckCircle2, Clock, AlertTriangle } from 'lucide-react';
+import { Book, CheckCircle2, Clock, AlertTriangle, Circle } from 'lucide-react';
+import { toggleEventCompletion } from '../features/events/lib/api';
 import { useStore } from '../shared/store/useStore';
 import { todayDay, t2m, daysUntil, urgColor, formatDate } from '../shared/lib/utils';
-import type { Subject, ScheduleEvent } from '../shared/types';
+import type { Subject } from '../shared/types';
 
 export function Dashboard() {
-  const { career, tasks } = useStore();
+  const { career, tasks, session, eventCompletions, setEventCompletions } = useStore();
+  const getTodayStr = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
+  const handleToggleEvent = async (eventId: string, currentCompleted: boolean) => {
+    if (!session?.user?.id) return;
+    const dateStr = getTodayStr();
+    
+    if (currentCompleted) {
+      setEventCompletions(eventCompletions.filter(c => !(c.event_id === eventId && c.date_str === dateStr)));
+    } else {
+      setEventCompletions([...eventCompletions, { id: 'temp', user_id: session.user.id, event_id: eventId, date_str: dateStr }]);
+    }
+    await toggleEventCompletion(session.user.id, eventId, dateStr, !currentCompleted);
+  };
   const subjects = career?.subjects || [];
 
   // Stats
   const pending = tasks.filter((t) => !t.done).length;
   const td = todayDay();
-  const todayC = td
-    ? subjects.reduce((a, s) => a + (s.schedules?.filter((sc) => sc.day === td)?.length || 0), 0)
-    : 0;
+  
 
   const warnSubs: Subject[] = subjects.filter(
     (s) => s.activeId && (s.absences || 0) >= (s.maxAbsences || 6) * 0.75,
@@ -36,18 +51,52 @@ export function Dashboard() {
 
   const DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
+  const getBlocksForDay = (day: string) => {
+    const blocks: { s: any; sc: any }[] = [];
+    subjects.forEach((s) => {
+      s.schedules?.filter((sc) => sc.day === day).forEach((sc) => blocks.push({ s, sc }));
+    });
+
+    const dayIndex = DAYS.indexOf(day);
+    const myDayIndex = dayIndex === 0 ? 7 : dayIndex;
+    const userEvents = useStore.getState().userEvents;
+    
+    userEvents.forEach((e) => {
+      let shouldShow = false;
+      if (e.isRecurring) {
+        if (e.dayOfWeek === myDayIndex) shouldShow = true;
+      } else if (e.date) {
+        const parts = e.date.split('-');
+        if (parts.length === 3) {
+          const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+          let jsDay = d.getDay();
+          let myDay = jsDay === 0 ? 7 : jsDay;
+          if (myDay === myDayIndex) shouldShow = true;
+        }
+      }
+      if (shouldShow) {
+        blocks.push({
+          s: { name: e.title, color: e.color || '#a855f7', room: '' },
+          sc: { 
+            id: e.id,
+            isEvent: true,
+            startTime: e.startTime, 
+            endTime: e.endTime, 
+            type: e.category.charAt(0).toUpperCase() + e.category.slice(1) 
+          }
+        });
+      }
+    });
+    return blocks.sort((a, b) => t2m(a.sc.startTime) - t2m(b.sc.startTime));
+  };
+
   const getNextClass = () => {
     const today = td;
     const nowM = Math.floor(nowSec / 60);
     const secs = nowSec % 60;
 
     if (today) {
-      const todays: { s: Subject; sc: ScheduleEvent }[] = [];
-      subjects.forEach((s) =>
-        s.schedules?.filter((sc) => sc.day === today).forEach((sc) => todays.push({ s, sc })),
-      );
-      todays.sort((a, b) => t2m(a.sc.startTime) - t2m(b.sc.startTime));
-
+      const todays = getBlocksForDay(today);
       for (const { s, sc } of todays) {
         const st = t2m(sc.startTime);
         const en = t2m(sc.endTime);
@@ -59,14 +108,10 @@ export function Dashboard() {
 
     if (!today) return null;
 
-    for (let off = 1; off <= 6; off++) {
+    for (let off = 1; off <= 7; off++) {
       const nd = DAYS[(DAYS.indexOf(today) + off) % DAYS.length];
-      const nb: { s: Subject; sc: ScheduleEvent }[] = [];
-      subjects.forEach((s) =>
-        s.schedules?.filter((sc) => sc.day === nd).forEach((sc) => nb.push({ s, sc })),
-      );
+      const nb = getBlocksForDay(nd);
       if (!nb.length) continue;
-      nb.sort((a, b) => t2m(a.sc.startTime) - t2m(b.sc.startTime));
       const { s, sc } = nb[0];
       return {
         s,
@@ -149,12 +194,10 @@ export function Dashboard() {
   const pad = (n: number) => String(n).padStart(2, '0');
 
   // Today classes logic matching V1
-  const todayClasses: { s: Subject; sc: ScheduleEvent }[] = [];
-  if (td)
-    subjects.forEach((s) =>
-      s.schedules?.filter((sc) => sc.day === td).forEach((sc) => todayClasses.push({ s, sc })),
-    );
-  todayClasses.sort((a, b) => t2m(a.sc.startTime) - t2m(b.sc.startTime));
+
+  
+
+  const todayClasses = td ? getBlocksForDay(td) : [];
 
   return (
     <div className="view-content fade-in" style={{ animation: 'fadeUp 0.3s ease' }}>
@@ -330,7 +373,7 @@ export function Dashboard() {
               <Clock size={20} />
             </div>
             <div className="stat-value" style={{ color: '#34d399' }}>
-              {todayC}
+              {todayClasses.length}
             </div>
             <div className="stat-label">Hoy</div>
           </div>
@@ -407,19 +450,30 @@ export function Dashboard() {
                 const inPrg =
                   Math.floor(nowSec / 60) >= t2m(sc.startTime) &&
                   Math.floor(nowSec / 60) < t2m(sc.endTime);
+                
+                const isEvent = sc.isEvent;
+                const isCompleted = isEvent && eventCompletions.some(c => c.event_id === sc.id && c.date_str === getTodayStr());
+
                 return (
                   <div
                     key={i}
                     className="today-row"
                     style={{
-                      opacity: past ? 0.5 : 1,
+                      opacity: past || isCompleted ? 0.5 : 1,
                       borderLeft: `3px solid ${s.color || 'var(--primary)'}`,
+                      cursor: isEvent ? 'pointer' : 'default'
                     }}
+                    onClick={() => isEvent && handleToggleEvent(sc.id, isCompleted)}
                   >
-                    <div style={{ flex: 1 }}>
+                    {isEvent && (
+                      <div style={{ marginRight: '8px', display: 'flex', alignItems: 'center' }}>
+                        {isCompleted ? <CheckCircle2 size={18} color="var(--primary)" /> : <Circle size={18} color="var(--text2)" />}
+                      </div>
+                    )}
+                    <div style={{ flex: 1, textDecoration: isCompleted ? 'line-through' : 'none' }}>
                       <div style={{ fontWeight: 700, fontSize: '13px' }}>{s.name}</div>
                       <div style={{ fontSize: '11px', color: 'var(--text2)', marginTop: '2px' }}>
-                        {sc.startTime}–{sc.endTime} · {sc.type} · {s.room}
+                        {sc.startTime}–{sc.endTime} · {sc.type} {s.room ? `· ${s.room}` : ''}
                       </div>
                     </div>
                     {inPrg && (

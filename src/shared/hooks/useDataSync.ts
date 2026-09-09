@@ -17,6 +17,10 @@ export function useDataSync() {
       const uid = session!.user.id;
       const planId = profile?.plan_id || '2016';
 
+      const setUserEvents = useStore.getState().setUserEvents;
+      const setEventCompletions = useStore.getState().setEventCompletions;
+      const setStudySessions = useStore.getState().setStudySessions;
+      
       const [
         { data: activeSubsData },
         { data: tasksData },
@@ -26,6 +30,9 @@ export function useDataSync() {
         { data: seminarsData },
         { data: electivesData },
         { data: notesData },
+        { data: eventsData },
+        { data: completionsData },
+        { data: studySessionsData },
       ] = await Promise.all([
         supabase.from('user_active_subjects').select('*').eq('user_id', uid),
         supabase.from('user_tasks').select('*').eq('user_id', uid),
@@ -44,6 +51,9 @@ export function useDataSync() {
           .select('*')
           .eq('user_id', uid)
           .order('note_date', { ascending: false }),
+        supabase.from('user_events').select('*').eq('user_id', uid),
+        supabase.from('event_completions').select('*').eq('user_id', uid),
+        supabase.from('study_sessions').select('*').eq('user_id', uid),
       ]);
 
       // Map Tasks
@@ -59,6 +69,30 @@ export function useDataSync() {
           done: t.done,
         }));
         setTasks(mappedTasks);
+      }
+
+      // Map Events
+      if (eventsData) {
+        const mappedEvents = eventsData.map((e: any) => ({
+          id: e.id,
+          title: e.title,
+          category: e.category,
+          startTime: e.start_time,
+          endTime: e.end_time,
+          isRecurring: e.is_recurring,
+          date: e.date,
+          dayOfWeek: e.day_of_week,
+          color: e.color,
+        }));
+        setUserEvents(mappedEvents);
+      }
+
+      // Map Completions
+      if (completionsData) {
+        setEventCompletions(completionsData);
+      }
+      if (studySessionsData) {
+        setStudySessions(studySessionsData);
       }
 
       // Map Notes
