@@ -120,7 +120,7 @@
 - **Categoría:** Nueva Funcionalidad
 - **Impacto:** Alto
 - **Esfuerzo:** Medio
-- **Estado:** Propuesta
+- **Estado:** Completada
 - **Resumen:** Ocultar menús y elementos distractivos al iniciar el Pomodoro, mostrando solo el temporizador en pantalla completa.
 - **Plan:** `src/docs/improvements/MEJ-013-modo-do-not-disturb-pomodoro.md`
 
@@ -129,7 +129,7 @@
 - **Categoría:** Nueva Funcionalidad
 - **Impacto:** Alto
 - **Esfuerzo:** Medio
-- **Estado:** Propuesta
+- **Estado:** Completada
 - **Resumen:** Permitir asociar una sesión de estudio a un evento tipo Parcial o Final, para poder medir la cantidad de horas dedicadas a prepararlo.
 - **Plan:** `src/docs/improvements/MEJ-014-vincular-pomodoro-examenes.md`
 
@@ -183,7 +183,7 @@
 - **Categoría:** Nueva Funcionalidad
 - **Impacto:** Alto
 - **Esfuerzo:** Medio
-- **Estado:** Propuesta
+- **Estado:** Completada
 - **Resumen:** Habilitar la configuración de la duración del Pomodoro (ej. 50/10) desde la pantalla de Ajustes.
 - **Plan:** `src/docs/improvements/MEJ-020-tiempos-pomodoro-personalizables.md`
 
@@ -201,7 +201,7 @@
 - **Categoría:** Nueva Funcionalidad
 - **Impacto:** Alto
 - **Esfuerzo:** Medio
-- **Estado:** Propuesta
+- **Estado:** Completada
 - **Resumen:** Incluir un mini-reproductor con ruido blanco o sonidos relajantes integrados dentro de la vista de Estudio.
 - **Plan:** `src/docs/improvements/MEJ-022-sonidos-ambientacion-estudio.md`
 
