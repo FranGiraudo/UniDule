@@ -131,22 +131,31 @@ export function GradesModal({ subject, onClose }: Props) {
                 <option value="libre">Libre</option>
               </select>
             </div>
-            <label
+            <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
-                fontSize: '13px',
+                justifyContent: 'flex-start',
+                gap: '12px',
                 marginTop: '20px',
               }}
             >
-              <input
-                type="checkbox"
-                checked={allowsPromotion}
-                onChange={(e) => setAllowsPromotion(e.target.checked)}
-              />
-              Habilita promoción
-            </label>
+              <span style={{ fontSize: '13px', fontWeight: 600 }}>Habilita promoción</span>
+              <button
+                type="button"
+                onClick={() => setAllowsPromotion(!allowsPromotion)}
+                style={{
+                  width: '44px', height: '24px', borderRadius: '12px', 
+                  background: allowsPromotion ? 'var(--primary)' : 'var(--border)',
+                  position: 'relative', border: 'none', cursor: 'pointer', transition: 'all 0.2s'
+                }}
+              >
+                <div style={{ 
+                  position: 'absolute', top: '2px', left: allowsPromotion ? '22px' : '2px', 
+                  width: '20px', height: '20px', borderRadius: '50%', background: '#fff', transition: 'all 0.2s' 
+                }} />
+              </button>
+            </div>
           </div>
 
           <div>
