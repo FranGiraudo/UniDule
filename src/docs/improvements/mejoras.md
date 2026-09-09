@@ -97,6 +97,123 @@
 - **Resumen:** `user_profiles.name` (`supabase/schema.sql:48`) se setea una única vez al registrarse, con el prefijo del email como valor por defecto (`handle_new_user()`, `supabase/schema.sql:152-159`). `Settings.tsx:312-336` lo muestra en un `<div>` de solo lectura con pinta de input, y en todo el repo `user_profiles` solo se actualiza para `theme` (`Settings.tsx:111`) — no existe ninguna forma de cambiar el nombre mostrado.
 - **Plan:** `src/docs/improvements/MEJ-010-nombre-perfil-editable.md`
 
+### MEJ-011 — Agenda con Soporte de Fechas Reales (Semanas/Mes)
+
+- **Categoría:** Nueva Funcionalidad
+- **Impacto:** Alto
+- **Esfuerzo:** Medio
+- **Estado:** Propuesta
+- **Resumen:** Migrar la vista de horarios (Schedule) a un calendario con fechas reales, permitiendo navegar entre semanas pasadas y futuras, y agregando un toggle para vista mensual.
+- **Plan:** `src/docs/improvements/MEJ-011-agenda-fechas-reales.md`
+
+### MEJ-012 — Sincronización con Google Calendar
+
+- **Categoría:** Nueva Funcionalidad
+- **Impacto:** Alto
+- **Esfuerzo:** Medio
+- **Estado:** Propuesta
+- **Resumen:** Permitir importar y exportar eventos extracurriculares a Google Calendar para interoperabilidad.
+- **Plan:** `src/docs/improvements/MEJ-012-sincronizacion-google-calendar.md`
+
+### MEJ-013 — Modo Do Not Disturb en Pomodoro
+
+- **Categoría:** Nueva Funcionalidad
+- **Impacto:** Alto
+- **Esfuerzo:** Medio
+- **Estado:** Propuesta
+- **Resumen:** Ocultar menús y elementos distractivos al iniciar el Pomodoro, mostrando solo el temporizador en pantalla completa.
+- **Plan:** `src/docs/improvements/MEJ-013-modo-do-not-disturb-pomodoro.md`
+
+### MEJ-014 — Vincular Pomodoro a Exámenes específicos
+
+- **Categoría:** Nueva Funcionalidad
+- **Impacto:** Alto
+- **Esfuerzo:** Medio
+- **Estado:** Propuesta
+- **Resumen:** Permitir asociar una sesión de estudio a un evento tipo Parcial o Final, para poder medir la cantidad de horas dedicadas a prepararlo.
+- **Plan:** `src/docs/improvements/MEJ-014-vincular-pomodoro-examenes.md`
+
+### MEJ-015 — Rachas y Gamificación (Streaks) en Estadísticas
+
+- **Categoría:** Nueva Funcionalidad
+- **Impacto:** Alto
+- **Esfuerzo:** Medio
+- **Estado:** Propuesta
+- **Resumen:** Mostrar en la pestaña de Estadísticas rachas de días seguidos cumpliendo actividades o sesiones de estudio.
+- **Plan:** `src/docs/improvements/MEJ-015-rachas-gamificacion-stats.md`
+
+### MEJ-016 — Checklist de Hábitos Diarios Independiente
+
+- **Categoría:** Nueva Funcionalidad
+- **Impacto:** Alto
+- **Esfuerzo:** Medio
+- **Estado:** Propuesta
+- **Resumen:** Separar los hábitos repetitivos diarios de los eventos del timeline, creando un checklist que se reinicie cada medianoche.
+- **Plan:** `src/docs/improvements/MEJ-016-checklist-habitos-independiente.md`
+
+### MEJ-017 — Cuenta Regresiva de Exámenes (Countdown)
+
+- **Categoría:** Nueva Funcionalidad
+- **Impacto:** Alto
+- **Esfuerzo:** Medio
+- **Estado:** Propuesta
+- **Resumen:** Agregar un widget destacado en el Dashboard indicando los días restantes para el próximo parcial o final.
+- **Plan:** `src/docs/improvements/MEJ-017-cuenta-regresiva-examenes.md`
+
+### MEJ-018 — Modo Fin de Semana en Dashboard
+
+- **Categoría:** Nueva Funcionalidad
+- **Impacto:** Alto
+- **Esfuerzo:** Medio
+- **Estado:** Propuesta
+- **Resumen:** Los fines de semana, restar prioridad a la carga académica y destacar eventos de ocio/descanso, a menos que existan entregas urgentes.
+- **Plan:** `src/docs/improvements/MEJ-018-modo-fin-de-semana.md`
+
+### MEJ-019 — Matriz de Eisenhower para Tareas
+
+- **Categoría:** Nueva Funcionalidad
+- **Impacto:** Alto
+- **Esfuerzo:** Medio
+- **Estado:** Propuesta
+- **Resumen:** Permitir clasificar las tareas académicas según su urgencia e importancia para sugerir el orden de resolución.
+- **Plan:** `src/docs/improvements/MEJ-019-matriz-eisenhower-tareas.md`
+
+### MEJ-020 — Tiempos de Pomodoro Personalizables
+
+- **Categoría:** Nueva Funcionalidad
+- **Impacto:** Alto
+- **Esfuerzo:** Medio
+- **Estado:** Propuesta
+- **Resumen:** Habilitar la configuración de la duración del Pomodoro (ej. 50/10) desde la pantalla de Ajustes.
+- **Plan:** `src/docs/improvements/MEJ-020-tiempos-pomodoro-personalizables.md`
+
+### MEJ-021 — Log Historial y Edición de Sesiones
+
+- **Categoría:** Nueva Funcionalidad
+- **Impacto:** Alto
+- **Esfuerzo:** Medio
+- **Estado:** Propuesta
+- **Resumen:** Mostrar en Estadísticas una lista detallada de cada sesión completada, con la posibilidad de editar o eliminar registros erróneos.
+- **Plan:** `src/docs/improvements/MEJ-021-log-historial-edicion-sesiones.md`
+
+### MEJ-022 — Sonidos de Ambientación en el Estudio
+
+- **Categoría:** Nueva Funcionalidad
+- **Impacto:** Alto
+- **Esfuerzo:** Medio
+- **Estado:** Propuesta
+- **Resumen:** Incluir un mini-reproductor con ruido blanco o sonidos relajantes integrados dentro de la vista de Estudio.
+- **Plan:** `src/docs/improvements/MEJ-022-sonidos-ambientacion-estudio.md`
+
+### MEJ-023 — Reporte de Cierre Semanal
+
+- **Categoría:** Nueva Funcionalidad
+- **Impacto:** Alto
+- **Esfuerzo:** Medio
+- **Estado:** Propuesta
+- **Resumen:** Generar automáticamente una tarjeta resumen cada domingo detallando las horas estudiadas y tareas completadas durante la semana.
+- **Plan:** `src/docs/improvements/MEJ-023-reporte-cierre-semanal.md`
+
 ## Completadas
 
 _Sin ítems todavía._
