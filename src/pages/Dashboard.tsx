@@ -35,6 +35,13 @@ export function Dashboard() {
   );
   const warn = warnSubs.length;
 
+  const expiringSubs = subjects.filter((s) => {
+    if (s.status !== 'regular' || !s.expDate) return false;
+    const d = daysUntil(s.expDate);
+    return d !== null && d >= 0 && d <= 90;
+  });
+  const warnExpiring = expiringSubs.length;
+
   // Next Class Logic (Countdown)
   const [nowSec, setNowSec] = useState(() => {
     const d = new Date();
@@ -475,10 +482,30 @@ export function Dashboard() {
                       • <strong>{s.name}</strong> ({s.absences}/{s.maxAbsences} faltas)
                     </div>
                   ))}
+                  
+                  {warnExpiring > 0 && (
+                    <div style={{ marginTop: '8px' }}>
+                      <div
+                        style={{
+                          fontWeight: 800,
+                          fontSize: '11px',
+                          marginBottom: '4px',
+                          color: '#f87171',
+                        }}
+                      >
+                        Vencimientos (próximos 90 días):
+                      </div>
+                      {expiringSubs.map((s) => (
+                        <div key={s.id} style={{ fontSize: '10px', marginTop: '2px' }}>
+                          • <strong>{s.name}</strong> (vence en {daysUntil(s.expDate)}d)
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </>
               ) : (
                 <div style={{ fontWeight: 700, fontSize: '10px', color: '#4ade80' }}>
-                  Sin alertas de ausencias
+                  Sin alertas pendientes
                 </div>
               )}
             </div>
