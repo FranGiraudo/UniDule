@@ -451,7 +451,7 @@ export function Schedule() {
         </div>
       </header>
 
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
+      <div className="desktop-only" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
         {activeSubjects.map((s) => (
           <div
             key={s.id}

@@ -572,7 +572,7 @@ export function Settings() {
           <p style={{ fontSize: '0.85rem', color: 'var(--text2)', marginBottom: '1rem' }}>
             Sincronización en la nube activa.
           </p>
-          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
             <button className="btn btn-ghost" onClick={handleExportData}>
               Exportar mis datos (JSON)
             </button>

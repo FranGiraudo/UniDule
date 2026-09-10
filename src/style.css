@@ -40,7 +40,7 @@ body {
   background: var(--bg);
   color: var(--text);
   overflow: hidden;
-  height: 100vh;
+  height: 100dvh;
 }
 
 /* ─── SCROLLBAR ─── */
@@ -61,7 +61,7 @@ body {
 ══════════════════════════════════════════════ */
 #app {
   display: flex;
-  height: 100vh;
+  height: 100dvh;
   background-image:
     radial-gradient(
       ellipse at 8% 0%,
@@ -905,7 +905,9 @@ body {
   border-top: 1px solid var(--border);
   flex-direction: row;
   align-items: center;
-  justify-content: space-around;
+  justify-content: flex-start;
+  gap: 1rem;
+  padding: 0 1rem;
   padding: 0 0.25rem;
 }
 .bnav-item {
@@ -918,7 +920,7 @@ body {
   cursor: pointer;
   transition: all 0.2s;
   color: var(--text2);
-  flex: 1;
+  flex: 0 0 auto;
   user-select: none;
   min-width: 0;
 }
@@ -1658,7 +1660,7 @@ input[type='number'] {
 }
 .cm-canvas {
   width: 100%;
-  height: calc(100vh - 16rem);
+  height: calc(100dvh - 16rem);
   border: 1.5px solid #c4b99a;
   border-radius: 0.75rem;
   background: #ebe6d6;
@@ -1791,7 +1793,7 @@ input[type='number'] {
     grid-template-columns: repeat(2, 1fr);
   }
   .cm-canvas {
-    height: calc(100vh - 18rem);
+    height: calc(100dvh - 18rem);
   }
   .career-detail-panel {
     width: 100vw;

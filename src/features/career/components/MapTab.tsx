@@ -13,7 +13,7 @@ interface NodePos {
 }
 
 export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => void }) {
-  const { career, theme } = useStore();
+  const { career } = useStore();
   const subjects = career?.subjects || [];
 
   const [transform, setTransform] = useState({ x: 0, y: 0, s: 0.72 });
@@ -128,54 +128,29 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
   }, [subjects]);
 
   // --- Colors & Theme ---
-  const isPS1 = theme === 'keychron_ps1';
-  const V = isPS1
-    ? {
-        bg: '#D8D5CE',
-        nodeFill: '#E2DFD8',
-        nodeFillBloq: '#9A9892',
-        nodeFillDisp: '#E8A020',
-        nodeFillC: '#1A6FCC',
-        nodeFillR: '#B0308C',
-        nodeFillA: '#CC2929',
-        nodeStroke: '#A8A49C',
-        nodeStrokeA: '#8B1A1A',
-        textDark: '#1A1208',
-        textLight: '#F5F0E8',
-        textMuted: '#5C4F3A',
-        edge: 'rgba(80,60,40,.35)',
-        edgeIn: '#CC2929',
-        edgeOut: '#1A6FCC',
-        header: '#4A3F2F',
-        headerSub: '#7A6B52',
-        divider: 'rgba(80,60,40,.3)',
-        shadow: 'rgba(30,20,10,.22)',
-        gradeGood: '#1A6FCC',
-        gradeBad: '#CC2929',
-      }
-    : {
-        bg: '#EBE6D6',
-        nodeFill: '#D8D2BE',
-        nodeFillBloq: '#6E6558',
-        nodeFillDisp: '#B8973A',
-        nodeFillC: '#4A7C8D',
-        nodeFillR: '#8B4A7A',
-        nodeFillA: '#C0392B',
-        nodeStroke: '#A09070',
-        nodeStrokeA: '#922B1F',
-        textDark: '#2C1810',
-        textLight: '#F5EFE0',
-        textMuted: '#7A6B52',
-        edge: 'rgba(120,95,65,.28)',
-        edgeIn: '#C0392B',
-        edgeOut: '#4A7C59',
-        header: '#8B7355',
-        headerSub: '#A09070',
-        divider: 'rgba(120,95,65,.25)',
-        shadow: 'rgba(44,24,16,.18)',
-        gradeGood: '#4A7C59',
-        gradeBad: '#C0392B',
-      };
+  const V = {
+    bg: 'var(--bg)',
+    nodeFill: 'var(--card)',
+    nodeFillBloq: 'var(--border)',
+    nodeFillDisp: '#eab308',
+    nodeFillC: 'var(--primary)',
+    nodeFillR: '#9333ea',
+    nodeFillA: '#10b981',
+    nodeStroke: 'var(--border2)',
+    nodeStrokeA: '#059669',
+    textDark: 'var(--text)',
+    textLight: '#ffffff',
+    textMuted: 'var(--text2)',
+    edge: 'var(--border)',
+    edgeIn: '#ef4444',
+    edgeOut: 'var(--primary)',
+    header: 'var(--text)',
+    headerSub: 'var(--text2)',
+    divider: 'var(--border)',
+    shadow: 'rgba(0,0,0,0.2)',
+    gradeGood: '#10b981',
+    gradeBad: '#ef4444',
+  };
 
   const getStatusStyle = (s: Subject) => {
     switch (s.status) {
@@ -184,14 +159,14 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
       case 'regular':
         return {
           bg: V.nodeFillR,
-          stroke: isPS1 ? '#7A1A60' : '#6B4A70',
+          stroke: '#7e22ce',
           text: V.textLight,
           label: 'REGULAR',
         };
       case 'cursando':
         return {
           bg: V.nodeFillC,
-          stroke: isPS1 ? '#0F4A8A' : '#2A5060',
+          stroke: 'var(--border)',
           text: V.textLight,
           label: 'CURSANDO',
         };
