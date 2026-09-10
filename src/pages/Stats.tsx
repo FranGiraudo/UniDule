@@ -1,5 +1,5 @@
 import { useStore } from '../shared/store/useStore';
-import { Activity, BookOpen, Dumbbell } from 'lucide-react';
+import { Activity, BookOpen, Dumbbell, Flame } from 'lucide-react';
 
 export function Stats() {
   const { eventCompletions, studySessions, userEvents, career } = useStore();
@@ -39,6 +39,36 @@ export function Stats() {
     return acc;
   }, {} as Record<string, number>);
 
+
+  // Streak Calculation (MEJ-015)
+  let currentStreak = 0;
+  let d = new Date();
+  d.setHours(0,0,0,0);
+  
+  const hasActivityOnDate = (dateObj: Date) => {
+    const ds = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+    const hasEvent = eventCompletions.some((c: any) => c.date_str === ds);
+    const hasStudy = studySessions.some((s: any) => {
+       const cd = new Date(s.completed_at || s.created_at || new Date());
+       return cd.getFullYear() === dateObj.getFullYear() && cd.getMonth() === dateObj.getMonth() && cd.getDate() === dateObj.getDate();
+    });
+    return hasEvent || hasStudy;
+  };
+
+  let checkDate = new Date(d);
+  if (!hasActivityOnDate(checkDate)) {
+    checkDate.setDate(checkDate.getDate() - 1);
+  }
+
+  while (true) {
+    if (hasActivityOnDate(checkDate)) {
+      currentStreak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+
   return (
     <div className="view-content fade-in" style={{ animation: 'fadeUp 0.3s ease' }}>
       <header className="view-header">
@@ -49,6 +79,19 @@ export function Stats() {
       </header>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+        <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text2)' }}>
+            <Flame size={20} color="#f97316" />
+            <span style={{ fontWeight: 600 }}>Racha de Actividad</span>
+          </div>
+          <div style={{ fontSize: '36px', fontWeight: 900, color: '#f97316' }}>
+            {currentStreak} <span style={{ fontSize: '18px', color: 'var(--text2)' }}>días</span>
+          </div>
+          <div style={{ fontSize: '13px', color: 'var(--text2)' }}>
+            Días seguidos cumpliendo hábitos o estudiando.
+          </div>
+        </div>
+
         
         <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text2)' }}>
