@@ -66,3 +66,8 @@ export async function deleteUserEvent(id: string) {
   const { error } = await supabase.from('user_events').delete().eq('id', id);
   if (error) throw error;
 }
+
+export async function deleteStudySession(id: string) {
+  const { error } = await supabase.from('study_sessions').delete().eq('id', id);
+  if (error) throw error;
+}

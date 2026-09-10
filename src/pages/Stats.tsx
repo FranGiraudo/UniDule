@@ -1,5 +1,6 @@
 import { useStore } from '../shared/store/useStore';
-import { Activity, BookOpen, Dumbbell, Flame } from 'lucide-react';
+import { deleteStudySession } from '../features/events/lib/api';
+import { Activity, BookOpen, Dumbbell, Flame, Trash2, Clock } from 'lucide-react';
 
 export function Stats() {
   const { eventCompletions, studySessions, userEvents, career } = useStore();
@@ -68,6 +69,21 @@ export function Stats() {
       break;
     }
   }
+
+
+  const handleDeleteSession = async (id: string) => {
+    if (!window.confirm('¿Seguro que quieres eliminar esta sesión?')) return;
+    try {
+      await deleteStudySession(id);
+      // Actualizar el estado global
+      useStore.getState().setStudySessions(studySessions.filter(s => s.id !== id));
+    } catch (e) {
+      console.error(e);
+      alert('Error eliminando sesión');
+    }
+  };
+
+  const sortedSessions = [...studySessions].sort((a: any, b: any) => new Date(b.completed_at || b.created_at || new Date()).getTime() - new Date(a.completed_at || a.created_at || new Date()).getTime());
 
   return (
     <div className="view-content fade-in" style={{ animation: 'fadeUp 0.3s ease' }}>
@@ -149,6 +165,49 @@ export function Stats() {
             </div>
           )}
         </div>
+
+      <div className="card" style={{ marginTop: '24px' }}>
+        <div className="card-header">
+          <h3 style={{ fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Clock size={18} />
+            Historial de Sesiones
+          </h3>
+        </div>
+        <div className="card-body" style={{ padding: '16px' }}>
+          {sortedSessions.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '400px', overflowY: 'auto', paddingRight: '8px' }}>
+              {sortedSessions.map((session: any) => {
+                const sub = subjects.find(s => s.id === session.subject_id);
+                const hrs = Math.floor(session.duration_minutes / 60);
+                const ms = session.duration_minutes % 60;
+                const d = new Date(session.completed_at || session.created_at || new Date());
+                const dateStr = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                
+                return (
+                  <div key={session.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--card2)', padding: '12px', borderRadius: '8px' }}>
+                    <div>
+                      <div style={{ fontWeight: 600 }}>{sub?.name || 'Materia desconocida'}</div>
+                      <div style={{ fontSize: '11px', color: 'var(--text2)', marginTop: '2px' }}>{dateStr}</div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <div style={{ fontWeight: 700, color: 'var(--primary)' }}>
+                        {hrs > 0 ? `${hrs}h ` : ''}{ms}m
+                      </div>
+                      <button className="btn-xs" style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' }} onClick={() => handleDeleteSession(session.id)}>
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div style={{ color: 'var(--text2)', textAlign: 'center', padding: '12px 0' }}>
+              No hay sesiones registradas en tu historial.
+            </div>
+          )}
+        </div>
+      </div>
       </div>
     </div>
   );
