@@ -46,7 +46,6 @@ export function Sidebar() {
         </div>
         <div className="s-logo-text">
           <h1>UniDule</h1>
-          <p>IUA · 2do Sem 2026</p>
         </div>
       </div>
 
