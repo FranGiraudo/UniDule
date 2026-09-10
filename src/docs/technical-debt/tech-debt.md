@@ -6,35 +6,6 @@
 
 ## Crítica
 
-### TD-RF007 — Estado de Finales persistido como nota visible
-
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/pages/Finals.tsx:57-75`, `src/pages/Subjects.tsx:288-300`
-- **Descripción:** La sección de Finales almacena los "Intentos Restantes" como un JSON dentro de `user_notes` (título `__FINALS_STATE__`). El modal de notas en la sección de materias lista todas las notas y **no filtra** esta nota interna de configuración.
-- **Riesgo:** El usuario puede ver el JSON crudo en la UI, editarlo y romper el parser, o eliminarlo accidentalmente perdiendo su progreso de intentos de exámenes finales. Riesgo extremo de corrupción de datos por uso normal de la app.
-- **Recomendación:** Agregar un filtro `n.title !== '__FINALS_STATE__'` en la generación de `filteredNotes` dentro de `Subjects.tsx`, o migrar la data a una columna nativa si es posible.
-
-
-_Sin ítems en esta corrida._
-
-## Alta
-
-### TD-RF001 — El mapa de correlativas (`MapTab`) etiqueta materias bloqueadas como "Disponible"
-
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/features/career/components/MapTab.tsx:180-201,254`
-- **Descripción:** `getStatusStyle` solo distingue `aprobada`, `regular` y `cursando`; cualquier otro estado —incluidas materias con correlativas sin cumplir— cae en el mismo `default` y muestra la etiqueta `'DISPONIBLE'`. A diferencia de `GridTab.tsx:172-180` y `FinalsTab.tsx`, nunca llama a `getComputedStatus` para diferenciar `disponible` de `bloqueada`. El color de leyenda `V.nodeFillDisp` (línea 254) tampoco se usa en ningún nodo real (el `default` pinta con `V.nodeFill`), así que no hay ni siquiera contraste visual entre ambos estados. Detectado en auditoría 2026-08-11.
-- **Riesgo:** El mapa es la vista pensada para planificar qué cursar; decirle a un estudiante que una materia bloqueada está "Disponible" puede llevarlo a intentar anotarse en algo que no cumple correlativas, y contradice lo que la misma app muestra en `GridTab`/`FinalsTab` para la misma materia.
-- **Recomendación:** Reemplazar el `switch (s.status)` de `getStatusStyle` por la misma lógica de `getComputedStatus(s, subjects)` que ya usan `GridTab` y `FinalsTab`, agregando una rama explícita para `bloqueada` que use `V.nodeFillBloq` (ya definido pero sin uso) en vez de reutilizar el color de disponible.
-
-### TD-RF002 — `PlanSimulationModal` es contenido 100% hardcodeado, no una simulación real
-
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/features/career/components/PlanSimulationModal.tsx:1-99`, `src/pages/Settings.tsx:318-327,473`
-- **Descripción:** El propio comentario del código lo admite (línea 4): *"Hardcoded for the prompt's provided text... In a real scenario, this would be computed by comparing user progress with plan_id 2026 subjects' equivalent_ids"*. Las listas `riskSubjects` y `appliedEquivalences` son literales fijos que no leen `career`, `profile` ni ningún estado del usuario. Detectado en auditoría 2026-08-11.
-- **Riesgo:** El botón "Simular Cambio" en Settings promete "comprobar qué materias te tomarían como equivalencias" según el progreso propio del usuario, pero todos ven exactamente el mismo listado, sin relación con su carrera real — una feature que aparenta funcionar pero engaña.
-- **Recomendación:** O bien implementar el cálculo real comparando `career.subjects`/`electives` del usuario contra las equivalencias del plan destino (tabla de equivalencias en Supabase), o quitar la feature/marcarla explícitamente como "Próximamente" hasta que exista esa tabla.
-
 ### TD-RNF002 — Notas de usuario renderizadas con `dangerouslySetInnerHTML` sin sanitizar
 
 - **Tipo:** No funcional (RNF)
@@ -108,6 +79,14 @@ _Sin ítems en esta corrida._
 _Sin ítems en esta corrida._
 
 ## Resueltos
+
+### TD-RF007 — Estado de Finales persistido como nota visible
+
+- **Tipo:** Funcional (RF)
+- **Detectado en:** auditoría 2026-09-10.
+- **Resuelto en:** 2026-09-10.
+- **Fix:** Se agregó exclusión explícita `if (n.title === '__FINALS_STATE__') return false;` en el renderizado de notas (`Subjects.tsx`).
+
 
 ### TD-RF004 — "Próximas Entregas" del Dashboard no ordena por fecha
 
