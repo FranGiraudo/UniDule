@@ -174,7 +174,7 @@
 - **Categoría:** Nueva Funcionalidad
 - **Impacto:** Alto
 - **Esfuerzo:** Medio
-- **Estado:** Propuesta
+- **Estado:** Completada
 - **Resumen:** Permitir clasificar las tareas académicas según su urgencia e importancia para sugerir el orden de resolución.
 - **Plan:** `src/docs/improvements/MEJ-019-matriz-eisenhower-tareas.md`
 
