@@ -1,5 +1,9 @@
 import { useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+
+type DbTask = any;
+type DbUserEvent = any;
+
 import { useStore } from '../store/useStore';
 import type { Subject, Task, Career, Seminar, Elective, Note } from '../types';
 
@@ -56,9 +60,11 @@ export function useDataSync() {
         supabase.from('study_sessions').select('*').eq('user_id', uid),
       ]);
 
+
+
       // Map Tasks
       if (tasksData) {
-        const mappedTasks: Task[] = tasksData.map((t: any) => ({
+        const mappedTasks: Task[] = tasksData.map((t: DbTask) => ({
           id: t.id,
           subjectId: t.subject_id,
           title: t.title,
@@ -73,7 +79,7 @@ export function useDataSync() {
 
       // Map Events
       if (eventsData) {
-        const mappedEvents = eventsData.map((e: any) => ({
+        const mappedEvents = eventsData.map((e: DbUserEvent) => ({
           id: e.id,
           title: e.title,
           category: e.category,

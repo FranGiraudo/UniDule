@@ -1,5 +1,6 @@
 import { useStore } from '../shared/store/useStore';
 import { deleteStudySession } from '../features/events/lib/api';
+import { useMemo } from 'react';
 import { Activity, BookOpen, Dumbbell, Flame, Trash2, Clock } from 'lucide-react';
 
 export function Stats() {
@@ -17,58 +18,63 @@ export function Stats() {
   lastDay.setDate(firstDay.getDate() + 6);
   lastDay.setHours(23,59,59,999);
 
-  // Gym logic (or extra activities)
-  const gymEvents = userEvents.filter(e => e.category === 'gimnasio');
-  const gymCompletions = eventCompletions.filter(c => {
-    const isGym = gymEvents.some(ge => ge.id === c.event_id);
-    const d = new Date(c.completed_at);
-    return isGym && d >= firstDay && d <= lastDay;
-  });
-
-  // Study hours
-  const thisWeekStudy = studySessions.filter(s => {
-    const d = new Date(s.completed_at);
-    return d >= firstDay && d <= lastDay;
-  });
-  const totalStudyMinutes = thisWeekStudy.reduce((acc, s) => acc + s.duration_minutes, 0);
-  const studyHours = Math.floor(totalStudyMinutes / 60);
-  const studyMins = totalStudyMinutes % 60;
-
-  // Study by subject (this week)
-  const studyBySubject = thisWeekStudy.reduce((acc, s) => {
-    acc[s.subject_id] = (acc[s.subject_id] || 0) + s.duration_minutes;
-    return acc;
-  }, {} as Record<string, number>);
-
-
-  // Streak Calculation (MEJ-015)
-  let currentStreak = 0;
-  let d = new Date();
-  d.setHours(0,0,0,0);
-  
-  const hasActivityOnDate = (dateObj: Date) => {
-    const ds = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
-    const hasEvent = eventCompletions.some((c: any) => c.date_str === ds);
-    const hasStudy = studySessions.some((s: any) => {
-       const cd = new Date(s.completed_at || s.created_at || new Date());
-       return cd.getFullYear() === dateObj.getFullYear() && cd.getMonth() === dateObj.getMonth() && cd.getDate() === dateObj.getDate();
+  // Memoized stats calculations
+  const { gymCompletions, studyHours, studyMins, studyBySubject, currentStreak } = useMemo(() => {
+    // Gym logic
+    const gEvents = userEvents.filter(e => e.category === 'gimnasio');
+    const gComps = eventCompletions.filter(c => {
+      const isGym = gEvents.some(ge => ge.id === c.event_id);
+      const d = new Date(c.completed_at);
+      return isGym && d >= firstDay && d <= lastDay;
     });
-    return hasEvent || hasStudy;
-  };
 
-  let checkDate = new Date(d);
-  if (!hasActivityOnDate(checkDate)) {
-    checkDate.setDate(checkDate.getDate() - 1);
-  }
+    // Study hours
+    const twStudy = studySessions.filter(s => {
+      const d = new Date(s.completed_at || s.created_at || new Date());
+      return d >= firstDay && d <= lastDay;
+    });
+    const tMins = twStudy.reduce((acc, s) => acc + s.duration_minutes, 0);
+    const sHours = Math.floor(tMins / 60);
+    const sMins = tMins % 60;
 
-  while (true) {
-    if (hasActivityOnDate(checkDate)) {
-      currentStreak++;
+    // Study by subject
+    const sBySub = twStudy.reduce((acc, s) => {
+      acc[s.subject_id] = (acc[s.subject_id] || 0) + s.duration_minutes;
+      return acc;
+    }, {} as Record<string, number>);
+
+    // Streak logic
+    let streak = 0;
+    const d = new Date();
+    d.setHours(0,0,0,0);
+    
+    // Index completions for O(1) lookup
+    const compSet = new Set(eventCompletions.map(c => c.date_str));
+    const studySet = new Set(studySessions.map(s => {
+      const cd = new Date(s.completed_at || s.created_at || new Date());
+      return `${cd.getFullYear()}-${String(cd.getMonth() + 1).padStart(2, '0')}-${String(cd.getDate()).padStart(2, '0')}`;
+    }));
+    
+    const hasActivity = (dateObj: Date) => {
+      const ds = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+      return compSet.has(ds) || studySet.has(ds);
+    };
+
+    let checkDate = new Date(d);
+    if (!hasActivity(checkDate)) {
       checkDate.setDate(checkDate.getDate() - 1);
-    } else {
-      break;
     }
-  }
+    while (true) {
+      if (hasActivity(checkDate)) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+
+    return { gymCompletions: gComps, studyHours: sHours, studyMins: sMins, studyBySubject: sBySub, currentStreak: streak };
+  }, [userEvents, eventCompletions, studySessions, firstDay, lastDay]);
 
 
   const handleDeleteSession = async (id: string) => {

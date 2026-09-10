@@ -208,7 +208,7 @@ export function Settings() {
         ics += "BEGIN:VEVENT\n";
         ics += `UID:${sc.id}@unidule.com\n`;
         ics += `SUMMARY:${sub.name}\n`;
-        ics += `DESCRIPTION:${sc.type}\\nRoom: ${sub.room || ''}\n`;
+        ics += `DESCRIPTION:${sc.type} - Room: ${sub.room || ''}\n`;
         ics += `DTSTART:${formatICSDate(nextDate, sc.startTime)}\n`;
         ics += `DTEND:${formatICSDate(nextDate, sc.endTime)}\n`;
         ics += `RRULE:FREQ=WEEKLY;BYDAY=${rruleDays[jsDay]}\n`;

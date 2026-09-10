@@ -67,11 +67,18 @@ export function FinalsTab({ onSelectSubject }: { onSelectSubject: (id: string) =
   });
 
   filteredSubs.sort((a, b) => {
-    // We don't have expDate in V2 yet, so we assume 9999
-    if (sort === 'exp-asc') return 0;
-    if (sort === 'exp-desc') return 0;
+    if (sort === 'exp-asc') {
+      if (!a.expDate) return 1;
+      if (!b.expDate) return -1;
+      return a.expDate.localeCompare(b.expDate);
+    }
+    if (sort === 'exp-desc') {
+      if (!a.expDate) return 1;
+      if (!b.expDate) return -1;
+      return b.expDate.localeCompare(a.expDate);
+    }
     if (sort === 'name-asc') return a.name.localeCompare(b.name);
-    if (sort === 'year-asc') return a.year - b.year || (a.period || 0) - (b.period || 0);
+    if (sort === 'year-asc') return (a.year || 0) - (b.year || 0) || (a.period || 0) - (b.period || 0);
     return 0;
   });
 
@@ -172,7 +179,7 @@ export function FinalsTab({ onSelectSubject }: { onSelectSubject: (id: string) =
             const canRendir = missingToPass.length === 0;
 
             // Assumed fields for V2 until added to types
-            const expDate = (s as any).expDate;
+            const expDate = s.expDate;
             const regDate = (s as any).regDate;
 
             const daysLeft = getDaysToExpiration(expDate);
