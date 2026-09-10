@@ -30,7 +30,7 @@ export function GradePromptModal({ task, onClose }: Props) {
       return;
     }
     const raw = score.trim();
-    const newScore = raw === '' ? '' : clampGrade(raw);
+    const newScore: number | "" | null = raw === "" ? "" : clampGrade(raw);
     if (newScore === null && raw !== '') {
       alert('Nota inválida. Ingresá un número entre 0 y 10.');
       return;
