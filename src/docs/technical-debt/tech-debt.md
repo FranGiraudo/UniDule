@@ -1,10 +1,19 @@
 # Deuda Técnica — UniDule
 
-**Última actualización:** 2026-08-11 (auditoría src/docs/audits/2026-08-11.md)
+**Última actualización:** 2026-09-10 (auditoría src/docs/audits/2026-09-10.md)
 
 ---
 
 ## Crítica
+
+### TD-RF007 — Estado de Finales persistido como nota visible
+
+- **Tipo:** Funcional (RF)
+- **Archivos afectados:** `src/pages/Finals.tsx:57-75`, `src/pages/Subjects.tsx:288-300`
+- **Descripción:** La sección de Finales almacena los "Intentos Restantes" como un JSON dentro de `user_notes` (título `__FINALS_STATE__`). El modal de notas en la sección de materias lista todas las notas y **no filtra** esta nota interna de configuración.
+- **Riesgo:** El usuario puede ver el JSON crudo en la UI, editarlo y romper el parser, o eliminarlo accidentalmente perdiendo su progreso de intentos de exámenes finales. Riesgo extremo de corrupción de datos por uso normal de la app.
+- **Recomendación:** Agregar un filtro `n.title !== '__FINALS_STATE__'` en la generación de `filteredNotes` dentro de `Subjects.tsx`, o migrar la data a una columna nativa si es posible.
+
 
 _Sin ítems en esta corrida._
 
@@ -36,6 +45,15 @@ _Sin ítems en esta corrida._
 
 ## Media
 
+### TD-RNF005 — Generación frágil de iCalendar (.ics) y tipado débil
+
+- **Tipo:** No funcional (RNF)
+- **Archivos afectados:** `src/pages/Settings.tsx:201-255`
+- **Descripción:** El string de exportación `.ics` se ensambla concatenando texto bruto. No se maneja el plegado de líneas (folding) requerido por la RFC 5545 para líneas mayores a 75 bytes. Además, el mapeo se escribió evadiendo TypeScript con `(sub: any)`.
+- **Riesgo:** Si el título de una materia o su descripción excede la longitud, el archivo generado quedará corrompido y no será importado por Google Calendar.
+- **Recomendación:** Instalar un paquete liviano como `ics` o implementar un generador que respete el *folding CRLF* y tipar los parámetros correctamente.
+
+
 ### TD-RF003 — El ordenamiento de finales por vencimiento no hace nada
 
 - **Tipo:** Funcional (RF)
@@ -43,14 +61,6 @@ _Sin ítems en esta corrida._
 - **Descripción:** El `<select>` de orden ofrece "Vencimiento más próximo" y "Vencimiento más lejano" (`exp-asc`/`exp-desc`), pero el comparador hace `return 0` en ambos casos, dejando la lista sin ordenar. El comentario en línea 70 (*"We don't have expDate in V2 yet"*) está desactualizado: el mismo archivo usa `expDate` unas líneas más abajo (175, 178) para calcular `daysLeft` y pintar los badges de vencimiento — el campo ya existe en `Subject.expDate` (`shared/types/index.ts:25`). Detectado en auditoría 2026-08-11.
 - **Riesgo:** Es una opción de UI visible que no hace lo que dice; el `(s as any)` de las líneas 175-176 es además un cast innecesario que esconde que el tipo ya tiene el campo.
 - **Recomendación:** Implementar el comparador real usando `getDaysToExpiration`/`expDate` (`a.expDate` vs `b.expDate`, con `null` al final) y quitar los casts `as any` ya innecesarios.
-
-### TD-RF004 — "Próximas Entregas" del Dashboard no ordena por fecha
-
-- **Tipo:** Funcional (RF)
-- **Archivos afectados:** `src/pages/Dashboard.tsx:477-480`
-- **Descripción:** `tasks.filter((t) => !t.done).slice(0, 5).map(renderTask)` recorta las primeras 5 tareas pendientes en el orden en que llegan del store, sin ordenar por `dueDate`. `src/pages/Tasks.tsx:73-79` sí implementa el ordenamiento correcto (no hechas primero, luego por fecha ascendente) para la misma data. Detectado en auditoría 2026-08-11.
-- **Riesgo:** Una tarea que vence en 60 días puede desplazar del widget a otra que vence mañana, justo en el panel pensado para avisar qué es urgente.
-- **Recomendación:** Ordenar por `dueDate` ascendente (con `null` al final, igual que en `Tasks.tsx`) antes de aplicar `.slice(0, 5)`.
 
 ### TD-RF005 — Validación de notas inconsistente entre modales
 
@@ -86,9 +96,26 @@ _Sin ítems en esta corrida._
 
 ## Baja
 
+### TD-RNF006 — Cálculos pesados sin memoizar en Schedule y Stats
+
+- **Tipo:** No funcional (RNF)
+- **Archivos afectados:** `src/pages/Schedule.tsx`, `src/pages/Stats.tsx`
+- **Descripción:** `currentStreak` se calcula iterando todo el historial con un `while(true)` dentro del cuerpo del componente (ejecutado en cada render). En `Schedule.tsx`, `getBlocksForDate` filtra y mapea el estado global de eventos 31 veces por cada renderizado del calendario mensual.
+- **Riesgo:** Deterioro de performance (drop de FPS al navegar) en celulares gama baja a medida que el usuario acumula cientos de eventos históricos y sesiones a lo largo del semestre.
+- **Recomendación:** Envolver estos cálculos con `useMemo` y optimizar la iteración histórica con estructuras indexadas.
+
+
 _Sin ítems en esta corrida._
 
 ## Resueltos
+
+### TD-RF004 — "Próximas Entregas" del Dashboard no ordena por fecha
+
+- **Tipo:** Funcional (RF)
+- **Detectado en:** auditoría 2026-08-11.
+- **Resuelto en:** 2026-09-09.
+- **Fix:** Se agregó un `.sort()` explícito por `dueDate` en `src/pages/Dashboard.tsx` antes de aplicar `.slice(0, 5)`.
+
 
 ### TD-RNF001 — Robo de sesión entre usuarios vía "Compartir Horario" + exportación PDF sin sanitizar
 
