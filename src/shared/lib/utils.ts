@@ -87,5 +87,6 @@ export function clampGrade(val: number | string | null): number | null {
   if (val === null || val === '') return null;
   const num = parseFloat(String(val));
   if (isNaN(num)) return null;
-  return Math.max(0, Math.min(10, num));
+  if (num < 0 || num > 10) return null;
+  return num;
 }

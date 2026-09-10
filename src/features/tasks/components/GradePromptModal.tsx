@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import type { Task } from '../../../shared/types';
 import { useStore } from '../../../shared/store/useStore';
 import { syncGrades } from '../../subjects/lib/api';
+import { clampGrade } from '../../../shared/lib/utils';
 
 interface Props {
   task: Task;
@@ -29,16 +30,13 @@ export function GradePromptModal({ task, onClose }: Props) {
       return;
     }
     const raw = score.trim();
-    if (raw !== '') {
-      const num = parseFloat(raw);
-      if (isNaN(num) || num < 0 || num > 10) {
-        alert('Nota inválida. Ingresá un número entre 0 y 10.');
-        return;
-      }
+    const newScore = raw === '' ? '' : clampGrade(raw);
+    if (newScore === null && raw !== '') {
+      alert('Nota inválida. Ingresá un número entre 0 y 10.');
+      return;
     }
     setSaving(true);
     try {
-      const newScore: number | '' = raw === '' ? '' : parseFloat(raw);
       const newGrades = subject.grades!.map((g) =>
         g.id === grade.id ? { ...g, score: newScore } : g,
       );

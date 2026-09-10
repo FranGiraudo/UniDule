@@ -63,7 +63,8 @@ export function SubjectDetailModal({ subjectId, onClose }: Props) {
         
         finalGrade = clampGrade(grade);
         if (finalGrade === null) {
-          alert("Debes ingresar una nota válida (0-10) para aprobar la materia.");
+          alert('Debes ingresar una nota válida (0-10) para aprobar la materia.');
+          setLoading(false);
           return;
         }
       }

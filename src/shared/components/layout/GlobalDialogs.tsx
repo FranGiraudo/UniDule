@@ -9,22 +9,38 @@ export function GlobalDialogs() {
 
   return (
     <>
-      {toast && (
-        <div className={`toast toast-${toast.type}`}>
+            {toast && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '2rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: toast.type === 'error' ? '#ef4444' : 'var(--primary)',
+            color: toast.type === 'error' ? '#fff' : 'var(--bg)',
+            padding: '0.75rem 1.25rem',
+            borderRadius: '8px',
+            fontSize: '0.875rem',
+            fontWeight: 600,
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            zIndex: 9999,
+            animation: 'fadeUp 0.3s ease',
+          }}
+        >
           {toast.text}
         </div>
       )}
       
       
-      {promptDialog && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '300px', textAlign: 'center' }}>
+            {promptDialog && (
+        <div className="modal-bd fade-in">
+          <div className="modal-box modal-sm" style={{ padding: '1.5rem', textAlign: 'center' }}>
             <h3 style={{ marginTop: 0, color: 'var(--text)' }}>{promptDialog.title}</h3>
             <input 
               type="text" 
               value={promptValue} 
               onChange={e => setPromptValue(e.target.value)} 
-              style={{ width: '100%', marginBottom: '1rem', padding: '0.5rem', background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)', borderRadius: '4px' }} 
+              style={{ width: '100%', marginBottom: '1.5rem', padding: '0.75rem', background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)', borderRadius: '6px' }} 
               autoFocus
             />
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
@@ -36,11 +52,11 @@ export function GlobalDialogs() {
       )}
 
       {confirmDialog && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '300px', textAlign: 'center' }}>
+        <div className="modal-bd fade-in">
+          <div className="modal-box modal-sm" style={{ padding: '1.5rem', textAlign: 'center' }}>
             <h3 style={{ marginTop: 0, color: 'var(--text)' }}>Confirmar</h3>
             <p style={{ margin: '1rem 0', color: 'var(--text2)' }}>{confirmDialog.title}</p>
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '1.5rem' }}>
               <button className="btn-secondary" onClick={confirmDialog.onCancel}>Cancelar</button>
               <button className="btn-primary" onClick={confirmDialog.onConfirm}>Aceptar</button>
             </div>
