@@ -2194,3 +2194,46 @@ body.dnd-active .view-header {
 body.dnd-active {
   background: var(--bg);
 }
+
+/* ══════════════════════════════════════════════
+   GLOBAL DIALOGS (TOAST & ALERTS)
+══════════════════════════════════════════════ */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  animation: fadeUp 0.3s ease;
+  white-space: nowrap;
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.toast-success, .toast-info {
+  background: var(--primary);
+  color: var(--bg);
+}
+.toast-error {
+  background: #ef4444;
+  color: #fff;
+}
+
+.dialog-box {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .toast {
+    bottom: calc(var(--bnav-h) + 1.5rem);
+  }
+  .dialog-box {
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 1rem));
+  }
+}

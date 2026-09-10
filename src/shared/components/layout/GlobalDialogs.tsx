@@ -10,23 +10,7 @@ export function GlobalDialogs() {
   return (
     <>
             {toast && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '2rem',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            background: toast.type === 'error' ? '#ef4444' : 'var(--primary)',
-            color: toast.type === 'error' ? '#fff' : 'var(--bg)',
-            padding: '0.75rem 1.25rem',
-            borderRadius: '8px',
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-            zIndex: 9999,
-            animation: 'fadeUp 0.3s ease',
-          }}
-        >
+        <div className={`toast toast-${toast.type} fade-in`}>
           {toast.text}
         </div>
       )}
