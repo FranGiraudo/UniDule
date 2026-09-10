@@ -12,6 +12,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Career } from './pages/Career';
 import { Subjects } from './pages/Subjects';
 import { Tasks } from './pages/Tasks';
+import { Finals } from "./pages/Finals";
 import { Events } from './pages/Events';
 import { Study } from './pages/Study';
 import { Stats } from './pages/Stats';
@@ -44,6 +45,7 @@ export default function App() {
               <Route path="career" element={<Career />} />
               <Route path="subjects" element={<Subjects />} />
               <Route path="tasks" element={<Tasks />} />
+              <Route path="finals" element={<Finals />} />
               <Route path="events" element={<Events />} />
               <Route path="study" element={<Study />} />
               <Route path="stats" element={<Stats />} />

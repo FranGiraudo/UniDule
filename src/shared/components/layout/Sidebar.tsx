@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Map, Calendar, Settings, LogOut, LayoutDashboard, Edit, CalendarCheck, Timer, BarChart2 } from 'lucide-react';
+import { Map, Calendar, Settings, LogOut, LayoutDashboard, Edit, CalendarCheck, Timer, BarChart2, BookOpen } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 export function Sidebar() {
@@ -74,6 +74,13 @@ export function Sidebar() {
             <Edit size={18} />
           </div>
           <div className="nav-label">Tareas</div>
+        </NavLink>
+
+        <NavLink to="/finals" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <div className="nav-icon">
+            <BookOpen size={18} />
+          </div>
+          <div className="nav-label">Finales</div>
         </NavLink>
 
         <NavLink to="/study" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>

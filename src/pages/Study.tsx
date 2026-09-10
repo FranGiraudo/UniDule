@@ -11,7 +11,7 @@ export function Study() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { timeLeft, isRunning, mode, subjectId, taskId, examId } = pomodoro;
   const subjects = career?.subjects || [];
-  const activeSubjects = subjects.filter(s => s.status === 'cursando');
+  const activeSubjects = subjects.filter(s => s.status === 'cursando' || s.status === 'regular');
   const subjectTasks = tasks.filter(t => t.subjectId === subjectId && !t.done);
   const activeSubject = subjects.find(s => s.id === subjectId);
   const subjectExams = activeSubject?.grades?.filter(g => g.type.toLowerCase().includes('parcial') || g.type.toLowerCase().includes('final')) || [];
