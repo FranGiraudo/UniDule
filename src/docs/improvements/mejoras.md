@@ -111,7 +111,7 @@
 - **Categoría:** Nueva Funcionalidad
 - **Impacto:** Alto
 - **Esfuerzo:** Medio
-- **Estado:** Propuesta
+- **Estado:** Completada
 - **Resumen:** Permitir importar y exportar eventos extracurriculares a Google Calendar para interoperabilidad.
 - **Plan:** `src/docs/improvements/MEJ-012-sincronizacion-google-calendar.md`
 
