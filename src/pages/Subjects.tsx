@@ -32,6 +32,7 @@ export function Subjects() {
   };
 
   const filteredNotes = notes.filter((n) => {
+    if (n.title === '__FINALS_STATE__') return false;
     if (!noteQuery) return true;
     const q = noteQuery.toLowerCase();
     return n.title.toLowerCase().includes(q) || (n.content || '').toLowerCase().includes(q);
