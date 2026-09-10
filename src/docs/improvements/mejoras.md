@@ -192,7 +192,7 @@
 - **Categoría:** Nueva Funcionalidad
 - **Impacto:** Alto
 - **Esfuerzo:** Medio
-- **Estado:** Propuesta
+- **Estado:** Completada
 - **Resumen:** Mostrar en Estadísticas una lista detallada de cada sesión completada, con la posibilidad de editar o eliminar registros erróneos.
 - **Plan:** `src/docs/improvements/MEJ-021-log-historial-edicion-sesiones.md`
 
