@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Save, Trash2 } from 'lucide-react';
 import type { Note } from '../../../shared/types';
 import { useStore } from '../../../shared/store/useStore';
+import { useDialogs } from '../../../shared/store/useDialogs';
 import { saveNote, deleteNote } from '../lib/api';
 
 interface Props {
@@ -15,6 +16,7 @@ const todayStr = () => {
 };
 
 export function NoteModal({ note, onClose }: Props) {
+  const showConfirm = useDialogs(s => s.showConfirm);
   const subjects = useStore((state) => state.career?.subjects || []);
   const trackedSubjects = subjects.filter((s) => s.activeId);
 
@@ -47,7 +49,7 @@ export function NoteModal({ note, onClose }: Props) {
   };
 
   const handleDelete = async () => {
-    if (!note || !confirm('¿Eliminar nota?')) return;
+    if (!note || !(await showConfirm('¿Eliminar nota?'))) return;
     setSaving(true);
     try {
       await deleteNote(note.id);

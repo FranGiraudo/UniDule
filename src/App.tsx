@@ -5,6 +5,14 @@ import { useStore } from './shared/store/useStore';
 
 // Layout
 import { MainLayout } from './shared/components/layout/MainLayout';
+import { GlobalDialogs } from './shared/components/layout/GlobalDialogs';
+import { useDialogs } from './shared/store/useDialogs';
+
+window.alert = (msg) => {
+  useDialogs.getState().showToast(msg, 'error');
+};
+
+//  from './shared/components/layout/MainLayout';
 
 // Pages
 import { Auth } from './pages/Auth';
@@ -55,6 +63,7 @@ export default function App() {
           </Routes>
         </ThemeProvider>
       </AuthProvider>
+      <GlobalDialogs />
     </Router>
   );
 }

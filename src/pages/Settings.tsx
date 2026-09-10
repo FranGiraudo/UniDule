@@ -1,4 +1,5 @@
 import { useStore } from '../shared/store/useStore';
+import { useDialogs } from '../shared/store/useDialogs';
 import { supabase } from '../shared/lib/supabase';
 import { THEMES } from '../shared/context/ThemeProvider';
 import type { ThemeType, ScheduleEvent } from '../shared/types';
@@ -93,6 +94,7 @@ function sanitizeSharePayload(decoded: unknown): ScheduleSharePayload['data'] | 
 }
 
 export function Settings() {
+  const { showConfirm, showPrompt } = useDialogs();
   const { session, profile, theme, setTheme, career, tasks, userEvents } = useStore();
   const subjects = career?.subjects || [];
   const [showSim, setShowSim] = useState(false);
@@ -134,9 +136,7 @@ export function Settings() {
         if (!subjectsIn.length && !tasksIn.length) throw new Error('empty');
 
         if (
-          !confirm(
-            `Se cargarán ${subjectsIn.length} materia(s) y ${tasksIn.length} tarea(s). Esto sobrescribirá tus datos actuales para esas materias/tareas.`,
-          )
+          !(await showConfirm(`Se cargarán ${subjectsIn.length} materia(s) y ${tasksIn.length} tarea(s). Esto sobrescribirá tus datos actuales para esas materias/tareas.`))
         )
           return;
 
@@ -306,7 +306,7 @@ export function Settings() {
   };
 
   const handleInputCode = async () => {
-    const code = prompt('Pegá el código de horario que te pasaron:');
+    const code = await showPrompt('Pegá el código de horario que te pasaron:');
     if (!code) return;
     try {
       const decoded: unknown = JSON.parse(decodeURIComponent(atob(code)));

@@ -1,9 +1,11 @@
 import { useStore } from '../shared/store/useStore';
+import { useDialogs } from '../shared/store/useDialogs';
 import { deleteStudySession } from '../features/events/lib/api';
 import { useMemo } from 'react';
 import { Activity, BookOpen, Dumbbell, Flame, Trash2, Clock } from 'lucide-react';
 
 export function Stats() {
+  const showConfirm = useDialogs(s => s.showConfirm);
   const { eventCompletions, studySessions, userEvents, career } = useStore();
   const subjects = career?.subjects || [];
 
@@ -78,7 +80,7 @@ export function Stats() {
 
 
   const handleDeleteSession = async (id: string) => {
-    if (!window.confirm('¿Seguro que quieres eliminar esta sesión?')) return;
+    if (!(await showConfirm('¿Seguro que quieres eliminar esta sesión?'))) return;
     try {
       await deleteStudySession(id);
       // Actualizar el estado global

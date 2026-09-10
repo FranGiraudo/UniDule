@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Edit, Trash2, BarChart3, BookOpen, Search } from 'lucide-react';
 import { useStore } from '../shared/store/useStore';
+import { useDialogs } from '../shared/store/useDialogs';
 import { deleteActiveSubject } from '../features/subjects/lib/api';
 import { ACTIVE_STATUS } from '../features/subjects/lib/constants';
 import { parseMd } from '../features/subjects/lib/utils';
@@ -10,6 +11,7 @@ import { NoteModal } from '../features/subjects/components/NoteModal';
 import type { Subject, Note } from '../shared/types';
 
 export function Subjects() {
+  const showConfirm = useDialogs(s => s.showConfirm);
   const career = useStore((state) => state.career);
   const notes = useStore((state) => state.notes);
   const allSubjects = career?.subjects || [];
@@ -23,7 +25,7 @@ export function Subjects() {
 
   const handleDelete = async (s: Subject) => {
     if (!s.activeId) return;
-    if (!confirm(`¿Eliminar "${s.name}" de tus materias en curso?`)) return;
+    if (!(await showConfirm(`¿Eliminar "${s.name}" de tus materias en curso?`))) return;
     try {
       await deleteActiveSubject(s.activeId);
     } catch (e: any) {
