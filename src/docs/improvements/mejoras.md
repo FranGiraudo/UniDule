@@ -84,7 +84,7 @@
 - **Categoría:** Nueva Funcionalidad
 - **Impacto:** Medio
 - **Esfuerzo:** Bajo
-- **Estado:** Propuesta
+- **Estado:** Completada
 - **Resumen:** El stat-card "Alertas" del Dashboard (`src/pages/Dashboard.tsx:337-373`) solo cuenta riesgo de faltas (`warnSubs`). `FinalsTab.tsx:178-201` ya calcula, para cada materia regular, cuántos días faltan para que venza la regularidad (`getDaysToExpiration`) y ya define el umbral de alerta (≤90 días) — pero esa alerta solo es visible si el usuario entra a Career → Finales. Es el mismo patrón de "tarjeta de alertas" que el Dashboard ya resuelve para una causa de riesgo y no para otra equivalente que la propia app ya calcula.
 - **Plan:** `src/docs/improvements/MEJ-009-alerta-regularidad-dashboard.md`
 
@@ -138,7 +138,7 @@
 - **Categoría:** Nueva Funcionalidad
 - **Impacto:** Alto
 - **Esfuerzo:** Medio
-- **Estado:** Propuesta
+- **Estado:** Completada
 - **Resumen:** Mostrar en la pestaña de Estadísticas rachas de días seguidos cumpliendo actividades o sesiones de estudio.
 - **Plan:** `src/docs/improvements/MEJ-015-rachas-gamificacion-stats.md`
 
@@ -147,7 +147,7 @@
 - **Categoría:** Nueva Funcionalidad
 - **Impacto:** Alto
 - **Esfuerzo:** Medio
-- **Estado:** Propuesta
+- **Estado:** Completada
 - **Resumen:** Separar los hábitos repetitivos diarios de los eventos del timeline, creando un checklist que se reinicie cada medianoche.
 - **Plan:** `src/docs/improvements/MEJ-016-checklist-habitos-independiente.md`
 
