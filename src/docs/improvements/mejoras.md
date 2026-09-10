@@ -156,7 +156,7 @@
 - **Categoría:** Nueva Funcionalidad
 - **Impacto:** Alto
 - **Esfuerzo:** Medio
-- **Estado:** Propuesta
+- **Estado:** Completada
 - **Resumen:** Agregar un widget destacado en el Dashboard indicando los días restantes para el próximo parcial o final.
 - **Plan:** `src/docs/improvements/MEJ-017-cuenta-regresiva-examenes.md`
 
