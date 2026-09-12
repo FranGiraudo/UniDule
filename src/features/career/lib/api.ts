@@ -35,7 +35,7 @@ export async function updateSubjectProgress(
   if (status === 'pendiente') {
     try {
       const { deleteActiveSubject } = await import('../../subjects/lib/api');
-      await deleteActiveSubject(globalId);
+      await deleteActiveSubject(globalId, false);
     } catch (err) {
       console.warn('Could not untrack subject:', err);
     }

@@ -29,6 +29,20 @@ export async function saveActiveSubject(sub: ActiveSubjectInput) {
   const session = useStore.getState().session;
   if (!session) throw new Error('No session');
 
+  const status = sub.status || 'cursando';
+  
+  if (status !== 'cursando') {
+    try {
+      const { updateSubjectProgress } = await import('../../career/lib/api');
+      const progStatus = status === 'promocionado' ? 'aprobada' : status;
+      await updateSubjectProgress(sub.id, 'subject', progStatus, null, null, null);
+    } catch (e) {
+      console.error('Error updating progress on save:', e);
+    }
+    await deleteActiveSubject(sub.id, false);
+    return;
+  }
+
   const payload = {
     id: sub.id,
     user_id: session.user.id,
@@ -40,7 +54,7 @@ export async function saveActiveSubject(sub: ActiveSubjectInput) {
     email: sub.email || '',
     max_absences: sub.maxAbsences ?? 6,
     absences: sub.absences ?? 0,
-    status: sub.status || 'cursando',
+    status,
     allows_promotion: sub.allowsPromotion || false,
     schedule: sub.schedules || [],
   };
@@ -62,10 +76,11 @@ export async function saveActiveSubject(sub: ActiveSubjectInput) {
     absences: payload.absences,
     allowsPromotion: payload.allows_promotion,
     schedules: payload.schedule,
+    status: 'cursando',
   });
 }
 
-export async function deleteActiveSubject(id: string) {
+export async function deleteActiveSubject(id: string, resetProgress = true) {
   const session = useStore.getState().session;
   if (!session) throw new Error('No session');
   const uid = session.user.id;
@@ -82,6 +97,15 @@ export async function deleteActiveSubject(id: string) {
     throw error;
   }
 
+  if (resetProgress) {
+    try {
+      const { updateSubjectProgress } = await import('../../career/lib/api');
+      await updateSubjectProgress(id, 'subject', 'pendiente', null, null, null);
+    } catch (err) {
+      console.error('Error resetting progress on delete:', err);
+    }
+  }
+
   updateSubjectInCareer(id, {
     activeId: undefined,
     professor: undefined,
@@ -93,6 +117,7 @@ export async function deleteActiveSubject(id: string) {
     color: '#D8D2BE',
     room: '',
     schedules: [],
+    ...(resetProgress ? { status: 'pendiente' } : {})
   });
   useStore.getState().setTasks(useStore.getState().tasks.filter((t) => t.subjectId !== id));
 }
