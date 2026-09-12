@@ -562,6 +562,27 @@ export function Settings() {
           </div>
         </div>
 
+        {/* CALENDARIO ICS */}
+        <div className="card" style={{ padding: '1.5rem', borderRadius: '12px' }}>
+          <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Calendar size={20} style={{ color: 'var(--primary)' }} /> Sincronizar Calendario
+          </h3>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text2)', marginBottom: '1rem' }}>
+            Descargá tu horario de cursada, eventos y exámenes (que tengan horario) en formato iCalendar (.ics) para sincronizarlo con Google Calendar o Apple Calendar y recibir notificaciones del sistema en tu celular.
+          </p>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <button 
+              className="btn btn-outline" 
+              onClick={async () => {
+                const { exportICS } = await import('../shared/lib/ics');
+                exportICS(subjects, tasks, userEvents);
+              }}
+            >
+              Exportar a .ics
+            </button>
+          </div>
+        </div>
+
         {/* DATOS Y CUENTA */}
         <div className="card" style={{ padding: '1.5rem', borderRadius: '12px' }}>
           <h3
