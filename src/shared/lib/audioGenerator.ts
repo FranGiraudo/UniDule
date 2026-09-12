@@ -78,6 +78,46 @@ export class AmbientAudio {
     }
     this.isPlaying = false;
   }
+  public unlock() {
+    this.init();
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  public playNotification() {
+    this.init();
+    if (!this.ctx) return;
+    
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+
+    try {
+      const playTone = (freq: number, startTime: number, duration: number) => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + startTime);
+        
+        gain.gain.setValueAtTime(0, this.ctx.currentTime + startTime);
+        gain.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + startTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + startTime + duration);
+        
+        osc.start(this.ctx.currentTime + startTime);
+        osc.stop(this.ctx.currentTime + startTime + duration);
+      };
+
+      playTone(523.25, 0, 0.4);
+      playTone(659.25, 0.2, 0.6);
+    } catch (e) {
+      console.error('Audio play failed', e);
+    }
+  }
 }
 
 export const ambientAudio = new AmbientAudio();

@@ -3,6 +3,7 @@ import { LayoutDashboard, Map, Calendar, Settings, Edit, CalendarCheck, Timer, B
 import { Sidebar } from './Sidebar';
 import { useDataSync } from '../../hooks/useDataSync';
 import { useStore } from '../../store/useStore';
+import { useDialogs } from '../../store/useDialogs';
 import { useEffect } from 'react';
 import { playNotificationSound } from '../../lib/utils';
 import { saveStudySession } from '../../../features/events/lib/api';
@@ -27,13 +28,14 @@ export function MainLayout() {
             const stM = parseInt(parts[0]) * 60 + parseInt(parts[1]);
             // If exactly 15 mins before
             if (stM - nowM === 15) {
+              useDialogs.getState().showToast(`¡Clase en 15 minutos! ${s.name} (${sc.type}) en ${s.room || 'Aula sin asignar'}`, 'info');
               if (Notification.permission === 'granted') {
                 new Notification('¡Clase en 15 minutos!', {
                   body: `${s.name} (${sc.type}) a las ${sc.startTime} en ${s.room || 'Aula sin asignar'}`,
                   icon: '/icon-192x192.png'
                 });
-                playNotificationSound();
               }
+              playNotificationSound();
             }
           });
         });
@@ -47,6 +49,7 @@ export function MainLayout() {
         } else {
           state.setPomodoro({ isRunning: false });
           playNotificationSound();
+          useDialogs.getState().showToast('¡Tiempo cumplido! Tu sesión de estudio ha terminado.', 'info');
           if (Notification.permission === 'granted') {
             new Notification('¡Tiempo cumplido!', {
               body: 'Tu sesión de estudio ha terminado.',

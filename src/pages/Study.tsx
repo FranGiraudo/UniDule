@@ -56,8 +56,11 @@ export function Study() {
   };
 
   const toggleTimer = () => {
-    if (!isRunning && Notification.permission === 'default') {
-      Notification.requestPermission();
+    if (!isRunning) {
+      if (Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+      ambientAudio.unlock();
     }
     setPomodoro({ isRunning: !isRunning });
   };
