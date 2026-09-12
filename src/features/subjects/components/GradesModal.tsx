@@ -66,7 +66,7 @@ export function GradesModal({ subject, onClose }: Props) {
         if (!existing) {
           await saveTask({
             id: crypto.randomUUID(),
-            title: `${g.type} — ${subject.name}`,
+            title: g.type,
             type: g.type.includes('Parcial') ? 'Parcial' : (g.type === 'Final' ? 'Final' : 'Trabajo Práctico'),
             subjectId: subject.id,
             gradeId: g.id,
@@ -75,7 +75,7 @@ export function GradesModal({ subject, onClose }: Props) {
             done: hasScore,
           });
         } else {
-          const expectedTitle = `${g.type} — ${subject.name}`;
+          const expectedTitle = g.type;
           const needsScoreUpdate = hasScore && !existing.done;
           const needsDateUpdate = existing.dueDate !== (g.date || null);
           const needsTitleUpdate = existing.title !== expectedTitle;

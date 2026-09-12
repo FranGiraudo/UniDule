@@ -12,6 +12,7 @@ import type { Subject, Note } from '../shared/types';
 
 export function Subjects() {
   const showConfirm = useDialogs(s => s.showConfirm);
+  const showToast = useDialogs(s => s.showToast);
   const career = useStore((state) => state.career);
   const notes = useStore((state) => state.notes);
   const allSubjects = career?.subjects || [];
@@ -28,6 +29,7 @@ export function Subjects() {
     if (!(await showConfirm(`¿Eliminar "${s.name}" de tus materias en curso?`))) return;
     try {
       await deleteActiveSubject(s.activeId);
+      showToast(`Materia "${s.name}" volvió a estado Pendiente/Disponible en el plan`, 'info');
     } catch (e: any) {
       alert('Error al eliminar: ' + (e?.message || e));
     }
