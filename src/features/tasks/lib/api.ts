@@ -47,3 +47,43 @@ export async function deleteTask(id: string) {
   }
   useStore.getState().setTasks(useStore.getState().tasks.filter((t) => t.id !== id));
 }
+
+export async function linkExistingExams() {
+  const tasks = useStore.getState().tasks;
+  const career = useStore.getState().career;
+  if (!career) return;
+
+  const unlinked = tasks.filter(
+    (t) => (t.type === 'Parcial' || t.type === 'Final') && t.subjectId && !t.gradeId
+  );
+
+  if (unlinked.length === 0) return;
+
+  let anyChange = false;
+  for (const t of unlinked) {
+    const sub = career.subjects.find((s) => s.id === t.subjectId);
+    if (!sub || !sub.activeId) continue;
+
+    const grades = sub.grades || [];
+    // Try to find a matching grade by title/type
+    let grade = grades.find((g) => g.type === t.title);
+    
+    if (!grade) {
+      grade = {
+        id: crypto.randomUUID(),
+        type: t.title,
+        score: '',
+        date: t.dueDate || null,
+      };
+      const { syncGrades } = await import('../../subjects/lib/api');
+      await syncGrades(sub.id, [...grades, grade]);
+    }
+
+    await saveTask({ ...t, gradeId: grade.id });
+    anyChange = true;
+  }
+
+  if (anyChange) {
+    console.log('✅ Evaluaciones antiguas vinculadas automáticamente.');
+  }
+}

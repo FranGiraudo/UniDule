@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Check, CheckCircle2 } from 'lucide-react';
 import { useStore } from '../shared/store/useStore';
 import { saveTask, deleteTask } from '../features/tasks/lib/api';
@@ -22,6 +22,12 @@ export function Tasks() {
   const [editingTask, setEditingTask] = useState<Task | null | undefined>(undefined);
   const [gradeTask, setGradeTask] = useState<Task | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
+
+  useEffect(() => {
+    import('../features/tasks/lib/api').then((m) => {
+      m.linkExistingExams().catch(console.error);
+    });
+  }, []);
 
   const ensureGradeForTask = async (t: Task) => {
     const subject = useStore.getState().career?.subjects.find((s) => s.id === t.subjectId);
