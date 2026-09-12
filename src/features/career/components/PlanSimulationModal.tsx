@@ -95,7 +95,6 @@ export function PlanSimulationModal({ onClose }: { onClose: () => void }) {
     },
     { name: 'Economía para Ingeniería', status: 'REGULAR', derived: 'Economía' },
     { name: 'Auditoría e Informática Forense', status: 'CURSANDO', derived: 'Auditoría' },
-    { name: 'Inglés para Ingeniería', status: 'APROBADA', derived: 'Nivel Idioma Inglés' },
   ];
 
   return (
