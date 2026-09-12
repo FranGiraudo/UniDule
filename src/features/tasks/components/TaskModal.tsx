@@ -17,6 +17,8 @@ export function TaskModal({ task, onClose }: Props) {
   const [type, setType] = useState(task?.type || 'Tarea');
   const [subjectId, setSubjectId] = useState(task?.subjectId || '');
   const [dueDate, setDueDate] = useState(task?.dueDate || '');
+  const [startTime, setStartTime] = useState(task?.startTime || '');
+  const [endTime, setEndTime] = useState(task?.endTime || '');
   const [notes, setNotes] = useState(task?.notes || '');
   const [saving, setSaving] = useState(false);
 
@@ -27,14 +29,43 @@ export function TaskModal({ task, onClose }: Props) {
     }
     setSaving(true);
     try {
+      let finalGradeId = task?.gradeId ?? null;
+      
+      if (subjectId && (type === 'Parcial' || type === 'Final')) {
+        const sub = useStore.getState().career?.subjects.find((s) => s.id === subjectId);
+        if (sub && sub.activeId) {
+          const grades = sub.grades || [];
+          let grade = finalGradeId ? grades.find(g => g.id === finalGradeId) : null;
+          
+          if (!grade) {
+            grade = {
+              id: crypto.randomUUID(),
+              type: title.trim(),
+              score: '',
+              date: dueDate || null,
+            };
+            const { syncGrades } = await import('../../subjects/lib/api');
+            await syncGrades(sub.id, [...grades, grade]);
+            finalGradeId = grade.id;
+          } else {
+            // Update existing grade's title/date
+            const updatedGrades = grades.map(g => g.id === grade!.id ? { ...g, type: title.trim(), date: dueDate || null } : g);
+            const { syncGrades } = await import('../../subjects/lib/api');
+            await syncGrades(sub.id, updatedGrades);
+          }
+        }
+      }
+
       await saveTask({
         id: task?.id || crypto.randomUUID(),
         title: title.trim(),
         subjectId: subjectId || null,
         type,
         dueDate: dueDate || null,
+        startTime: startTime || null,
+        endTime: endTime || null,
         notes: notes.trim(),
-        gradeId: task?.gradeId ?? null,
+        gradeId: finalGradeId,
         done: task?.done || false,
       });
       onClose();
@@ -88,6 +119,27 @@ export function TaskModal({ task, onClose }: Props) {
                 className="f-input"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div>
+              <label className="f-label">Hora inicio (opcional)</label>
+              <input
+                type="time"
+                className="f-input"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="f-label">Hora fin (opcional)</label>
+              <input
+                type="time"
+                className="f-input"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
               />
             </div>
           </div>

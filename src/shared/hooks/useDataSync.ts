@@ -70,6 +70,8 @@ export function useDataSync() {
           title: t.title,
           type: t.type,
           dueDate: t.due_date,
+          startTime: t.start_time,
+          endTime: t.end_time,
           notes: t.notes || '',
           gradeId: t.grade_id,
           done: t.done,

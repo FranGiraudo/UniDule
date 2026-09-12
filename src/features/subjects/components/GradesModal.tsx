@@ -6,7 +6,7 @@ import { useStore } from '../../../shared/store/useStore';
 import { saveActiveSubject, syncGrades } from '../lib/api';
 import { updateSubjectProgress } from '../../career/lib/api';
 import { saveTask, deleteTask } from '../../tasks/lib/api';
-import { GRADE_TYPES, EXAM_TYPES } from '../lib/constants';
+import { GRADE_TYPES } from '../lib/constants';
 
 interface Props {
   subject: Subject;
@@ -67,7 +67,7 @@ export function GradesModal({ subject, onClose }: Props) {
           await saveTask({
             id: crypto.randomUUID(),
             title: `${g.type} — ${subject.name}`,
-            type: EXAM_TYPES.has(g.type) ? g.type : 'Tarea',
+            type: g.type.includes('Parcial') ? 'Parcial' : (g.type === 'Final' ? 'Final' : 'Trabajo Práctico'),
             subjectId: subject.id,
             gradeId: g.id,
             dueDate: g.date || null,
@@ -75,12 +75,15 @@ export function GradesModal({ subject, onClose }: Props) {
             done: hasScore,
           });
         } else {
+          const expectedTitle = `${g.type} — ${subject.name}`;
           const needsScoreUpdate = hasScore && !existing.done;
           const needsDateUpdate = existing.dueDate !== (g.date || null);
+          const needsTitleUpdate = existing.title !== expectedTitle;
           
-          if (needsScoreUpdate || needsDateUpdate) {
+          if (needsScoreUpdate || needsDateUpdate || needsTitleUpdate) {
             await saveTask({
               ...existing,
+              title: expectedTitle,
               done: hasScore ? true : existing.done,
               dueDate: g.date || null,
             });

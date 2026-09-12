@@ -87,6 +87,8 @@ export interface Task {
   title: string;
   type: string;
   dueDate: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
   notes?: string;
   gradeId?: string | null;
   done: boolean;

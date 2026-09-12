@@ -13,6 +13,8 @@ export async function saveTask(task: Task) {
     subject_id: task.subjectId || null,
     type: task.type,
     due_date: task.dueDate || null,
+    start_time: task.startTime || null,
+    end_time: task.endTime || null,
     notes: task.notes || '',
     done: task.done || false,
     grade_id: task.gradeId || null,

@@ -205,7 +205,7 @@ export function Tasks() {
                     )}
                     {t.dueDate && (
                       <span style={{ fontSize: '10px', color: 'var(--text2)' }}>
-                        {formatDate(t.dueDate)}
+                        {formatDate(t.dueDate)} {t.startTime ? `${t.startTime}${t.endTime ? ' - ' + t.endTime : ''}` : ''}
                       </span>
                     )}
                     {t.notes && (
