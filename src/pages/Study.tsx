@@ -1,14 +1,18 @@
 import { Play, Pause, RotateCcw, BookOpen, CheckSquare, Settings2, BellOff, GraduationCap, X } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useStore } from '../shared/store/useStore';
+import { ambientAudio } from '../shared/lib/audioGenerator';
 
-const SOUNDS = [{ id: 'none', label: 'Sin sonido' }, { id: 'rain', label: 'Lluvia', url: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=heavy-rain-nature-sounds-8186.mp3' }, { id: 'white', label: 'Ruido Blanco', url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_2fc27a419c.mp3?filename=white-noise-8117.mp3' }];
+const SOUNDS = [
+  { id: 'none', label: 'Sin sonido' },
+  { id: 'rain', label: 'Lluvia Suave' },
+  { id: 'white', label: 'Ruido Blanco' }
+];
 
 export function Study() {
 
   const { pomodoro, setPomodoro, career, tasks, settings, setSettings } = useStore();
   const [showSettings, setShowSettings] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const { timeLeft, isRunning, mode, subjectId, taskId, examId } = pomodoro;
   const subjects = career?.subjects || [];
   const activeSubjects = subjects.filter(s => s.status === 'cursando' || s.status === 'regular');
@@ -25,13 +29,12 @@ export function Study() {
 
   
   useEffect(() => {
-    if (audioRef.current) {
-      if (isRunning && settings.ambientSound !== 'none') {
-        audioRef.current.play().catch(e => console.log('Audio autoplay blocked', e));
-      } else {
-        audioRef.current.pause();
-      }
+    if (isRunning && settings.ambientSound !== 'none') {
+      ambientAudio.play(settings.ambientSound as any);
+    } else {
+      ambientAudio.stop();
     }
+    return () => ambientAudio.stop();
   }, [isRunning, settings.ambientSound]);
 
   
@@ -352,12 +355,7 @@ export function Study() {
           </div>
         </div>
       )}
-      <audio 
-        ref={audioRef} 
-        src={SOUNDS.find(s => s.id === settings.ambientSound)?.url || ''} 
-        loop 
-        preload="auto"
-      />
+
     </div>
   );
 }
