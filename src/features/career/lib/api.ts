@@ -31,6 +31,16 @@ export async function updateSubjectProgress(
     throw error;
   }
 
+  // If marked as pendiente (disponible/bloqueada), it should no longer be actively tracked.
+  if (status === 'pendiente') {
+    try {
+      const { deleteActiveSubject } = await import('../../subjects/lib/api');
+      await deleteActiveSubject(globalId);
+    } catch (err) {
+      console.warn('Could not untrack subject:', err);
+    }
+  }
+
   // Update local store for immediate UI update
   const career = useStore.getState().career;
   if (career) {

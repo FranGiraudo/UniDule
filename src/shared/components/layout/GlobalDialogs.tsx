@@ -28,8 +28,8 @@ export function GlobalDialogs() {
               autoFocus
             />
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-              <button className="btn-secondary" onClick={() => { setPromptValue(''); promptDialog.onCancel(); }}>Cancelar</button>
-              <button className="btn-primary" onClick={() => { promptDialog.onConfirm(promptValue); setPromptValue(''); }}>Aceptar</button>
+              <button className="btn btn-secondary" onClick={() => { setPromptValue(''); promptDialog.onCancel(); }}>Cancelar</button>
+              <button className="btn btn-primary" onClick={() => { promptDialog.onConfirm(promptValue); setPromptValue(''); }}>Aceptar</button>
             </div>
           </div>
         </div>
@@ -41,8 +41,8 @@ export function GlobalDialogs() {
             <h3 style={{ marginTop: 0, color: 'var(--text)' }}>Confirmar</h3>
             <p style={{ margin: '1rem 0', color: 'var(--text2)' }}>{confirmDialog.title}</p>
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '1.5rem' }}>
-              <button className="btn-secondary" onClick={confirmDialog.onCancel}>Cancelar</button>
-              <button className="btn-primary" onClick={confirmDialog.onConfirm}>Aceptar</button>
+              <button className="btn btn-secondary" onClick={confirmDialog.onCancel}>Cancelar</button>
+              <button className="btn btn-primary" style={{ background: '#ef4444' }} onClick={confirmDialog.onConfirm}>Eliminar</button>
             </div>
           </div>
         </div>
