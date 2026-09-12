@@ -37,3 +37,4 @@ graphify-out/
 # Antigravity Context
 .antigravity_context.md
 build_output.txt
+dev-dist
