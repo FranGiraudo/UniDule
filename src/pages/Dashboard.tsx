@@ -57,6 +57,7 @@ export function Dashboard() {
   }, []);
 
   const DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  const toYMD = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
   const getBlocksForDay = (day: string) => {
     const blocks: { s: any; sc: any }[] = [];
@@ -67,19 +68,21 @@ export function Dashboard() {
     const dayIndex = DAYS.indexOf(day);
     const myDayIndex = dayIndex === 0 ? 7 : dayIndex;
     const userEvents = useStore.getState().userEvents;
-    
+
     userEvents.forEach((e) => {
       let shouldShow = false;
       if (e.isRecurring) {
         if (e.dayOfWeek === myDayIndex) shouldShow = true;
       } else if (e.date) {
-        const parts = e.date.split('-');
-        if (parts.length === 3) {
-          const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-          const jsDay = d.getDay();
-          const myDay = jsDay === 0 ? 7 : jsDay;
-          if (myDay === myDayIndex) shouldShow = true;
-        }
+        // Fix: Only show one-time events if their exact date matches today/the target date
+        // Since Dashboard only cares about today and relative next days, we need to compare exact dates.
+        // To keep it simple, we approximate by calculating the target Date based on the day string offset from today.
+        const todayIdx = DAYS.indexOf(DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]);
+        let offset = dayIndex - todayIdx;
+        if (offset < 0) offset += 7;
+        const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() + offset);
+        if (e.date === toYMD(targetDate)) shouldShow = true;
       }
       if (shouldShow) {
         blocks.push({
@@ -92,6 +95,33 @@ export function Dashboard() {
             type: e.category.charAt(0).toUpperCase() + e.category.slice(1) 
           }
         });
+      }
+    });
+
+    const tasks = useStore.getState().tasks;
+    tasks.forEach((t) => {
+      if ((t.type === 'Parcial' || t.type === 'Final') && t.dueDate && t.startTime && t.endTime) {
+        const todayIdx = DAYS.indexOf(DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]);
+        let offset = dayIndex - todayIdx;
+        if (offset < 0) offset += 7;
+        const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() + offset);
+        
+        if (t.dueDate === toYMD(targetDate)) {
+          const sub = subjects.find(s => s.id === t.subjectId);
+          blocks.push({
+            s: { 
+              name: t.title, 
+              color: sub?.color || '#ef4444', 
+              room: sub?.name || 'Examen' 
+            },
+            sc: {
+              startTime: t.startTime,
+              endTime: t.endTime,
+              type: t.type
+            }
+          });
+        }
       }
     });
     return blocks.sort((a, b) => t2m(a.sc.startTime) - t2m(b.sc.startTime));

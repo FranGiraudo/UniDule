@@ -93,6 +93,27 @@ export function Schedule() {
       }
     });
 
+    const tasks = useStore.getState().tasks;
+    tasks.forEach((t) => {
+      if ((t.type === 'Parcial' || t.type === 'Final') && t.dueDate === dateStr) {
+        if (t.startTime && t.endTime) {
+          const sub = subjects.find(s => s.id === t.subjectId);
+          blocks.push({
+            s: { 
+              name: t.title, 
+              color: sub?.color || '#ef4444', 
+              room: sub?.name || 'Examen' 
+            },
+            sc: {
+              startTime: t.startTime,
+              endTime: t.endTime,
+              type: t.type
+            }
+          });
+        }
+      }
+    });
+
     return blocks.sort((a, b) => t2m(a.sc.startTime) - t2m(b.sc.startTime));
   };
 
