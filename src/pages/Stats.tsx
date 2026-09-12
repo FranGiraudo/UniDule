@@ -62,7 +62,7 @@ export function Stats() {
       return compSet.has(ds) || studySet.has(ds);
     };
 
-    let checkDate = new Date(d);
+    const checkDate = new Date(d);
     if (!hasActivity(checkDate)) {
       checkDate.setDate(checkDate.getDate() - 1);
     }

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useStore } from '../../../shared/store/useStore';
 import type { Subject } from '../../../shared/types';
+import { getComputedStatus } from '../lib/utils';
 
 const CM = { NW: 156, NH: 48, HGAP: 32, VGAP: 14, HEADER: 72, M: 16 };
 const COL_W = CM.NW + CM.HGAP;
@@ -153,7 +154,8 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
   };
 
   const getStatusStyle = (s: Subject) => {
-    switch (s.status) {
+    const cs = getComputedStatus(s, subjects);
+    switch (cs) {
       case 'aprobada':
         return { bg: V.nodeFillA, stroke: V.nodeStrokeA, text: V.textLight, label: 'APROBADA' };
       case 'regular':
@@ -170,8 +172,16 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
           text: V.textLight,
           label: 'CURSANDO',
         };
+      case 'disponible':
+        return {
+          bg: V.nodeFillDisp,
+          stroke: '#ca8a04',
+          text: '#854d0e',
+          label: 'DISPONIBLE',
+        };
+      case 'bloqueada':
       default:
-        return { bg: V.nodeFill, stroke: V.nodeStroke, text: V.textDark, label: 'DISPONIBLE' };
+        return { bg: V.nodeFill, stroke: V.nodeStroke, text: V.textMuted, label: 'BLOQUEADA' };
     }
   };
 

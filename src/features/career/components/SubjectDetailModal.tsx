@@ -23,12 +23,7 @@ export function SubjectDetailModal({ subjectId, onClose }: Props) {
   const target = subject || elective;
   const isElective = !!elective;
 
-  const initialStatus = target
-    ? target.status ||
-      (isElective
-        ? target.status || 'pendiente'
-        : getComputedStatus(target as any, career?.subjects || []))
-    : 'pendiente';
+  const initialStatus = target?.status || 'pendiente';
 
   const [status, setStatus] = useState<string>(initialStatus);
   const [grade, setGrade] = useState<string>(target?.grade != null ? target.grade.toString() : '');
@@ -98,9 +93,14 @@ export function SubjectDetailModal({ subjectId, onClose }: Props) {
   };
 
   if (!target) return null;
+  
+  let displayStatus = status;
+  if (status === 'pendiente' && !isElective && target) {
+    displayStatus = getComputedStatus({ ...target, status: 'pendiente' } as any, career?.subjects || []);
+  }
 
   const cfg =
-    CAREER_STATUS_CFG[status as keyof typeof CAREER_STATUS_CFG] || CAREER_STATUS_CFG.pendiente;
+    CAREER_STATUS_CFG[displayStatus as keyof typeof CAREER_STATUS_CFG] || CAREER_STATUS_CFG.pendiente;
   const credits = isElective ? elective.credits : subject?.credits || 0;
   const yearStr = isElective
     ? `Área: ${elective.category}`

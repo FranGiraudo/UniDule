@@ -1,5 +1,5 @@
 import { useStore } from '../../../shared/store/useStore';
-import { CAREER_STATUS_CFG } from '../lib/utils';
+import { CAREER_STATUS_CFG, getComputedStatus } from '../lib/utils';
 
 export function ElectivesTab({ onSelectSubject }: { onSelectSubject: (id: string) => void }) {
   const { career } = useStore();
@@ -47,9 +47,8 @@ export function ElectivesTab({ onSelectSubject }: { onSelectSubject: (id: string
         }}
       >
         {electives.map((s) => {
-          const cfg =
-            CAREER_STATUS_CFG[(s.status || 'pendiente') as keyof typeof CAREER_STATUS_CFG] ||
-            CAREER_STATUS_CFG.pendiente;
+          const cs = getComputedStatus(s as any, career?.subjects || []);
+          const cfg = CAREER_STATUS_CFG[cs] || CAREER_STATUS_CFG.pendiente;
           return (
             <div
               key={s.id}
