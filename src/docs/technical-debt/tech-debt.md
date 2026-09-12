@@ -16,6 +16,14 @@
 
 ## Media
 
+### TD-RF008 — Poblar tabla de equivalencias (equivalent_ids) en base de datos para Plan 2026
+
+- **Tipo:** Funcional (RF)
+- **Archivos afectados:** Ninguno (Base de Datos / Supabase)
+- **Descripción:** El `PlanSimulationModal.tsx` fue refactorizado para calcular dinámicamente las equivalencias cruzando el progreso del usuario con las materias del Plan 2026 en la tabla `global_subjects`. Sin embargo, la columna `equivalent_ids` (tipo jsonb) actualmente está vacía en la base de datos de producción para las materias del plan nuevo, por lo que el simulador solo logra reconocer equivalencias donde los nombres coinciden exactamente.
+- **Riesgo:** El simulador de plan no cumple su función de orientar al alumno sobre el impacto real del cambio de plan (ej. no detecta materias combinadas o con cambio de nombre).
+- **Recomendación:** Recuperar o reconstruir el archivo JSON/CSV original con la matriz de equivalencias del plan 2016 vs 2026, y correr un script de `UPDATE` en Supabase para llenar la columna `equivalent_ids` de cada materia del Plan 2026 con los UUIDs/Códigos correspondientes del plan anterior.
+
 ## Baja
 
 ## Resueltos
