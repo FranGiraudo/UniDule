@@ -1,0 +1,156 @@
+[
+  {
+    "id": "T-01",
+    "title": "Configuración de Supabase y Base de Datos",
+    "description": "Diseño del esquema de base de datos y configuración inicial del proyecto en Supabase.",
+    "status": "completed",
+    "nodeId": "N-00"
+  },
+  {
+    "id": "T-02",
+    "title": "Sistema de Autenticación",
+    "description": "Login, registro y gestión de sesiones (Auth Provider).",
+    "status": "completed",
+    "nodeId": "N-00"
+  },
+  {
+    "id": "T-03",
+    "title": "Mapa de Carrera interactivo",
+    "description": "Visualización del plan de estudios con cálculo de correlativas.",
+    "status": "completed",
+    "nodeId": "N-01"
+  },
+  {
+    "id": "T-04",
+    "title": "Gestión de Materias y Calificaciones",
+    "description": "CRUD de materias, carga de notas y cálculo de promedio.",
+    "status": "completed",
+    "nodeId": "N-01"
+  },
+  {
+    "id": "T-05",
+    "title": "MEJ-010 — Nombre de perfil editable",
+    "description": "Permitir editar el nombre del perfil desde Configuración.",
+    "status": "completed",
+    "nodeId": "N-00"
+  },
+  {
+    "id": "T-06",
+    "title": "MEJ-011 — Agenda con Fechas Reales",
+    "description": "Migrar Schedule a un calendario mensual/semanal navegable.",
+    "status": "completed",
+    "nodeId": "N-02"
+  },
+  {
+    "id": "T-07",
+    "title": "MEJ-012 — Sincronización Google Calendar",
+    "description": "Exportación de eventos a ICS.",
+    "status": "completed",
+    "nodeId": "N-02"
+  },
+  {
+    "id": "T-08",
+    "title": "MEJ-013 — Modo Do Not Disturb en Pomodoro",
+    "description": "Ocultar distractivos durante el foco.",
+    "status": "completed",
+    "nodeId": "N-03"
+  },
+  {
+    "id": "T-09",
+    "title": "MEJ-014 — Vincular Pomodoro a Exámenes",
+    "description": "Asociar sesiones a preparación de finales/parciales.",
+    "status": "completed",
+    "nodeId": "N-03"
+  },
+  {
+    "id": "T-10",
+    "title": "MEJ-020 — Tiempos Pomodoro personalizables",
+    "description": "Configuración de tiempos 50/10, etc.",
+    "status": "completed",
+    "nodeId": "N-03"
+  },
+  {
+    "id": "T-11",
+    "title": "MEJ-021 — Log e Historial de Sesiones",
+    "description": "Registro de sesiones completadas con edición.",
+    "status": "completed",
+    "nodeId": "N-03"
+  },
+  {
+    "id": "T-12",
+    "title": "MEJ-022 — Sonidos de Ambientación",
+    "description": "Ruido blanco integrado en la vista de estudio.",
+    "status": "completed",
+    "nodeId": "N-03"
+  },
+  {
+    "id": "T-13",
+    "title": "MEJ-024 — Sección de Finales",
+    "description": "Gestión de mesas, intentos y visualización específica para finales.",
+    "status": "completed",
+    "nodeId": "N-04"
+  },
+  {
+    "id": "T-14",
+    "title": "MEJ-017 — Cuenta regresiva de exámenes",
+    "description": "Widget en Dashboard para días restantes a un examen.",
+    "status": "completed",
+    "nodeId": "N-04"
+  },
+  {
+    "id": "T-15",
+    "title": "MEJ-015 — Rachas y Gamificación",
+    "description": "Streaks de estudio visible en Estadísticas.",
+    "status": "completed",
+    "nodeId": "N-05"
+  },
+  {
+    "id": "T-16",
+    "title": "MEJ-016 — Checklist de Hábitos Diarios",
+    "description": "Lista de rutinas con reinicio a la medianoche.",
+    "status": "completed",
+    "nodeId": "N-05"
+  },
+  {
+    "id": "T-17",
+    "title": "MEJ-019 — Matriz de Eisenhower",
+    "description": "Clasificación de tareas por urgencia/importancia.",
+    "status": "completed",
+    "nodeId": "N-05"
+  },
+  {
+    "id": "T-18",
+    "title": "MEJ-001 — Code-splitting por ruta con React.lazy",
+    "description": "Dividir el bundle principal implementando dynamic imports en App.tsx.",
+    "status": "todo",
+    "nodeId": "N-06"
+  },
+  {
+    "id": "T-19",
+    "title": "MEJ-003 — Tipos generados desde Supabase",
+    "description": "Reemplazar tipos any usando supabase gen types.",
+    "status": "todo",
+    "nodeId": "N-06"
+  },
+  {
+    "id": "T-20",
+    "title": "MEJ-004 — Pipeline de CI en GitHub Actions",
+    "description": "Correr lint, tsc y tests automáticamente en PRs.",
+    "status": "todo",
+    "nodeId": "N-07"
+  },
+  {
+    "id": "T-21",
+    "title": "MEJ-018 — Modo Fin de Semana en Dashboard",
+    "description": "Restar prioridad a la carga académica los findes.",
+    "status": "todo",
+    "nodeId": "N-08"
+  },
+  {
+    "id": "T-22",
+    "title": "MEJ-023 — Reporte de Cierre Semanal",
+    "description": "Resumen dominical de horas estudiadas.",
+    "status": "todo",
+    "nodeId": "N-08"
+  }
+]

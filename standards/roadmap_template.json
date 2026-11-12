@@ -1,0 +1,9 @@
+[
+  {
+    "id": "N-01",
+    "title": "Ejemplo Hito",
+    "description": "Resumen de lo que se espera implementar.",
+    "status": "active",
+    "dependencies": []
+  }
+]

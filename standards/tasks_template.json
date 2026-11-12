@@ -1,0 +1,9 @@
+[
+  {
+    "id": "T-01",
+    "title": "Ejemplo Tarea",
+    "description": "Detalle técnico y criterios de aceptación.",
+    "status": "todo",
+    "nodeId": "N-01"
+  }
+]

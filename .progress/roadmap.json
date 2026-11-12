@@ -1,0 +1,65 @@
+[
+  {
+    "id": "N-00",
+    "title": "Fundamentos y Autenticación",
+    "description": "Configuración de Supabase, autenticación de usuarios y diseño base UI/UX.",
+    "status": "done",
+    "dependencies": []
+  },
+  {
+    "id": "N-01",
+    "title": "Gestión Académica Core",
+    "description": "Mapeo de carrera, gestión de materias, tareas y calificaciones.",
+    "status": "done",
+    "dependencies": ["N-00"]
+  },
+  {
+    "id": "N-02",
+    "title": "Agenda y Calendario",
+    "description": "Vistas semanales/mensuales, eventos extracurriculares y exportación a Google Calendar.",
+    "status": "done",
+    "dependencies": ["N-01"]
+  },
+  {
+    "id": "N-03",
+    "title": "Asistente de Estudio y Pomodoro",
+    "description": "Temporizador integrado, sonidos de ambiente, historial de sesiones y vinculación a exámenes.",
+    "status": "done",
+    "dependencies": ["N-01"]
+  },
+  {
+    "id": "N-04",
+    "title": "Gestión de Finales",
+    "description": "Sección dedicada para gestionar mesas de exámenes, intentos y cuenta regresiva.",
+    "status": "done",
+    "dependencies": ["N-01"]
+  },
+  {
+    "id": "N-05",
+    "title": "Productividad y Gamificación",
+    "description": "Matriz de Eisenhower, checklist de hábitos diarios y rachas (streaks).",
+    "status": "done",
+    "dependencies": ["N-01"]
+  },
+  {
+    "id": "N-06",
+    "title": "Arquitectura y Performance",
+    "description": "Mejoras base de arquitectura, tipado estricto con Supabase y optimizaciones de renderizado.",
+    "status": "active",
+    "dependencies": []
+  },
+  {
+    "id": "N-07",
+    "title": "Calidad y Seguridad",
+    "description": "Implementación de CI/CD, tests para lógica core y políticas de seguridad.",
+    "status": "active",
+    "dependencies": []
+  },
+  {
+    "id": "N-08",
+    "title": "Nuevas Funcionalidades (Pendientes)",
+    "description": "Reportes automáticos, modos dinámicos (fin de semana).",
+    "status": "active",
+    "dependencies": []
+  }
+]
