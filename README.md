@@ -1,250 +1,140 @@
-# 🎓 UniDule
+# UniDule
 
-<div align="center">
+Gestor académico personal y planificador de carrera universitaria para estudiantes.
 
-  **Tu centro de comando académico personal y definitivo.**  
-  *Organiza tus cursadas, correlatividades, exámenes, agenda, hábitos y sesiones de estudio en una única aplicación fluida, moderna y personalizable.*
-
-  <br />
-
-  [![Live Demo](https://img.shields.io/badge/Demo%20en%20Vivo-unidule.vercel.app-4f46e5?style=for-the-badge&logo=vercel&logoColor=white)](https://unidule.vercel.app)
-
-  <br />
-
-  [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-  [![Vite](https://img.shields.io/badge/Vite-8.2-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
-  [![Supabase](https://img.shields.io/badge/Supabase-Database%20%26%20Auth-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
-  [![Zustand](https://img.shields.io/badge/Zustand-5.0-443e38?style=flat-square&logo=zustand&logoColor=white)](https://zustand-demo.pmnd.rs/)
-  [![Vitest](https://img.shields.io/badge/Tested%20with-Vitest-FCC72B?style=flat-square&logo=vitest&logoColor=black)](https://vitest.dev/)
-  [![PWA Ready](https://img.shields.io/badge/PWA-Ready-10b981?style=flat-square&logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
-  [![Vercel](https://img.shields.io/badge/Deploy-Vercel-000000?style=flat-square&logo=vercel&logoColor=white)](https://unidule.vercel.app)
-
-</div>
+**Demo en producción:** [unidule.vercel.app](https://unidule.vercel.app)
 
 ---
 
-## 🌐 Aplicación en Vivo
+## Descripción
 
-UniDule se encuentra desplegada y disponible para su uso en producción:
+UniDule centraliza la organización de la vida universitaria en una sola interfaz: control de cursadas, cálculo de correlatividades, seguimiento de regularidades, agenda semanal con fechas reales, matriz de tareas y temporizador de estudio con ambientación sonora.
 
-👉 **[https://unidule.vercel.app](https://unidule.vercel.app)**
-
----
-
-## 💡 ¿Qué es UniDule?
-
-**UniDule** es una plataforma web progresiva (PWA) de gestión académica integral diseñada por y para estudiantes universitarios. Nace para resolver la dispersión de información habitual en la vida académica: fechas de exámenes, asistencia a clases, planes de correlatividades, apuntes, tareas y hábitos de estudio.
-
-Con una arquitectura cliente-servidor reactiva, interfaz ultra rápida construida sobre **React 19** y almacenamiento seguro en tiempo real con **Supabase**, UniDule centraliza todas tus herramientas en un solo lugar, sin fricciones ni sobrecarga cognitiva.
+Está construida con React 19 y TypeScript sobre Vite, utilizando Zustand para el manejo de estado en memoria y Supabase como backend relacional con políticas de seguridad a nivel de fila (Row Level Security).
 
 ---
 
-## ✨ Características Principales
+## Funcionalidades
 
-### 📊 1. Dashboard Inteligente
-- **Próxima Clase al Instante:** Widget dinámico con cuenta regresiva en tiempo real indicando materia, aula y docente.
-- **Resumen del Día:** Visualización clara de cursadas y tareas pendientes para hoy.
-- **Alertas Tempranas:** Alerta de riesgo de inasistencias (faltas máximas) y vencimiento de regularidades (≤90 días).
-- **Cuenta Regresiva de Exámenes:** Temporizador destacado para tus próximos parciales y finales.
-- **Checklist de Hábitos Diarios:** Seguimiento de rutinas que se reinicia automáticamente cada medianoche.
+### Carrera y Correlatividades
+- **Árbol de correlativas:** Determina automáticamente si una materia está disponible para cursar, disponible para final, regularizada, aprobada o bloqueada según tu historial.
+- **Simulador de avance:** Permite probar escenarios de aprobación con resolución de equivalencias dinámicas para planificar inscripciones a próximos semestres.
+- **Electivas y seminarios:** Seguimiento de créditos acumulados y cursos extracurriculares requeridos por el plan de estudio.
 
-### 🗺️ 2. Mapa de Carrera y Correlatividades
-- **Árbol de Correlatividades Dinámico:** Cálculo automático del estado de cada materia (*Cursando*, *Regular*, *Aprobada*, *Disponible para cursar*, *Disponible para final* o *Bloqueada*).
-- **Seguimiento de Créditos:** Control de avance respecto a los requerimientos del plan de estudios.
-- **Simulador de Avance de Carrera:** Proyección de qué materias se habilitan al aprobar exámenes pendientes con resolución de equivalencias.
-- **Electivas y Seminarios:** Módulo para cargar materias optativas, talleres y horas de extensión.
+### Materias y Cursada
+- **Control de inasistencias:** Configuración de faltas máximas toleradas y cálculo de margen restante para evitar pérdidas de regularidad.
+- **Evaluaciones y promedio ponderado:** Carga de notas de parciales y trabajos prácticos con pesos porcentuales configurables.
+- **Apuntes integrados:** Cuaderno de notas por materia con formato Markdown.
 
-### 📚 3. Gestión de Materias y Calificaciones
-- **Ficha Completa de Cursada:** Código, docente, aula, correo de contacto y horario semanal.
-- **Control Riguroso de Asistencia:** Contador de inasistencias con límite de faltas y semáforo visual de riesgo.
-- **Apuntes en Markdown:** Bloc de notas integrado por materia con previsualización en vivo.
-- **Calificaciones y Promedio Ponderado:** Registro de notas de exámenes, trabajos prácticos y cálculo de promedio con pesos.
+### Finales y Regularidades
+- **Panel de finales pendientes:** Vista centralizada de materias con cursada regularizada.
+- **Alerta de vencimiento:** Advertencia preventiva cuando una regularidad está a menos de 90 días de caducar.
+- **Mesas de examen:** Registro de turnos de examen e intentos consumidos.
 
-### 🎓 4. Módulo Especializado de Finales
-- **Panel de Regularidades:** Lista filtrada de materias regulares pendientes de aprobación final.
-- **Vencimiento de Regularidad:** Control de fechas límite para no perder la condición de regular.
-- **Mesas e Intentos:** Registro de turnos de examen e intentos restantes.
-- **Vinculación con Estudio:** Posibilidad de vincular sesiones de preparación directamente a cada mesa.
+### Horarios y Calendario
+- **Vista semanal y mensual:** Grilla horaria con fechas reales navegable por semana y mes.
+- **Eventos extracurriculares:** Soporte para actividades no académicas (trabajo, gimnasio, estudio) con etiquetas y recurrencia semanal.
+- **Exportación iCalendar (.ics):** Descarga de calendarios compatibles con Google Calendar, Apple Calendar y Outlook para sincronización en móvil y escritorio.
 
-### 📅 5. Agenda y Calendario Multivista
-- **Vistas Semanal y Mensual:** Visualización con fechas reales para organizar toda tu semana o planificar el mes.
-- **Eventos Extracurriculares:** Carga de actividades no académicas (gimnasio, trabajo, hobbies, estudio) con etiquetas y colores.
-- **Sincronización de Calendario (.ics):** Exportación compatible con Google Calendar, Apple Calendar y Outlook para contar con recordatorios nativos en tu teléfono o computadora.
+### Modo Estudio (Pomodoro)
+- **Temporizador adaptable:** Intervalos personalizables (25/5, 50/10 o libre) y modo a pantalla completa sin distracciones.
+- **Generador de audio ambiente:** Síntesis procedural de ruido blanco y lluvia utilizando Web Audio API nativo (sin archivos pesados ni consumo de datos).
+- **Asociación a exámenes:** Registro de horas de estudio vinculadas directamente a la preparación de un parcial o final.
+- **Checklist de temas:** Lista de conceptos para tachar durante cada sesión.
 
-### ⏱️ 6. Asistente de Estudio, Pomodoro y Sonido Ambiente
-- **Temporizador Personalizable:** Modos de concentración (25/5, 50/10 o intervalos personalizados).
-- **Modo Do Not Disturb (DND):** Vista a pantalla completa enfocada 100% en el estudio para minimizar distracciones.
-- **Generador Procedural de Sonido:** Ruido blanco y sonido de lluvia sintetizados nativamente mediante **Web Audio API** (sin descargas pesadas de audio ni consumo de ancho de banda).
-- **Checklist de Temas:** Lista de conceptos para tachar mientras estudias.
-- **Historial de Sesiones:** Registro auditable y editable del tiempo dedicado a cada materia o examen.
-
-### 🎯 7. Matriz de Eisenhower para Tareas
-- Clasificación de tareas en 4 cuadrantes: *Urgente & Importante (Hacer)*, *No Urgente & Importante (Planificar)*, *Urgente & No Importante (Delegar)*, y *No Urgente & No Importante (Descartar)*.
-- Sincronización automática de parciales y entregas registradas en las materias.
-
-### 📈 8. Estadísticas y Gamificación
-- **Rachas de Estudio (Streaks):** Contador de días consecutivos cumpliendo metas de estudio.
-- **Métricas Globales:** Promedio general, materias aprobadas, porcentaje de carrera completado y horas dedicadas.
-
-### 🎨 9. Personalización y Temas
-- Colección de más de 8 temas cuidadosamente diseñados:
-  - 🌙 **Midnight Dark** (por defecto)
-  - 💎 **Emerald Obsidian**
-  - 🧛 **Dracula Purple**
-  - ⚡ **Cyberpunk Neon**
-  - 🔴 **Crimson Red**
-  - ☀️ **Enterprise Light**
-  - 🌅 **Sunset Amber**
-  - 🌸 **Sakura Blossom**
-  - 🍭 **Algodón de Azúcar**
-  - 🌌 **Amanecer Morado**
+### Tareas y Matriz de Eisenhower
+- **Priorización en 4 cuadrantes:** Clasificación de pendientes según urgencia e importancia.
+- **Sincronización:** Vinculación directa con fechas de entrega y exámenes cargados en las materias.
 
 ---
 
-## 🛠️ Stack Tecnológico
+## Stack Tecnológico
 
-| Capa | Tecnología | Propósito |
-| :--- | :--- | :--- |
-| **Frontend Framework** | [React 19](https://react.dev/) | Renderizado concurrente y UI declarativa de última generación |
-| **Lenguaje** | [TypeScript](https://www.typescriptlang.org/) | Tipado estático riguroso y autocompletado en todo el proyecto |
-| **Bundler & Tooling** | [Vite 8](https://vitejs.dev/) | HMR ultra veloz y optimización del bundle de producción |
-| **Enrutamiento** | [React Router v7](https://reactrouter.com/) | Navegación SPA fluida y control de rutas protegidas |
-| **Estado Global** | [Zustand](https://zustand-demo.pmnd.rs/) | Store reactivo, minimalista y sin boilerplate innecesario |
-| **Backend & Base de Datos** | [Supabase](https://supabase.com/) | PostgreSQL gestionado, Row Level Security (RLS) y Autenticación JWT |
-| **Iconografía** | [Lucide React](https://lucide.dev/) | Set de iconos vectoriales modernos y consistentes |
-| **Audio Síntesis** | [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API) | Generación procedural en tiempo real de ruido blanco y lluvia |
-| **Testing** | [Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/) | Pruebas unitarias y de integración de componentes y lógica de negocio |
-| **Despliegue** | [Vercel](https://vercel.com/) | Hosting global con CI/CD automatizado |
+- **Frontend:** React 19, TypeScript, React Router v7, Vite
+- **Estado Global:** Zustand
+- **Backend & Auth:** Supabase (PostgreSQL, Auth con JWT, Row Level Security)
+- **Audio:** Web Audio API (generación sintética)
+- **Iconos:** Lucide React
+- **Estilos:** CSS variables nativo (sistema multitema con modo oscuro, claro y variantes de contraste)
+- **Testing:** Vitest, React Testing Library
+- **Despliegue:** Vercel
 
 ---
 
-## 📂 Estructura del Proyecto
-
-El código está estructurado siguiendo una arquitectura orientada a **Features**:
+## Estructura del Proyecto
 
 ```text
-UniDule/
-├── public/                 # Favicon, assets estáticos y manifiesto PWA
-├── src/
-│   ├── assets/             # Recursos gráficos e ilustraciones
-│   ├── docs/               # Documentación interna (auditorías, mejoras, arquitectura)
-│   ├── features/           # Módulos de dominio de la aplicación
-│   │   ├── career/         # Mapa de carrera, correlativas, simulador
-│   │   ├── events/         # Gestión de eventos extracurriculares
-│   │   ├── subjects/       # Materias activas, notas, faltas, apuntes
-│   │   └── tasks/          # Tareas, matriz de Eisenhower, parciales
-│   ├── pages/              # Vistas principales de la aplicación
-│   │   ├── Auth.tsx        # Login y registro de usuarios
-│   │   ├── Career.tsx      # Vista de plan de estudios y electivas
-│   │   ├── Dashboard.tsx   # Panel central del estudiante
-│   │   ├── Events.tsx      # Agenda de eventos
-│   │   ├── Finals.tsx      # Mesa de exámenes y finales
-│   │   ├── Schedule.tsx    # Horario semanal y calendario mensual
-│   │   ├── Settings.tsx    # Perfil, preferencias y exportación ICS
-│   │   ├── Stats.tsx       # Estadísticas académicas y rachas
-│   │   ├── Study.tsx       # Pomodoro, DND y sonido ambiente
-│   │   ├── Subjects.tsx    # Vista general de cursadas
-│   │   └── Tasks.tsx       # Lista de tareas y matriz de Eisenhower
-│   ├── shared/             # Código compartido y transversal
-│   │   ├── components/     # Layouts (Sidebar, Topbar) y modales comunes
-│   │   ├── context/        # AuthProvider y ThemeProvider
-│   │   ├── hooks/          # Hooks compartidos (useDataSync)
-│   │   ├── lib/            # Utilidades, audioGenerator, ics export, themes
-│   │   ├── store/          # Store global Zustand (useStore, useDialogs)
-│   │   └── types/          # Definiciones TypeScript de dominio
-│   ├── test/               # Setup y mocks de Vitest
-│   ├── App.tsx             # Enrutador principal y layout
-│   ├── main.tsx            # Punto de entrada de la aplicación
-│   └── style.css           # Sistema de diseño con variables CSS
-├── supabase/               # Esquema de base de datos SQL y políticas RLS
-└── package.json            # Scripts y dependencias
+src/
+├── features/               # Módulos de dominio
+│   ├── career/             # Mapa curricular, correlatividades y simulación
+│   ├── events/             # Gestión de actividades extracurriculares
+│   ├── subjects/           # Materias activas, notas, faltas y notas
+│   └── tasks/              # Tareas y matriz de Eisenhower
+├── pages/                  # Vistas principales (Dashboard, Schedule, Study, etc.)
+├── shared/                 # Componentes y lógica transversal
+│   ├── components/         # Layouts, modales y diálogos globales
+│   ├── context/            # AuthProvider y ThemeProvider
+│   ├── hooks/              # useDataSync (sincronización con Supabase)
+│   ├── lib/                # Utilidades, audioGenerator, exportación ICS, temas
+│   ├── store/              # Stores Zustand (useStore, useDialogs)
+│   └── types/              # Definiciones TypeScript
+└── test/                   # Configuración y utilidades de testing
 ```
 
 ---
 
-## 🚀 Instalación y Ejecución Local
+## Instalación Local
 
-Para clonar y correr UniDule en tu entorno local, sigue estos pasos:
+### Requisitos previos
+- Node.js 18+
+- npm o pnpm
 
-### 1. Clonar el repositorio
+### Pasos
+
+1. **Clonar el repositorio:**
+   ```bash
+   git clone https://github.com/FranGiraudo/UniDule.git
+   cd UniDule
+   ```
+
+2. **Instalar dependencias:**
+   ```bash
+   npm install
+   ```
+
+3. **Configurar variables de entorno:**
+   Copia el archivo de ejemplo:
+   ```bash
+   cp .env.example .env.local
+   ```
+   Y completa las variables con tu proyecto de Supabase:
+   ```env
+   VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
+   VITE_SUPABASE_ANON_KEY=tu-anon-key
+   ```
+
+4. **Ejecutar el servidor de desarrollo:**
+   ```bash
+   npm run dev
+   ```
+   La aplicación quedará disponible en `http://localhost:5173`.
+
+---
+
+## Comandos Útiles
 
 ```bash
-git clone https://github.com/frang/UniDule.git
-cd UniDule
+npm run dev           # Servidor local de desarrollo
+npm run build         # Verificación de tipos con tsc y build para producción
+npm run preview       # Previsualizar build de producción localmente
+npm run test:run      # Ejecución de tests con Vitest
+npm run test:coverage # Reporte de cobertura de tests
+npm run lint          # Análisis estático de código con ESLint
+npm run format        # Formateo de código con Prettier
 ```
-
-### 2. Instalar dependencias
-
-```bash
-npm install
-```
-
-### 3. Configurar variables de entorno
-
-Crea un archivo `.env.local` en la raíz del proyecto basándote en `.env.example`:
-
-```bash
-cp .env.example .env.local
-```
-
-Configura tus credenciales de Supabase en `.env.local`:
-
-```env
-VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
-VITE_SUPABASE_ANON_KEY=tu-anon-key-de-supabase
-```
-
-### 4. Iniciar el servidor de desarrollo
-
-```bash
-npm run dev
-```
-
-Abre tu navegador en `http://localhost:5173` para empezar a usar la aplicación.
 
 ---
 
-## 🧪 Scripts Disponibles
+## Licencia
 
-En el directorio del proyecto puedes ejecutar:
-
-| Comando | Descripción |
-| :--- | :--- |
-| `npm run dev` | Inicia el servidor de desarrollo local con Vite |
-| `npm run build` | Compila TypeScript y genera el build de producción en `dist/` |
-| `npm run preview` | Previsualiza localmente el build de producción |
-| `npm run test` | Ejecuta la suite de pruebas en modo interactivo con Vitest |
-| `npm run test:run` | Ejecuta todos los tests una sola vez |
-| `npm run test:coverage` | Genera el reporte de cobertura de código |
-| `npm run lint` | Analiza el código en busca de errores con ESLint |
-| `npm run lint:fix` | Corrige automáticamente problemas de linting |
-| `npm run format` | Aplica formato a todo el código fuente con Prettier |
-
----
-
-## 🔒 Seguridad y Privacidad
-
-UniDule utiliza **Row Level Security (RLS)** en PostgreSQL a través de Supabase:
-- Cada usuario autenticado tiene acceso exclusivamente a sus propios registros (`user_id = auth.uid()`).
-- Los tokens de sesión se gestionan mediante JWT seguro.
-- No se envían datos analíticos invasivos ni se comparten credenciales con terceros.
-
----
-
-## 📱 Progressive Web App (PWA)
-
-UniDule está optimizada como **PWA**:
-- Puedes instalarla como aplicación nativa en tu dispositivo móvil (Android / iOS) o escritorio (Chrome, Edge, macOS).
-- Funciona en pantalla completa con interfaz adaptada y navegación táctil intuitiva.
-
----
-
-## 📄 Licencia
-
-Este proyecto se distribuye bajo fines académicos y de código abierto.
-
-<div align="center">
-  <sub>Desarrollado con ❤️ para transformar la experiencia universitaria.</sub><br />
-  <sub>Visita la aplicación: <strong><a href="https://unidule.vercel.app">unidule.vercel.app</a></strong></sub>
-</div>
+Distribuido bajo licencia MIT o académica para uso personal y de código abierto.
