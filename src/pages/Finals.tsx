@@ -37,7 +37,7 @@ export function Finals() {
   };
 
   const handleStudy = (subjectId: string) => {
-    setPomodoro({ subjectId, taskId: undefined, examId: undefined, isRunning: false, timeLeft: 25 * 60, mode: 'pomodoro' });
+    setPomodoro({ subjectId, taskId: undefined, examId: undefined, isRunning: false, timeLeft: 25 * 60, mode: 'pomodoro', endTime: null });
     navigate('/study');
   };
 

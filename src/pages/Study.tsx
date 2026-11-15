@@ -1,7 +1,8 @@
-import { Play, Pause, RotateCcw, BookOpen, CheckSquare, Settings2, BellOff, GraduationCap, X } from 'lucide-react';
+import { Play, Pause, RotateCcw, BookOpen, CheckSquare, Settings2, BellOff, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useStore } from '../shared/store/useStore';
 import { ambientAudio } from '../shared/lib/audioGenerator';
+import { formatDate } from '../shared/lib/utils';
 
 const SOUNDS = [
   { id: 'none', label: 'Sin sonido' },
@@ -13,12 +14,23 @@ export function Study() {
 
   const { pomodoro, setPomodoro, career, tasks, settings, setSettings } = useStore();
   const [showSettings, setShowSettings] = useState(false);
-  const { timeLeft, isRunning, mode, subjectId, taskId, examId } = pomodoro;
+  const { timeLeft, isRunning, mode, subjectId, taskId } = pomodoro;
   const subjects = career?.subjects || [];
   const activeSubjects = subjects.filter(s => s.status === 'cursando' || s.status === 'regular');
   const subjectTasks = tasks.filter(t => t.subjectId === subjectId && !t.done);
   const activeSubject = subjects.find(s => s.id === subjectId);
-  const subjectExams = activeSubject?.grades?.filter(g => g.type.toLowerCase().includes('parcial') || g.type.toLowerCase().includes('final')) || [];
+  const isExam = (t: { type: string; title: string }) =>
+    t.type === 'Parcial' ||
+    t.type === 'Final' ||
+    t.title.toLowerCase().includes('parcial') ||
+    t.title.toLowerCase().includes('final');
+  const examTasks = subjectTasks.filter(isExam);
+  const regularTasks = subjectTasks.filter(t => !isExam(t));
+  const unlinkedGrades = (activeSubject?.grades || []).filter(
+    (g) =>
+      (g.type.toLowerCase().includes('parcial') || g.type.toLowerCase().includes('final')) &&
+      !tasks.some((t) => t.gradeId === g.id || (t.subjectId === subjectId && t.title.toLowerCase() === g.type.toLowerCase()))
+  );
 
 
   const modes = {
@@ -51,7 +63,8 @@ export function Study() {
     setPomodoro({
       mode: newMode,
       timeLeft: modes[newMode].duration,
-      isRunning: false
+      isRunning: false,
+      endTime: null,
     });
   };
 
@@ -61,14 +74,28 @@ export function Study() {
         Notification.requestPermission();
       }
       ambientAudio.unlock();
+      const duration = timeLeft > 0 ? timeLeft : modes[mode].duration;
+      setPomodoro({
+        isRunning: true,
+        timeLeft: duration,
+        endTime: Date.now() + duration * 1000,
+      });
+    } else {
+      const targetEnd = pomodoro.endTime || Date.now() + timeLeft * 1000;
+      const remaining = Math.max(0, Math.ceil((targetEnd - Date.now()) / 1000));
+      setPomodoro({
+        isRunning: false,
+        timeLeft: remaining,
+        endTime: null,
+      });
     }
-    setPomodoro({ isRunning: !isRunning });
   };
 
   const resetTimer = () => {
     setPomodoro({
       isRunning: false,
-      timeLeft: modes[mode].duration
+      timeLeft: modes[mode].duration,
+      endTime: null,
     });
   };
 
@@ -104,7 +131,7 @@ export function Study() {
           <select 
             className="f-input" 
             value={subjectId || ''} 
-            onChange={(e) => setPomodoro({ subjectId: e.target.value, taskId: '' })}
+            onChange={(e) => setPomodoro({ subjectId: e.target.value, taskId: '', examId: undefined })}
             disabled={isRunning}
             style={{ 
               width: '100%', 
@@ -126,8 +153,8 @@ export function Study() {
           </select>
         </div>
         
-        {/* Task Selector (Only if subject is selected) */}
-        {subjectId && (
+        {/* Unified Task & Exam Selector */}
+        {subjectId && (subjectTasks.length > 0 || unlinkedGrades.length > 0) && (
           <div style={{ position: 'relative', display: 'flex', alignItems: 'center', animation: 'fadeUp 0.2s ease' }}>
             <CheckSquare size={20} style={{ position: 'absolute', left: '16px', color: 'var(--text2)', pointerEvents: 'none' }} />
             <select 
@@ -148,40 +175,30 @@ export function Study() {
                 transition: 'all 0.2s ease'
               }}
             >
-              <option value="">¿Alguna tarea en específico? (Opcional)</option>
-              {subjectTasks.map(t => (
-                <option key={t.id} value={t.id}>{t.title} ({t.type})</option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {/* Exam Selector */}
-        {subjectId && subjectExams.length > 0 && (
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', animation: 'fadeUp 0.2s ease', marginTop: '16px' }}>
-            <GraduationCap size={20} style={{ position: 'absolute', left: '16px', color: 'var(--text2)', pointerEvents: 'none' }} />
-            <select 
-              className="f-input" 
-              value={examId || ''} 
-              onChange={(e) => setPomodoro({ examId: e.target.value })}
-              disabled={isRunning}
-              style={{ 
-                width: '100%', 
-                cursor: isRunning ? 'not-allowed' : 'pointer', 
-                paddingLeft: '48px',
-                paddingTop: '12px',
-                paddingBottom: '12px',
-                fontSize: '1rem',
-                fontWeight: 500,
-                borderRadius: '12px',
-                opacity: isRunning ? 0.7 : 1,
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <option value="">¿Estudiando para algún examen? (Opcional)</option>
-              {subjectExams.map(g => (
-                <option key={g.id} value={g.id}>{g.type} - {g.date || 'Sin fecha'}</option>
-              ))}
+              <option value="">¿Algún examen o tarea específica? (Opcional)</option>
+              {(examTasks.length > 0 || unlinkedGrades.length > 0) && (
+                <optgroup label="Exámenes y Parciales">
+                  {examTasks.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.title} {t.dueDate ? `— ${formatDate(t.dueDate)}` : ''}
+                    </option>
+                  ))}
+                  {unlinkedGrades.map((g) => (
+                    <option key={`grade:${g.id}`} value={`grade:${g.id}`}>
+                      {g.type} {g.date ? `— ${formatDate(g.date)}` : ''}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              {regularTasks.length > 0 && (
+                <optgroup label="Tareas y Trabajos Prácticos">
+                  {regularTasks.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.title} {t.dueDate ? `— ${formatDate(t.dueDate)}` : `(${t.type})`}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
             </select>
           </div>
         )}

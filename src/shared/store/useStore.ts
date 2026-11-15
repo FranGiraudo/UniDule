@@ -2,6 +2,57 @@ import { create } from 'zustand';
 import type { Session } from '@supabase/supabase-js';
 import type { Career, Note, ScheduleEvent, SupabaseProfile, Task, ThemeType, UserEvent } from '../types';
 
+interface PomodoroState {
+  timeLeft: number;
+  isRunning: boolean;
+  mode: 'pomodoro' | 'shortBreak' | 'longBreak';
+  subjectId?: string;
+  taskId?: string;
+  examId?: string;
+  endTime?: number | null;
+}
+
+const getInitialPomodoro = (): PomodoroState => {
+  const defaultState: PomodoroState = {
+    timeLeft: 25 * 60,
+    isRunning: false,
+    mode: 'pomodoro',
+    endTime: null,
+  };
+  try {
+    const saved = localStorage.getItem('unidule_pomodoro');
+    if (!saved) return defaultState;
+    const parsed = JSON.parse(saved);
+    if (!parsed || typeof parsed !== 'object') return defaultState;
+
+    if (parsed.isRunning && parsed.endTime) {
+      const remaining = Math.max(0, Math.ceil((parsed.endTime - Date.now()) / 1000));
+      if (remaining > 0) {
+        return {
+          ...parsed,
+          timeLeft: remaining,
+          isRunning: true,
+        };
+      } else {
+        return {
+          ...parsed,
+          timeLeft: 0,
+          isRunning: false,
+          endTime: null,
+        };
+      }
+    }
+    return {
+      ...defaultState,
+      ...parsed,
+      isRunning: false,
+      endTime: null,
+    };
+  } catch {
+    return defaultState;
+  }
+};
+
 interface AppState {
   session: Session | null;
   profile: SupabaseProfile | null;
@@ -20,14 +71,7 @@ interface AppState {
     ambientSound: string;
     dndMode: boolean;
   };
-  pomodoro: {
-    timeLeft: number;
-    isRunning: boolean;
-    mode: 'pomodoro' | 'shortBreak' | 'longBreak';
-    subjectId?: string;
-    taskId?: string;
-    examId?: string;
-  };
+  pomodoro: PomodoroState;
 
   // Actions
   setSettings: (settings: Partial<AppState['settings']>) => void;
@@ -62,7 +106,7 @@ export const useStore = create<AppState>((set) => ({
     ambientSound: 'none',
     dndMode: false,
   },
-  pomodoro: { timeLeft: 25 * 60, isRunning: false, mode: 'pomodoro' },
+  pomodoro: getInitialPomodoro(),
 
   setSettings: (newSettings) => set((state) => ({ settings: { ...state.settings, ...newSettings } })),
   setSession: (session) => set({ session }),
@@ -75,5 +119,14 @@ export const useStore = create<AppState>((set) => ({
   setEventCompletions: (eventCompletions) => set({ eventCompletions }),
   setStudySessions: (studySessions) => set({ studySessions }),
   setTheme: (theme) => set({ theme }),
-  setPomodoro: (pomoState) => set((state) => ({ pomodoro: { ...state.pomodoro, ...pomoState } })),
+  setPomodoro: (pomoState) =>
+    set((state) => {
+      const updated = { ...state.pomodoro, ...pomoState };
+      try {
+        localStorage.setItem('unidule_pomodoro', JSON.stringify(updated));
+      } catch {
+        // ignore storage errors
+      }
+      return { pomodoro: updated };
+    }),
 }));

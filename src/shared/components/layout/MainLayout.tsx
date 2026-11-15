@@ -13,61 +13,147 @@ export function MainLayout() {
 
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
+    const checkPomodoroTick = () => {
       const state = useStore.getState();
-      
-      // Check for upcoming classes to send a notification (15 mins before)
+      const p = state.pomodoro;
+
+      if (!p.isRunning) {
+        if (document.title.startsWith('(')) {
+          document.title = 'UniDule';
+        }
+        return;
+      }
+
+      const now = Date.now();
+      const endTime = p.endTime ?? now + p.timeLeft * 1000;
+      const remaining = Math.max(0, Math.ceil((endTime - now) / 1000));
+
+      if (remaining > 0) {
+        if (remaining !== p.timeLeft || !p.endTime) {
+          state.setPomodoro({ timeLeft: remaining, endTime });
+        }
+        const m = Math.floor(remaining / 60)
+          .toString()
+          .padStart(2, '0');
+        const s = (remaining % 60).toString().padStart(2, '0');
+        document.title = `(${m}:${s}) UniDule`;
+      } else {
+        state.setPomodoro({ isRunning: false, timeLeft: 0, endTime: null });
+        document.title = 'UniDule';
+        playNotificationSound();
+        useDialogs.getState().showToast('¡Tiempo cumplido! Tu sesión de estudio ha terminado.', 'info');
+        if (Notification.permission === 'granted') {
+          new Notification('¡Tiempo cumplido!', {
+            body: 'Tu sesión de estudio ha terminado.',
+            icon: '/favicon.svg',
+          });
+        }
+
+        // Save study session if it was a pomodoro
+        if (p.mode === 'pomodoro' && p.subjectId && state.session) {
+          const duration = state.settings.pomodoroTime || 25;
+          const taskIdToSave = p.taskId && !p.taskId.startsWith('grade:') ? p.taskId : undefined;
+          saveStudySession(state.session.user.id, p.subjectId, taskIdToSave, duration)
+            .then((newSession) => {
+              const current = useStore.getState().studySessions;
+              state.setStudySessions([...current, newSession]);
+            })
+            .catch((err) => console.warn('Could not save study session', err));
+        }
+      }
+    };
+
+    const checkUpcomingClasses = () => {
+      const state = useStore.getState();
       const d = new Date();
       if (d.getSeconds() === 0) {
         const nowM = d.getHours() * 60 + d.getMinutes();
         const todayStr = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][d.getDay()];
-        
-        state.career?.subjects.forEach(s => {
-          s.schedules?.filter(sc => sc.day === todayStr).forEach(sc => {
-            const parts = sc.startTime.split(':');
-            const stM = parseInt(parts[0]) * 60 + parseInt(parts[1]);
-            // If exactly 15 mins before
-            if (stM - nowM === 15) {
-              useDialogs.getState().showToast(`¡Clase en 15 minutos! ${s.name} (${sc.type}) en ${s.room || 'Aula sin asignar'}`, 'info');
-              if (Notification.permission === 'granted') {
-                new Notification('¡Clase en 15 minutos!', {
-                  body: `${s.name} (${sc.type}) a las ${sc.startTime} en ${s.room || 'Aula sin asignar'}`,
-                  icon: '/icon-192x192.png'
-                });
+
+        state.career?.subjects.forEach((s) => {
+          s.schedules
+            ?.filter((sc) => sc.day === todayStr)
+            .forEach((sc) => {
+              const parts = sc.startTime.split(':');
+              const stM = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+              if (stM - nowM === 15) {
+                useDialogs
+                  .getState()
+                  .showToast(`¡Clase en 15 minutos! ${s.name} (${sc.type}) en ${s.room || 'Aula sin asignar'}`, 'info');
+                if (Notification.permission === 'granted') {
+                  new Notification('¡Clase en 15 minutos!', {
+                    body: `${s.name} (${sc.type}) a las ${sc.startTime} en ${s.room || 'Aula sin asignar'}`,
+                    icon: '/favicon.svg',
+                  });
+                }
+                playNotificationSound();
               }
-              playNotificationSound();
-            }
-          });
+            });
         });
       }
+    };
 
-      // Pomodoro logic
-      if (state.pomodoro.isRunning) {
-        const currentLeft = state.pomodoro.timeLeft;
-        if (currentLeft > 0) {
-          state.setPomodoro({ timeLeft: currentLeft - 1 });
-        } else {
-          state.setPomodoro({ isRunning: false });
-          playNotificationSound();
-          useDialogs.getState().showToast('¡Tiempo cumplido! Tu sesión de estudio ha terminado.', 'info');
-          if (Notification.permission === 'granted') {
-            new Notification('¡Tiempo cumplido!', {
-              body: 'Tu sesión de estudio ha terminado.',
-            });
-          }
-          
-          // Save study session if it was a pomodoro
-          const p = state.pomodoro;
-          if (p.mode === 'pomodoro' && p.subjectId && state.session) {
-            saveStudySession(state.session.user.id, p.subjectId, p.taskId, 25).then(newSession => {
-              state.setStudySessions([...state.studySessions, newSession]);
-            });
-          }
+    const onHeartbeat = () => {
+      checkPomodoroTick();
+      checkUpcomingClasses();
+    };
+
+    // Web Worker for background ticking (prevents browser tab throttling when user leaves the tab)
+    let worker: Worker | null = null;
+    let workerUrl: string | null = null;
+    try {
+      if (typeof Worker !== 'undefined' && typeof Blob !== 'undefined' && typeof URL !== 'undefined') {
+        const workerCode = `
+          let timer = null;
+          timer = setInterval(function() {
+            self.postMessage('tick');
+          }, 1000);
+          self.onmessage = function(e) {
+            if (e.data === 'stop' && timer) {
+              clearInterval(timer);
+              timer = null;
+            }
+          };
+        `;
+        const blob = new Blob([workerCode], { type: 'application/javascript' });
+        workerUrl = URL.createObjectURL(blob);
+        worker = new Worker(workerUrl);
+        worker.onmessage = () => {
+          onHeartbeat();
+        };
+      }
+    } catch {
+      // Fallback to standard window interval if worker cannot be initialized
+    }
+
+    const intervalTimer = window.setInterval(onHeartbeat, 1000);
+
+    // Reconcile immediately when user switches back to this tab or window
+    const onVisibilityOrFocus = () => {
+      onHeartbeat();
+    };
+    document.addEventListener('visibilitychange', onVisibilityOrFocus);
+    window.addEventListener('focus', onVisibilityOrFocus);
+
+    return () => {
+      clearInterval(intervalTimer);
+      document.removeEventListener('visibilitychange', onVisibilityOrFocus);
+      window.removeEventListener('focus', onVisibilityOrFocus);
+      if (worker) {
+        try {
+          worker.postMessage('stop');
+          worker.terminate();
+        } catch {
+          // ignore
         }
       }
-    }, 1000);
-    
-    return () => clearInterval(timer);
+      if (workerUrl) {
+        URL.revokeObjectURL(workerUrl);
+      }
+      if (document.title.startsWith('(')) {
+        document.title = 'UniDule';
+      }
+    };
   }, []);
 
   return (

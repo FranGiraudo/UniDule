@@ -152,5 +152,12 @@
     "description": "Resumen dominical de horas estudiadas.",
     "status": "todo",
     "nodeId": "N-08"
+  },
+  {
+    "id": "T-23",
+    "title": "Fix — Temporizador Pomodoro en segundo plano",
+    "description": "Cálculo por timestamp endTime, Web Worker y reconciliación visibilitychange para evitar congelamiento de pestaña.",
+    "status": "completed",
+    "nodeId": "N-03"
   }
 ]
