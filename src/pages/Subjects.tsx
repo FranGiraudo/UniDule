@@ -16,7 +16,7 @@ export function Subjects() {
   const career = useStore((state) => state.career);
   const notes = useStore((state) => state.notes);
   const allSubjects = career?.subjects || [];
-  const trackedSubjects = allSubjects.filter((s) => s.activeId);
+  const trackedSubjects = allSubjects.filter((s) => s.activeId && s.status === 'cursando');
 
   const [tab, setTab] = useState<'materias' | 'notas'>('materias');
   const [editingSubject, setEditingSubject] = useState<Subject | null | undefined>(undefined);

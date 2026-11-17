@@ -115,12 +115,32 @@ export function useDataSync() {
 
       // Map Career and Subjects
       if (globalSubsData) {
+        // Clean up any orphaned active_subjects (where progress is not cursando)
+        const orphanedActive = (activeSubsData || []).filter((a: any) => {
+          const prog = (progressData || []).find((p: any) => p.global_id === a.code || p.global_id === a.id);
+          return prog && prog.status !== 'cursando';
+        });
+        if (orphanedActive.length > 0) {
+          const orphanedIds = orphanedActive.map((a: any) => a.id);
+          (async () => {
+            try {
+              await supabase.from('user_grades').delete().in('active_subject_id', orphanedIds).eq('user_id', uid);
+              await supabase.from('user_active_subjects').delete().in('id', orphanedIds).eq('user_id', uid);
+            } catch (err) {
+              console.warn('Could not clean up orphaned active subjects:', err);
+            }
+          })();
+        }
+
         const subjects: Subject[] = globalSubsData.map((g: any) => {
           const prog = (progressData || []).find((p: any) => p.global_id === g.code);
           const active = (activeSubsData || []).find(
             (a: any) => a.code === g.code || a.id === g.code,
           );
-          const grades = active
+          const resolvedStatus = prog?.status || (active ? 'cursando' : 'pendiente');
+          const isCursando = resolvedStatus === 'cursando';
+
+          const grades = active && isCursando
             ? (gradesData || [])
                 .filter((gr: any) => gr.active_subject_id === active.id)
                 .map((gr: any) => ({
@@ -139,7 +159,7 @@ export function useDataSync() {
             year: parseInt(g.year, 10) || 1,
             period: parseInt(g.semester, 10) || 1,
             correlatives: g.correlatives?.toCurse || [],
-            status: prog?.status || (active ? 'cursando' : 'pendiente'),
+            status: resolvedStatus,
             grade: prog ? parseFloat(prog.grade) : null,
             regDate: prog?.reg_date || null,
             expDate: prog?.exp_date || null,
@@ -148,9 +168,9 @@ export function useDataSync() {
             // Active subject metadata if cursando
             color: active?.color || '#D8D2BE',
             room: active?.room || '',
-            schedules: active?.schedule || [],
+            schedules: isCursando ? active?.schedule || [] : [],
 
-            activeId: active?.id,
+            activeId: isCursando ? active?.id : undefined,
             professor: active?.professor || '',
             email: active?.email || '',
             absences: active?.absences ?? 0,

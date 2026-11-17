@@ -63,4 +63,24 @@ describe('useStore - Pomodoro state & timestamp reconciliation', () => {
     const remaining = Math.max(0, Math.ceil((endTime - now) / 1000));
     expect(remaining).toBe(0);
   });
+
+  it('filters tracked subjects to only include cursando status', () => {
+    useStore.getState().setCareer({
+      id: 'cs',
+      name: 'Ingeniería en Informática',
+      subjects: [
+        { id: 'cs-fis2', code: 'cs-fis2', name: 'Física 2', year: 2, period: 1, correlatives: [], status: 'libre', activeId: 'cs-fis2' } as any,
+        { id: 'cs-bd1', code: 'cs-bd1', name: 'Base de Datos 1', year: 2, period: 2, correlatives: [], status: 'cursando', activeId: 'cs-bd1' } as any,
+        { id: 'cs-am2a', code: 'cs-am2a', name: 'Análisis Matemático 2A', year: 2, period: 1, correlatives: [], status: 'libre' } as any,
+      ],
+      electives: [],
+      seminars: [],
+    });
+
+    const all = useStore.getState().career?.subjects || [];
+    const activeCursando = all.filter((s) => s.activeId && s.status === 'cursando');
+
+    expect(activeCursando).toHaveLength(1);
+    expect(activeCursando[0].id).toBe('cs-bd1');
+  });
 });

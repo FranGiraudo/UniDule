@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { X, Plus, Save } from 'lucide-react';
 import type { Grade, Subject } from '../../../shared/types';
 import { useStore } from '../../../shared/store/useStore';
-import { saveActiveSubject, syncGrades } from '../lib/api';
+import { saveActiveSubject, syncGrades, deleteActiveSubject } from '../lib/api';
 import { updateSubjectProgress } from '../../career/lib/api';
 import { saveTask, deleteTask } from '../../tasks/lib/api';
 import { GRADE_TYPES } from '../lib/constants';
@@ -35,6 +35,21 @@ export function GradesModal({ subject, onClose }: Props) {
   const handleSave = async () => {
     setSaving(true);
     try {
+      if (status !== 'cursando') {
+        const progStatus = status === 'promocionado' ? 'aprobada' : status;
+        await updateSubjectProgress(
+          subject.id,
+          'subject',
+          progStatus,
+          subject.grade ?? null,
+          subject.regDate ?? null,
+          subject.expDate ?? null,
+        );
+        await deleteActiveSubject(subject.id, false);
+        onClose();
+        return;
+      }
+
       await saveActiveSubject({
         id: subject.id,
         name: subject.name,
@@ -44,7 +59,7 @@ export function GradesModal({ subject, onClose }: Props) {
         email: subject.email,
         maxAbsences: subject.maxAbsences,
         absences: subject.absences,
-        status,
+        status: 'cursando',
         allowsPromotion,
         schedules: subject.schedules,
       });
@@ -52,7 +67,7 @@ export function GradesModal({ subject, onClose }: Props) {
       await updateSubjectProgress(
         subject.id,
         'subject',
-        status,
+        'cursando',
         subject.grade ?? null,
         subject.regDate ?? null,
         subject.expDate ?? null,

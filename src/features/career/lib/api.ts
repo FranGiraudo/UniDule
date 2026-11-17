@@ -31,13 +31,27 @@ export async function updateSubjectProgress(
     throw error;
   }
 
-  // If marked as pendiente (disponible/bloqueada), it should no longer be actively tracked.
-  if (status === 'pendiente') {
+  // If no longer cursando (libre, regular, aprobada, pendiente), it should no longer be actively tracked.
+  if (status !== 'cursando') {
     try {
       const { deleteActiveSubject } = await import('../../subjects/lib/api');
       await deleteActiveSubject(globalId, false);
     } catch (err) {
       console.warn('Could not untrack subject:', err);
+    }
+  } else if (type === 'subject') {
+    try {
+      const career = useStore.getState().career;
+      const sub = career?.subjects.find((s) => s.id === globalId || (s as any).code === globalId);
+      const { saveActiveSubject } = await import('../../subjects/lib/api');
+      await saveActiveSubject({
+        id: globalId,
+        name: sub?.name || globalId,
+        color: sub?.color || '#6366f1',
+        status: 'cursando',
+      });
+    } catch (err) {
+      console.warn('Could not track subject as active:', err);
     }
   }
 
@@ -48,7 +62,14 @@ export async function updateSubjectProgress(
     if (type === 'subject') {
       newCareer.subjects = newCareer.subjects.map((s) =>
         s.id === globalId || (s as any).code === globalId
-          ? { ...s, status: status as any, grade, regDate, expDate }
+          ? {
+              ...s,
+              status: status as any,
+              grade,
+              regDate,
+              expDate,
+              activeId: status === 'cursando' ? s.activeId || globalId : undefined,
+            }
           : s,
       );
     } else {
