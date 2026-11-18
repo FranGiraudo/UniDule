@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Book, CheckCircle2, Clock, AlertTriangle, Circle, GraduationCap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Book, CheckCircle2, Clock, AlertTriangle, Circle, GraduationCap, Compass, ArrowRight } from 'lucide-react';
 import { toggleEventCompletion } from '../features/events/lib/api';
 import { useStore } from '../shared/store/useStore';
 import { todayDay, t2m, daysUntil, urgColor, formatDate } from '../shared/lib/utils';
 import type { Subject } from '../shared/types';
+import { getRecommendedCourses, getRecommendedFinals } from '../features/career/lib/recommender';
 
 export function Dashboard() {
+  const navigate = useNavigate();
   const { career, tasks, session, eventCompletions, setEventCompletions } = useStore();
   const getTodayStr = () => {
     const d = new Date();
@@ -41,6 +44,9 @@ export function Dashboard() {
     return d !== null && d >= 0 && d <= 90;
   });
   const warnExpiring = expiringSubs.length;
+
+  const recCourses = getRecommendedCourses(subjects, { limit: 3 });
+  const recFinals = getRecommendedFinals(subjects, { limit: 3 });
 
   // Next Class Logic (Countdown)
   const [nowSec, setNowSec] = useState(() => {
@@ -539,6 +545,312 @@ export function Dashboard() {
                 <div style={{ fontWeight: 700, fontSize: '10px', color: '#4ade80' }}>
                   Sin alertas pendientes
                 </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* WIDGET RECOMENDACIONES ACADÉMICAS ALGORÍTMICAS (Punto 2.A) */}
+        <div
+          className="card fade-in"
+          style={{
+            marginBottom: '1.25rem',
+            background: 'var(--card)',
+            border: '1px solid color-mix(in srgb, var(--primary) 25%, var(--border))',
+            borderRadius: '16px',
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '10px',
+              borderBottom: '1px solid var(--border)',
+              paddingBottom: '12px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  background: 'color-mix(in srgb, var(--primary) 15%, transparent)',
+                  color: 'var(--primary)',
+                }}
+              >
+                <Compass size={20} />
+              </div>
+              <div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text)' }}>
+                  Recomendaciones Académicas
+                </div>
+                <div style={{ fontSize: '11px', color: 'var(--text2)', marginTop: '2px' }}>
+                  Motor algorítmico · Camino crítico y correlatividades
+                </div>
+              </div>
+            </div>
+            <button
+              className="btn btn-ghost btn-sm"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '12px',
+                color: 'var(--primary)',
+                fontWeight: 700,
+              }}
+              onClick={() => navigate('/career')}
+            >
+              Ver Plan de Carrera <ArrowRight size={14} />
+            </button>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '16px',
+            }}
+          >
+            {/* COLUMNA 1: MATERIAS PARA CURSAR */}
+            <div
+              style={{
+                background: 'var(--bg)',
+                borderRadius: '12px',
+                padding: '14px',
+                border: '1px solid var(--border)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: 'var(--text)',
+                  }}
+                >
+                  Sugerencias para Cursar
+                </span>
+                <span style={{ fontSize: '10px', color: 'var(--text2)' }}>
+                  Disponibles
+                </span>
+              </div>
+
+              {recCourses.length === 0 ? (
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: 'var(--text2)',
+                    padding: '12px 0',
+                    textAlign: 'center',
+                  }}
+                >
+                  No hay materias pendientes con correlativas completas para cursar ahora.
+                </div>
+              ) : (
+                recCourses.map((rc) => (
+                  <div
+                    key={rc.subject.id}
+                    style={{
+                      background: 'var(--card)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '8px',
+                      padding: '10px 12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '6px',
+                      borderLeft: '3px solid var(--primary)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        gap: '8px',
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: '13px',
+                          fontWeight: 700,
+                          color: 'var(--text)',
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        {rc.subject.name}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          color: 'var(--text2)',
+                          whiteSpace: 'nowrap',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {rc.subject.year}° Año
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                      {rc.reasons.map((reason, idx) => (
+                        <span
+                          key={idx}
+                          style={{
+                            fontSize: '9.5px',
+                            fontWeight: 600,
+                            padding: '1px 6px',
+                            borderRadius: '4px',
+                            background: 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                            color: 'var(--primary)',
+                            border: '1px solid color-mix(in srgb, var(--primary) 25%, transparent)',
+                          }}
+                        >
+                          {reason}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* COLUMNA 2: MESAS DE FINAL */}
+            <div
+              style={{
+                background: 'var(--bg)',
+                borderRadius: '12px',
+                padding: '14px',
+                border: '1px solid var(--border)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: 'var(--text)',
+                  }}
+                >
+                  Finales Prioritarios
+                </span>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    color: 'var(--primary)',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                  }}
+                  onClick={() => navigate('/finals')}
+                >
+                  Ver todos ({subjects.filter((s) => s.status === 'regular').length})
+                </span>
+              </div>
+
+              {recFinals.length === 0 ? (
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: 'var(--text2)',
+                    padding: '12px 0',
+                    textAlign: 'center',
+                  }}
+                >
+                  Sin materias regulares pendientes de final.
+                </div>
+              ) : (
+                recFinals.map((rf) => (
+                  <div
+                    key={rf.subject.id}
+                    style={{
+                      background: 'var(--card)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '8px',
+                      padding: '10px 12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '6px',
+                      borderLeft: rf.canRendir ? '3px solid #10b981' : '3px solid #f87171',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        gap: '8px',
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: '13px',
+                          fontWeight: 700,
+                          color: 'var(--text)',
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        {rf.subject.name}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '9.5px',
+                          fontWeight: 700,
+                          padding: '1px 5px',
+                          borderRadius: '4px',
+                          background: rf.canRendir
+                            ? 'rgba(16, 185, 129, 0.15)'
+                            : 'rgba(239, 68, 68, 0.15)',
+                          color: rf.canRendir ? '#10b981' : '#f87171',
+                        }}
+                      >
+                        {rf.canRendir ? 'Listo para rendir' : 'Correlativa pendiente'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                      {rf.reasons.map((reason, idx) => (
+                        <span
+                          key={idx}
+                          style={{
+                            fontSize: '9.5px',
+                            fontWeight: 600,
+                            padding: '1px 6px',
+                            borderRadius: '4px',
+                            background:
+                              reason.includes('Vence') || reason.includes('Vencida')
+                                ? 'rgba(239, 68, 68, 0.15)'
+                                : 'var(--card2)',
+                            color:
+                              reason.includes('Vence') || reason.includes('Vencida')
+                                ? '#ef4444'
+                                : 'var(--text2)',
+                            border: '1px solid var(--border)',
+                          }}
+                        >
+                          {reason}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))
               )}
             </div>
           </div>

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useStore } from '../../../shared/store/useStore';
 import { getDaysToExpiration } from '../lib/utils';
+import { getRecommendedFinals } from '../lib/recommender';
 import { Book, Search, CheckCircle2, Lock, FileEdit } from 'lucide-react';
 
 export function FinalsTab({ onSelectSubject }: { onSelectSubject: (id: string) => void }) {
@@ -9,9 +10,16 @@ export function FinalsTab({ onSelectSubject }: { onSelectSubject: (id: string) =
 
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
-  const [sort, setSort] = useState('exp-asc');
+  const [sort, setSort] = useState('priority');
 
   const regularSubs = subjects.filter((s) => s.status === 'regular');
+
+  const recFinals = useMemo(() => getRecommendedFinals(subjects), [subjects]);
+  const recFinalsMap = useMemo(() => {
+    const map = new Map<string, { score: number; reasons: string[]; canRendir: boolean }>();
+    recFinals.forEach((rf) => map.set(rf.subject.id, rf));
+    return map;
+  }, [recFinals]);
 
   if (!regularSubs.length) {
     return (
@@ -67,6 +75,12 @@ export function FinalsTab({ onSelectSubject }: { onSelectSubject: (id: string) =
   });
 
   filteredSubs.sort((a, b) => {
+    if (sort === 'priority') {
+      const scoreA = recFinalsMap.get(a.id)?.score ?? 0;
+      const scoreB = recFinalsMap.get(b.id)?.score ?? 0;
+      if (scoreB !== scoreA) return scoreB - scoreA;
+      return (a.year || 0) - (b.year || 0);
+    }
     if (sort === 'exp-asc') {
       if (!a.expDate) return 1;
       if (!b.expDate) return -1;
@@ -133,6 +147,7 @@ export function FinalsTab({ onSelectSubject }: { onSelectSubject: (id: string) =
             onChange={(e) => setSort(e.target.value)}
             style={{ fontSize: '0.75rem', padding: '0.375rem 0.625rem' }}
           >
+            <option value="priority">Prioridad recomendada (Algorítmica)</option>
             <option value="exp-asc">Vencimiento más próximo</option>
             <option value="exp-desc">Vencimiento más lejano</option>
             <option value="name-asc">Nombre (A - Z)</option>
@@ -310,6 +325,37 @@ export function FinalsTab({ onSelectSubject }: { onSelectSubject: (id: string) =
                   {!canRendir && (
                     <div style={{ fontSize: '0.6875rem', color: '#f87171', marginTop: '0.25rem' }}>
                       Falta aprobar: {missingToPass.map((m) => (m ? m.name : '?')).join(', ')}
+                    </div>
+                  )}
+
+                  {recFinalsMap.get(s.id) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '6px' }}>
+                      {recFinalsMap.get(s.id)!.reasons.map((r, idx) => (
+                        <span
+                          key={idx}
+                          style={{
+                            fontSize: '0.625rem',
+                            fontWeight: 600,
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            background:
+                              r.includes('Vence') || r.includes('Vencida')
+                                ? 'rgba(239, 68, 68, 0.15)'
+                                : 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                            color:
+                              r.includes('Vence') || r.includes('Vencida')
+                                ? '#ef4444'
+                                : 'var(--primary)',
+                            border: `1px solid ${
+                              r.includes('Vence') || r.includes('Vencida')
+                                ? 'rgba(239, 68, 68, 0.3)'
+                                : 'color-mix(in srgb, var(--primary) 25%, transparent)'
+                            }`,
+                          }}
+                        >
+                          {r}
+                        </span>
+                      ))}
                     </div>
                   )}
                 </div>

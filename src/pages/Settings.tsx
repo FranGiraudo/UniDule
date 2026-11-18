@@ -180,76 +180,6 @@ export function Settings() {
   };
 
 
-  const handleExportICS = () => {
-    let ics = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//UniDule//ES\n";
-    
-    const getNextDate = (dayOfWeek: number) => {
-      const d = new Date();
-      d.setDate(d.getDate() + ((dayOfWeek - d.getDay() + 7) % 7));
-      return d;
-    };
-    
-    const formatICSDate = (date: Date | string, timeStr: string) => {
-      const [h, m] = timeStr.split(':');
-      const d = new Date(date);
-      d.setHours(Number(h), Number(m), 0);
-      return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-    };
-
-    const dayMap: Record<string, number> = { 'Lunes': 1, 'Martes': 2, 'Miércoles': 3, 'Jueves': 4, 'Viernes': 5, 'Sábado': 6, 'Domingo': 0 };
-    const rruleDays = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
-
-    subjects.forEach((sub: any) => {
-      sub.schedules?.forEach((sc: any) => {
-        const jsDay = dayMap[sc.day as string];
-        if (jsDay === undefined) return;
-        const nextDate = getNextDate(jsDay);
-        
-        ics += "BEGIN:VEVENT\n";
-        ics += `UID:${sc.id}@unidule.com\n`;
-        ics += `SUMMARY:${sub.name}\n`;
-        ics += `DESCRIPTION:${sc.type} - Room: ${sub.room || ''}\n`;
-        ics += `DTSTART:${formatICSDate(nextDate, sc.startTime)}\n`;
-        ics += `DTEND:${formatICSDate(nextDate, sc.endTime)}\n`;
-        ics += `RRULE:FREQ=WEEKLY;BYDAY=${rruleDays[jsDay]}\n`;
-        ics += "END:VEVENT\n";
-      });
-    });
-
-    userEvents.forEach((e: any) => {
-      ics += "BEGIN:VEVENT\n";
-      ics += `UID:${e.id}@unidule.com\n`;
-      ics += `SUMMARY:${e.title}\n`;
-      
-      if (e.isRecurring && e.dayOfWeek) {
-         const jsDay = e.dayOfWeek === 7 ? 0 : e.dayOfWeek;
-         const nextDate = getNextDate(jsDay);
-         ics += `DTSTART:${formatICSDate(nextDate, e.startTime)}\n`;
-         ics += `DTEND:${formatICSDate(nextDate, e.endTime)}\n`;
-         ics += `RRULE:FREQ=WEEKLY;BYDAY=${rruleDays[jsDay]}\n`;
-      } else if (e.date) {
-         // Create local date but interpret as local time
-         const parts = e.date.split('-');
-         const d = new Date(Number(parts[0]), Number(parts[1])-1, Number(parts[2]));
-         ics += `DTSTART:${formatICSDate(d, e.startTime)}\n`;
-         ics += `DTEND:${formatICSDate(d, e.endTime)}\n`;
-      }
-      ics += "END:VEVENT\n";
-    });
-
-    ics += "END:VCALENDAR";
-
-    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'unidule-horarios.ics';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast('Archivo .ics generado con éxito. Ábrelo en Google Calendar para importar tus horarios.');
-  };
-
   const handleExportData = () => {
     const dataToExport = {
       version: 1,
@@ -532,11 +462,18 @@ export function Settings() {
             <Calendar size={20} style={{ color: 'var(--primary)' }} /> Sincronización de Calendario
           </h3>
           <p style={{ fontSize: '0.85rem', color: 'var(--text2)', marginBottom: '1rem' }}>
-            Exporta tus horarios de cursada y eventos diarios para verlos en Google Calendar, Apple Calendar o Outlook.
+            Descargá tu horario de cursada, eventos y exámenes en formato iCalendar (.ics) para sincronizarlos con Google Calendar, Apple Calendar u Outlook y recibir notificaciones en tu celular.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <button className="btn btn-primary" onClick={handleExportICS}>
-              Descargar Archivo .ics
+            <button
+              className="btn btn-primary"
+              onClick={async () => {
+                const { exportICS } = await import('../shared/lib/ics');
+                exportICS(subjects, tasks, userEvents);
+                showToast('Archivo .ics generado con éxito.');
+              }}
+            >
+              Exportar Calendario (.ics)
             </button>
           </div>
         </div>
@@ -558,27 +495,6 @@ export function Settings() {
             </button>
             <button className="btn btn-ghost" onClick={handleInputCode}>
               Ingresar Código
-            </button>
-          </div>
-        </div>
-
-        {/* CALENDARIO ICS */}
-        <div className="card" style={{ padding: '1.5rem', borderRadius: '12px' }}>
-          <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Calendar size={20} style={{ color: 'var(--primary)' }} /> Sincronizar Calendario
-          </h3>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text2)', marginBottom: '1rem' }}>
-            Descargá tu horario de cursada, eventos y exámenes (que tengan horario) en formato iCalendar (.ics) para sincronizarlo con Google Calendar o Apple Calendar y recibir notificaciones del sistema en tu celular.
-          </p>
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <button 
-              className="btn btn-outline" 
-              onClick={async () => {
-                const { exportICS } = await import('../shared/lib/ics');
-                exportICS(subjects, tasks, userEvents);
-              }}
-            >
-              Exportar a .ics
             </button>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { useStore } from '../../../shared/store/useStore';
 import type { Subject } from '../../../shared/types';
 import { getComputedStatus } from '../lib/utils';
+import { getCriticalPath, getNextSemesterRecommendations } from '../lib/recommender';
 
 const CM = { NW: 156, NH: 48, HGAP: 32, VGAP: 14, HEADER: 72, M: 16 };
 const COL_W = CM.NW + CM.HGAP;
@@ -19,7 +20,15 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
 
   const [transform, setTransform] = useState({ x: 0, y: 0, s: 0.72 });
   const [hoverId, setHoverId] = useState<string | null>(null);
+  const [highlightMode, setHighlightMode] = useState<'none' | 'nextSemester' | 'criticalPath'>('none');
   const svgRef = useRef<SVGSVGElement>(null);
+
+  const criticalPath = useMemo(() => getCriticalPath(subjects), [subjects]);
+  const nextSemesterRecs = useMemo(() => getNextSemesterRecommendations(subjects, 6), [subjects]);
+  const nextSemesterSet = useMemo(
+    () => new Set(nextSemesterRecs.map((r) => r.subject.id)),
+    [nextSemesterRecs]
+  );
 
   // --- Pan and Zoom logic ---
   useEffect(() => {
@@ -226,6 +235,52 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
         >
           Centrar Mapa
         </button>
+        <button
+          className={`btn btn-sm ${highlightMode === 'nextSemester' ? 'btn-primary' : 'btn-ghost'}`}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '12px',
+            cursor: 'pointer',
+            ...(highlightMode === 'nextSemester'
+              ? {
+                  background: 'color-mix(in srgb, var(--primary) 20%, transparent)',
+                  color: 'var(--primary)',
+                  border: '1.5px solid var(--primary)',
+                  fontWeight: 800,
+                }
+              : {}),
+          }}
+          onClick={() =>
+            setHighlightMode((prev) => (prev === 'nextSemester' ? 'none' : 'nextSemester'))
+          }
+        >
+          Próximo Semestre ({nextSemesterSet.size})
+        </button>
+        <button
+          className={`btn btn-sm ${highlightMode === 'criticalPath' ? 'btn-primary' : 'btn-ghost'}`}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '12px',
+            cursor: 'pointer',
+            ...(highlightMode === 'criticalPath'
+              ? {
+                  background: 'color-mix(in srgb, var(--primary) 20%, transparent)',
+                  color: 'var(--primary)',
+                  border: '1.5px solid var(--primary)',
+                  fontWeight: 800,
+                }
+              : {}),
+          }}
+          onClick={() =>
+            setHighlightMode((prev) => (prev === 'criticalPath' ? 'none' : 'criticalPath'))
+          }
+        >
+          Camino Crítico
+        </button>
         <div
           style={{
             marginLeft: 'auto',
@@ -233,8 +288,37 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
             gap: '12px',
             fontSize: '11px',
             fontWeight: 600,
+            alignItems: 'center',
           }}
         >
+          {highlightMode === 'nextSemester' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--primary)', fontWeight: 700 }}>
+              <div
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  background: 'var(--primary)',
+                  borderRadius: '2px',
+                  boxShadow: '0 0 6px var(--primary)',
+                }}
+              />
+              Próximo Semestre ({nextSemesterSet.size})
+            </div>
+          )}
+          {highlightMode === 'criticalPath' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--primary)', fontWeight: 700 }}>
+              <div
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  background: 'var(--primary)',
+                  borderRadius: '2px',
+                  boxShadow: '0 0 6px var(--primary)',
+                }}
+              />
+              Camino Crítico
+            </div>
+          )}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <div style={{ width: '10px', height: '10px', background: V.nodeFillDisp }}></div>
             Disponible
@@ -270,8 +354,14 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
             <filter id="node-shadow" x="-15%" y="-15%" width="130%" height="140%">
               <feDropShadow dx="1" dy="3" stdDeviation="3" floodColor={V.shadow} floodOpacity="1" />
             </filter>
+            <filter id="crit-glow" x="-25%" y="-25%" width="150%" height="150%">
+              <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="var(--primary)" floodOpacity="0.8" />
+            </filter>
             <marker id="cm-arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
               <circle cx="3" cy="3" r="2.5" fill={V.edge} />
+            </marker>
+            <marker id="cm-arr-crit" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+              <circle cx="3" cy="3" r="2.5" fill="var(--primary)" />
             </marker>
             <marker id="cm-arr-in" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
               <circle cx="3" cy="3" r="2.5" fill={V.edgeIn} />
@@ -312,6 +402,13 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
                 let opacity = 1;
                 let sw = 1.5;
 
+                const isHighlightEdge =
+                  highlightMode === 'nextSemester'
+                    ? nextSemesterSet.has(tgt.id)
+                    : highlightMode === 'criticalPath'
+                      ? criticalPath.has(srcId) && criticalPath.has(tgt.id)
+                      : false;
+
                 if (hoverId) {
                   if (tgt.id === hoverId) {
                     stroke = V.edgeIn;
@@ -325,6 +422,15 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
                     sw = 2;
                   } else {
                     opacity = 0.2;
+                  }
+                } else if (highlightMode !== 'none') {
+                  if (isHighlightEdge) {
+                    stroke = 'var(--primary)';
+                    marker = 'url(#cm-arr-crit)';
+                    opacity = 1;
+                    sw = 2.5;
+                  } else {
+                    opacity = 0.15;
                   }
                 }
 
@@ -394,6 +500,10 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
               const short = s.name.length > 20 ? s.name.slice(0, 19) + '…' : s.name;
               const st = getStatusStyle(s);
 
+              const isNextSem = highlightMode === 'nextSemester' && nextSemesterSet.has(s.id);
+              const isCrit = highlightMode === 'criticalPath' && criticalPath.has(s.id);
+              const isHigh = isNextSem || isCrit;
+
               let opacity = 1;
               if (
                 hoverId &&
@@ -402,6 +512,8 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
                 !unlockedByHover.has(s.id)
               ) {
                 opacity = 0.25;
+              } else if (highlightMode !== 'none' && !hoverId && !isHigh) {
+                opacity = 0.35;
               }
 
               return (
@@ -423,15 +535,15 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
                     pointerEvents="none"
                   />
                   <rect
-                    filter="url(#node-shadow)"
+                    filter={isHigh ? 'url(#crit-glow)' : 'url(#node-shadow)'}
                     x={p.x}
                     y={p.y}
                     width={p.w}
                     height={CM.NH}
                     rx={5}
-                    fill={st.bg}
-                    stroke={st.stroke}
-                    strokeWidth={1.5}
+                    fill={isHigh ? 'color-mix(in srgb, var(--primary) 18%, var(--card))' : st.bg}
+                    stroke={isHigh ? 'var(--primary)' : st.stroke}
+                    strokeWidth={isHigh ? 2.5 : 1.5}
                   />
 
                   <line
@@ -469,7 +581,7 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
                     x={cx}
                     y={p.y + 20}
                     textAnchor="middle"
-                    fill={st.text}
+                    fill="var(--text)"
                     fontSize={10}
                     fontWeight={700}
                     fontFamily="'IBM Plex Mono',monospace"
@@ -481,15 +593,19 @@ export function MapTab({ onSelectSubject }: { onSelectSubject: (id: string) => v
                     x={cx}
                     y={p.y + 35}
                     textAnchor="middle"
-                    fill={st.text}
-                    opacity={0.65}
+                    fill={isHigh ? 'var(--primary)' : st.text}
+                    opacity={isHigh ? 1 : 0.65}
                     fontSize={7.5}
-                    fontWeight={600}
+                    fontWeight={isHigh ? 900 : 600}
                     fontFamily="'IBM Plex Mono',monospace"
                     letterSpacing="0.12em"
                     pointerEvents="none"
                   >
-                    {st.label}
+                    {isNextSem
+                      ? 'PRÓXIMO SEMESTRE'
+                      : isCrit
+                        ? `CRÍTICO · ${st.label}`
+                        : st.label}
                   </text>
                 </g>
               );
